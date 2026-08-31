@@ -6,12 +6,14 @@ on:
       - 'server.js'
       - 'package.json'
       - 'js/ai-tutor-*.js'
+      - 'scripts/validate-tutor-server.mjs'
       - '.github/workflows/tutor-backend.yml'
   pull_request:
     paths:
       - 'server.js'
       - 'package.json'
       - 'js/ai-tutor-*.js'
+      - 'scripts/validate-tutor-server.mjs'
       - '.github/workflows/tutor-backend.yml'
 
 jobs:
@@ -33,3 +35,5 @@ jobs:
         run: node --check js/ai-tutor-client.js
       - name: Validate tutor bridge syntax
         run: node --check js/ai-tutor-bridge.js
+      - name: Validate tutor server startup and health endpoint
+        run: node scripts/validate-tutor-server.mjs
