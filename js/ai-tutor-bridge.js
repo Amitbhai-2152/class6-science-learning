@@ -16,31 +16,32 @@
         const answer=await AI.ask({messages:T.__history,subject:ctx.subject,chapter:ctx.chapter,section:ctx.section});
         T.__history.push({role:'assistant',content:answer});pushScience(answer,'bot');
       }catch(err){
-        // Keep the local tutor as a graceful offline fallback.
         T.__history.pop();const local=T.reply?.(q);if(local)pushScience(local,'bot');else pushScience('AI Tutor से अभी connection नहीं हो पाया। बाद में फिर कोशिश करें।','bot');
       }finally{T.setTyping?.(false)}
     };
   }
 
   function mathHistory(){return window.__mathsAIHistory||(window.__mathsAIHistory=[])}
+  function activeMathsChapter(){
+    const chapters=[1,2,3,4,5,6,7,8].map(n=>window['mathsChapter0'+n]).filter(Boolean);
+    const fromUrl=Number(new URLSearchParams(location.search).get('chapter'))||1;
+    return chapters.find(c=>Number(c.id)===fromUrl)||chapters[0]||null;
+  }
   function replaceMaths(){
     const M=window.MathsTutor;if(!M||M.__aiBound)return;
     M.__aiBound=true;
     const originalAsk=M.ask.bind(M);
     M.ask=async function(q){
       const text=String(q||'').trim();if(!text)return;
-      const w=document.getElementById('mathsTutor');M.open?.();const msgs=w?.querySelector('.mt-msgs');if(!msgs){return originalAsk(q)}
+      const w=document.getElementById('mathsTutor');M.open?.();const msgs=w?.querySelector('.mt-msgs');if(!msgs)return originalAsk(q);
       const user=document.createElement('div');user.className='mt-user';user.textContent=text;msgs.appendChild(user);msgs.scrollTop=msgs.scrollHeight;
-      const chapters=[1,2,3,4,5,6,7,8].map(n=>window['mathsChapter0'+n]).filter(Boolean);
-      const active=chapters[0];
+      const active=activeMathsChapter();
       const history=mathHistory();history.push({role:'user',content:text});
       try{
         const answer=await AI.ask({messages:history,subject:'Mathematics',chapter:active?.title||'',section:''});
         history.push({role:'assistant',content:answer});
         const bot=document.createElement('div');bot.className='mt-bot';bot.textContent=answer;msgs.appendChild(bot);msgs.scrollTop=msgs.scrollHeight;
-      }catch(err){
-        history.pop();originalAsk(q);
-      }
+      }catch(err){history.pop();originalAsk(q)}
     };
   }
 
