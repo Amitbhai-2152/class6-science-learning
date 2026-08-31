@@ -24,8 +24,8 @@ This file is the project queue. When the user says `next`, continue with the fir
 
 ## Phase 3 — Mathematics
 - [x] Create `subjects/maths/` modular architecture
-- [ ] Add Class 6 NCERT Maths chapter files
-- [ ] Build step-by-step solution engine
+- [x] Add Class 6 NCERT Maths chapter files
+- [x] Build step-by-step solution engine
 - [ ] Add hint system and mistake analysis
 - [ ] Add Maths quiz/CBT engine
 - [ ] Add Maths tutor
