@@ -15,7 +15,7 @@ This file is the project queue. When the user says `next`, continue with the fir
 ## Phase 2 — Science quality upgrades
 - [x] Connect real diagrams to relevant chapter sections
 - [x] Add more chapter-specific SVG/illustrations
-- [ ] Add interactive mini activities/simulations
+- [x] Add interactive mini activities/simulations
 - [ ] Improve tutor to use chapter content more deeply
 - [ ] Add spaced-revision / weak-topic recommendations
 - [ ] Add a full 12-chapter Science test mode
