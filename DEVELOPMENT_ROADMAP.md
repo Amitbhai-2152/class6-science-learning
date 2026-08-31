@@ -28,7 +28,7 @@ This file is the project queue. When the user says `next`, continue with the fir
 - [x] Build step-by-step solution engine
 - [x] Add hint system and mistake analysis
 - [x] Add Maths quiz/CBT engine
-- [ ] Add Maths tutor
+- [x] Add Maths tutor
 - [ ] Connect Maths progress/XP to shared learner dashboard
 
 ## Phase 4 — English Grammar & Translation
