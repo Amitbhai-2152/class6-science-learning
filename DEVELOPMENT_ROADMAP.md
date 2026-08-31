@@ -23,7 +23,7 @@ This file is the project queue. When the user says `next`, continue with the fir
 - [x] Run a full bug/accessibility/mobile audit
 
 ## Phase 3 — Mathematics
-- [ ] Create `subjects/maths/` modular architecture
+- [x] Create `subjects/maths/` modular architecture
 - [ ] Add Class 6 NCERT Maths chapter files
 - [ ] Build step-by-step solution engine
 - [ ] Add hint system and mistake analysis
