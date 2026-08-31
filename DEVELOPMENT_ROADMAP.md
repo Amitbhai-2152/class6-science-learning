@@ -13,7 +13,7 @@ This file is the project queue. When the user says `next`, continue with the fir
 - [x] Interactive visual cards and SVG diagram foundation
 
 ## Phase 2 — Science quality upgrades
-- [ ] Connect real diagrams to relevant chapter sections
+- [x] Connect real diagrams to relevant chapter sections
 - [ ] Add more chapter-specific SVG/illustrations
 - [ ] Add interactive mini activities/simulations
 - [ ] Improve tutor to use chapter content more deeply
