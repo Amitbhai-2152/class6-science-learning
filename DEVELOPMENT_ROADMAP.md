@@ -19,7 +19,7 @@ This file is the project queue. When the user says `next`, continue with the fir
 - [x] Improve tutor to use chapter content more deeply
 - [x] Add spaced-revision / weak-topic recommendations
 - [x] Add a full 12-chapter Science test mode
-- [ ] Add 2-hour CBT mode with timer, marks, review and final report
+- [x] Add 2-hour CBT mode with timer, marks, review and final report
 - [ ] Run a full bug/accessibility/mobile audit
 
 ## Phase 3 — Mathematics
