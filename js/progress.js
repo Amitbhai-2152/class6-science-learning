@@ -3,7 +3,7 @@ const Progress={
  load(){try{const d=JSON.parse(localStorage.getItem(this.key)||'null');if(d&&Array.isArray(d.completed)&&d.best&&typeof d.best==='object')return {...d,section:d.section&&typeof d.section==='object'?d.section:{},history:Array.isArray(d.history)?d.history:[],xp:Number(d.xp)||0,badges:Array.isArray(d.badges)?d.badges:[],streak:Number(d.streak)||0,lastActive:d.lastActive||null}}catch(e){}return {completed:[],best:{},section:{},history:[],xp:0,badges:[],streak:0,lastActive:null}},
  init(){this.data=this.load()},
  markActive(){const today=new Date();const key=today.toISOString().slice(0,10);if(this.data.lastActive===key)return;const prev=new Date(today);prev.setDate(prev.getDate()-1);const pkey=prev.toISOString().slice(0,10);this.data.streak=this.data.lastActive===pkey?Math.max(1,this.data.streak+1):1;this.data.lastActive=key;this.save()},
- addXP(points){this.markActive();this.data.xp=Math.max(0,this.data.xp+Math.max(0,Number(points)||0));this.evaluateBadges();this.save()},
+ addXP(points){this.markActive();const p=Math.max(0,Number(points)||0);this.data.xp=Math.max(0,this.data.xp+p);this.evaluateBadges();this.save();window.dispatchEvent(new CustomEvent('science:xp',{detail:{points:p,total:this.data.xp}}))},
  complete(id){id=Number(id);this.markActive();if(!this.data.completed.includes(id))this.data.completed.push(id);this.data.completed.sort((a,b)=>a-b);this.addXP(50);this.save()},
  setBest(id,s){id=Number(id);s=Math.max(0,Math.min(100,Number(s)||0));this.data.best[id]=Math.max(Number(this.data.best[id]||0),s);this.save()},
  setSection(id,part){id=Number(id);part=Math.max(0,Number(part)||0);this.data.section[id]=part;this.save()},
