@@ -1,130 +1,14 @@
-<!doctype html>
-<html lang="hi">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#20252b">
-<title>Study • कक्षा 6 Learning</title>
-<link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/homepage.css">
-<link rel="stylesheet" href="css/activities.css">
-<link rel="stylesheet" href="css/exam-review.css">
-</head>
-<body>
-<div id="homeView" class="view">
-  <div class="study-top">
-    <div class="study-brand">Study</div>
-    <div class="study-stats">
-      <div class="study-stat" aria-label="Learning rewards">🎁</div>
-      <div class="study-stat"><span class="study-icon">🔥</span><span id="streakMini">0</span></div>
-      <div class="study-stat"><span class="study-icon">⚡</span><span id="xpMini">0 XP</span></div>
-      <div class="study-avatar" aria-hidden="true">A</div>
-      <button id="themeBtn" class="study-stat" aria-label="थीम बदलें">🌙</button>
-      <button id="progressBtn" class="study-stat" aria-label="प्रगति देखें">📊</button>
-    </div>
-  </div>
-
-  <main class="home-wrap">
-    <section class="batch-banner">
-      <div class="batch-copy">
-        <div class="batch-label">YOUR LEARNING SPACE</div>
-        <h1 class="batch-title">कक्षा 6 • Complete Learning</h1>
-        <p class="batch-sub">Science + Maths • Concepts, Practice, Tests &amp; Revision</p>
-      </div>
-      <div class="batch-actions">
-        <button class="batch-button" onclick="openRevision()">Revision Plan ↗</button>
-        <button class="batch-menu" aria-label="More options">⋮</button>
-      </div>
-    </section>
-
-    <div class="study-content">
-      <section class="study-section">
-        <div class="study-section-head">
-          <div><h2>Quick Access</h2><p>जो काम अभी करना है, सीधे वहीं जाओ।</p></div>
-        </div>
-        <div class="offer-grid">
-          <button class="offer-card" onclick="openChapter(1)"><span class="offer-icon">▶️</span><span class="offer-copy"><strong>All Classes</strong><small>12 Science chapters और chapter-wise learning</small></span><span class="offer-arrow">›</span></button>
-          <a class="offer-card" href="subjects/maths/maths-exam.html"><span class="offer-icon">🔢</span><span class="offer-copy"><strong>Maths</strong><small>8 chapters • Practice + CBT</small></span><span class="offer-arrow">›</span></a>
-          <button class="offer-card" onclick="toggleChat()"><span class="offer-icon">❓</span><span class="offer-copy"><strong>My Doubts</strong><small>Science Tutor से question पूछो</small></span><span class="offer-arrow">›</span></button>
-          <button class="offer-card" onclick="openRevision()"><span class="offer-icon">📚</span><span class="offer-copy"><strong>Revision</strong><small>आज क्या पढ़ना है, priority के साथ</small></span><span class="offer-arrow">›</span></button>
-          <button class="offer-card" onclick="openProgress()"><span class="offer-icon gold">📊</span><span class="offer-copy"><strong>My Progress</strong><small>Scores, mastery, attempts और XP</small></span><span class="offer-arrow">›</span></button>
-          <a class="offer-card" href="subjects/maths/maths-exam.html"><span class="offer-icon">📝</span><span class="offer-copy"><strong>All Tests</strong><small>Science + Maths exam centers</small></span><span class="offer-arrow">›</span></a>
-          <button class="offer-card" onclick="openChapter(1)"><span class="offer-icon">📖</span><span class="offer-copy"><strong>Digital Books</strong><small>Chapter-wise reading experience</small></span><span class="offer-arrow">›</span></button>
-          <button class="offer-card" onclick="openChapter(1)"><span class="offer-icon gold">🎯</span><span class="offer-copy"><strong>Practice</strong><small>Concept के बाद challenge questions</small></span><span class="offer-arrow">›</span></button>
-        </div>
-      </section>
-
-      <section class="study-section">
-        <div class="study-section-head">
-          <div><h2>Subjects</h2><p>अपने subject के learning path में जाओ।</p></div>
-        </div>
-        <div class="subject-grid">
-          <button class="subject-card science" onclick="openChapter(1)"><div class="subject-icon">🔬</div><h3>Science</h3><p>12 chapters • Visuals • Activities • Tutor • Test</p><span class="subject-badge">Continue learning →</span></button>
-          <a class="subject-card maths" href="subjects/maths/maths-exam.html"><div class="subject-icon">➗</div><h3>Mathematics</h3><p>8 chapters • Step solutions • Hints • CBT</p><span class="subject-badge">Open Maths →</span></a>
-          <button class="subject-card english" onclick="alert('English Grammar & Translation अगला subject phase है।')"><div class="subject-icon">🇬🇧</div><h3>English</h3><p>Grammar • Translation • Error correction • Tests</p><span class="subject-badge">Coming next</span></button>
-          <button class="subject-card coming" onclick="alert('Hindi और GK अगले phases में जुड़ेंगे।')"><div class="subject-icon">🌱</div><h3>Hindi + GK</h3><p>Paragraph • Grammar • Thinking • Reasoning</p><span class="subject-badge">Coming next</span></button>
-        </div>
-      </section>
-
-      <section class="study-section">
-        <div class="study-section-head">
-          <div><h2>Continue Learning</h2><p>जहाँ छोड़ा था, वहीं से वापस शुरू करो।</p></div>
-          <button class="view-all" onclick="openChapter(1)">View ›</button>
-        </div>
-        <div class="continue-shell">
-          <div class="continue-card">
-            <div class="continue-head"><div><div class="continue-label">CURRENT PATH</div><h3 id="continueTitle">Science</h3></div><span id="continuePercent" class="tag">0%</span></div>
-            <p id="continueMeta" class="continue-label">अध्याय 1 से शुरुआत करो</p>
-            <div class="continue-progress"><i id="continueBar"></i></div>
-            <div class="continue-meta"><span>Science progress</span><b id="homeSciencePct">0%</b></div>
-            <div class="continue-actions"><button class="home-btn primary" onclick="openChapter(1)">Continue →</button><button class="home-btn soft" onclick="openRevision()">Revise</button></div>
-          </div>
-          <div class="progress-card">
-            <h3>Overall Progress</h3>
-            <div class="mini-subject-progress">
-              <div class="mini-progress-row"><div><span>🔬 Science</span><span id="homeSciencePct2">0%</span></div><div class="mini-progress-track"><i id="homeScienceBar"></i></div></div>
-              <div class="mini-progress-row"><div><span>➗ Maths</span><span id="homeMathsPct">0%</span></div><div class="mini-progress-track maths"><i id="homeMathsBar"></i></div></div>
-            </div>
-            <div class="continue-actions"><span class="tag">⚡ <b id="homeTotalXP">0</b> XP</span><span class="tag">🔥 <b id="homeStreak">0</b> days</span></div>
-          </div>
-        </div>
-      </section>
-
-      <section class="study-section">
-        <div class="study-section-head"><div><h2>Test Center</h2><p>Practice और exam दोनों एक जगह।</p></div></div>
-        <div class="test-grid">
-          <article class="test-card"><div class="test-icon">📝</div><h3>Science Practice</h3><p>48 questions • detailed answer review</p><button onclick="FullScienceTest.start(4)">Start Test →</button></article>
-          <article class="test-card"><div class="test-icon">⏱️</div><h3>Science CBT</h3><p>120 minutes • candidate details • review</p><button onclick="ScienceCBT.open()">Start CBT →</button></article>
-          <article class="test-card"><div class="test-icon">➗</div><h3>Maths Tests</h3><p>Practice + 2-hour Maths CBT</p><a href="subjects/maths/maths-exam.html">Open Center →</a></article>
-        </div>
-      </section>
-
-      <section class="study-section">
-        <div class="study-section-head"><div><h2>Science Chapters</h2><p>Chapter-wise learning, now neatly organized.</p></div></div>
-        <div class="home-chapter-section"><div id="chapterGrid" class="chapter-grid home-chapters"></div></div>
-      </section>
-
-      <section class="study-section">
-        <div class="study-section-head"><div><h2>Learning Rewards</h2><p>XP, streak और badges सीखने के साथ बढ़ते हैं।</p></div></div>
-        <div class="continue-card"><div class="reward-stats"><div><b id="xpHome">0</b><span>XP</span></div><div><b id="streakHome">0</b><span>Day streak</span></div><div><b id="badgeHome">0</b><span>Badges</span></div></div><div id="badgeStrip" class="badge-strip"></div></div>
-      </section>
-
-      <div aria-hidden="true" style="display:none"><span id="progressPercent">0%</span><span id="progressText"></span><span id="homeProgress"></span></div>
-    </div>
-  </main>
-</div>
-
+<!doctype html><html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#20252b"><title>Study • कक्षा 6</title><link rel="stylesheet" href="css/style.css"><link rel="stylesheet" href="css/home.css"><link rel="stylesheet" href="css/activities.css"><link rel="stylesheet" href="css/exam-review.css"></head><body>
+<section id="homeView" class="view"><header class="home-nav"><div class="home-brand">Study • कक्षा 6</div><div class="home-actions"><span class="home-stat">🔥 <span id="streakMini">0</span></span><span class="home-stat">⚡ <span id="xpMini">0 XP</span></span><span class="home-avatar" aria-hidden="true">A</span><button id="themeBtn" class="home-theme" aria-label="थीम बदलें">🌙</button><button id="progressBtn" class="home-progress-btn" aria-label="प्रगति देखें">📊</button></div></header>
+<main class="home-shell"><section class="home-hero"><div><div class="home-kicker">CLASS 6 • LEARNING HUB</div><h1>पढ़ो • समझो • Practice करो • बेहतर बनो</h1><p>सभी learning categories एक साफ और व्यवस्थित जगह पर।</p></div><button class="home-hero-btn" type="button" onclick="openRevision()">Revision Plan ↗</button></section>
+<section class="home-section"><div class="home-head"><div><h2>Batch Offerings</h2><p>हर सुविधा अपनी सही category में।</p></div></div><div class="home-offers"><a class="home-offer" href="subjects/all-classes.html"><span class="home-offer-icon">🎓</span><span class="home-offer-copy"><strong>All Classes</strong><small>Science, Maths, English, Hindi और GK</small></span><span class="home-arrow">›</span></a><a class="home-offer" href="tests/index.html"><span class="home-offer-icon">📝</span><span class="home-offer-copy"><strong>All Tests</strong><small>Practice tests और CBT</small></span><span class="home-arrow">›</span></a><button class="home-offer" type="button" onclick="openRevision()"><span class="home-offer-icon">🔁</span><span class="home-offer-copy"><strong>Revision</strong><small>Weak topics और due revision</small></span><span class="home-arrow">›</span></button><button class="home-offer" type="button" onclick="openProgress()"><span class="home-offer-icon">📊</span><span class="home-offer-copy"><strong>My Progress</strong><small>Mastery, scores, attempts और XP</small></span><span class="home-arrow">›</span></button></div></section>
+<section class="home-section"><div class="home-head"><div><h2>Continue Learning</h2><p>जहाँ छोड़ा था, वहीं से पढ़ाई जारी रखो।</p></div></div><div class="home-continue"><div class="home-card"><div class="home-row"><div><div class="home-label">CURRENT PATH</div><h3 id="continueTitle">Science</h3></div><span id="continuePercent" class="tag">0%</span></div><p id="continueMeta" class="home-label">अध्याय 1 से शुरुआत करो</p><div class="home-progress"><i id="continueBar"></i></div><div class="home-meta"><span>Current subject progress</span><b id="homeSciencePct">0%</b></div><div class="home-buttons"><button class="home-btn primary" type="button" onclick="openChapter(Math.max(1,Number(window.currentChapter)||1))">Continue →</button><button class="home-btn soft" type="button" onclick="openRevision()">Revise</button></div></div><div class="home-card"><h3>Overall Progress</h3><div class="home-bar-row"><div class="home-bar-top"><span>🔬 Science</span><span id="homeSciencePct2">0%</span></div><div class="home-bar"><i id="homeScienceBar"></i></div></div><div class="home-bar-row"><div class="home-bar-top"><span>➗ Maths</span><span id="homeMathsPct">0%</span></div><div class="home-bar maths"><i id="homeMathsBar"></i></div></div><div class="home-mini-stats"><div><b id="homeTotalXP">0</b><span>XP</span></div><div><b id="homeStreak">0</b><span>Streak</span></div><div><b id="badgeHome">0</b><span>Badges</span></div></div></div></div></section>
+<div class="home-notice">💡 <b>Tip:</b> Subjects के लिए <b>All Classes</b> और exams के लिए <b>All Tests</b> खोलें।</div><div aria-hidden="true" style="display:none"><div id="chapterGrid"></div><span id="progressPercent">0%</span><span id="progressText"></span><span id="homeProgress"></span><div id="badgeStrip"></div><span id="xpHomeLegacy">0</span><span id="streakHomeLegacy">0</span></div></main></section>
 <section id="lessonView" class="view hidden"><button class="btn soft" onclick="goHome()">← सभी chapters</button><div class="lesson-layout"><aside class="card side"><h3>📑 Chapter Navigator</h3><div id="chapterNav" class="toc"></div></aside><section><div class="card lesson-head"><div><span class="tag" id="chapterTag"></span><h1 id="chapterTitle"></h1><p id="chapterGoal" class="muted"></p></div><span id="chapterIcon" class="chapter-icon-large"></span></div><div class="progress"><i id="lessonProgress"></i></div><article id="lessonContent" class="card"></article></section></div></section>
 <section id="revisionView" class="view hidden"><button class="btn soft" onclick="goHome()">← वापस</button><div class="card lesson-head"><span class="tag">QUICK REVISION</span><h1>⚡ 5-Minute Revision</h1><p class="muted">आज क्या पढ़ना है, system के अनुसार priority देखें।</p><div id="revisionPlan" class="revision-plan"></div></div><div id="revisionContent" class="card"></div></section>
 <section id="progressView" class="view hidden"><button class="btn soft" onclick="goHome()">← वापस</button><div class="card lesson-head"><span class="tag">MY PROGRESS</span><h1>📊 मेरी संयुक्त Progress</h1><p class="muted">Science और Maths दोनों की learning progress एक जगह देखें।</p></div><div id="progressContent" class="card"></div></section>
 <section id="fullTestView" class="view hidden"><button class="btn soft" onclick="FullScienceTest.cancel()">← Test छोड़ें</button><div class="card test-head"><div><span class="tag">FULL SCIENCE TEST</span><h1>📝 12-Chapter Challenge</h1><p class="muted">48 questions • 1 mark/question • No negative marking</p></div><div id="fullTimer" class="test-timer">--:--</div></div><div class="progress"><i id="fullTestProgress"></i></div><div class="test-meta"><b id="fullTestCounter">प्रश्न 0 / 48</b><span id="fullTestChapter">Chapter</span></div><div id="fullTestContent" class="card"></div></section>
 <section id="cbtView" class="view hidden"><button class="btn soft" onclick="ScienceCBT.cancel()">← Home</button><div id="cbtContent" class="card"></div></section>
-
-<div id="chatWrap" class="chat-wrap hidden"><div class="chat"><div class="chat-head"><div><b>🤖 Science Tutor</b><small id="chatContext">Current chapter</small></div><button aria-label="Close chat" onclick="toggleChat()">×</button></div><div id="quickActions" class="quick-actions"><button onclick="tutorQuick('explain')">💡 आसान</button><button onclick="tutorQuick('example')">🌍 Example</button><button onclick="tutorQuick('hint')">🧩 Hint</button><button onclick="tutorQuick('quiz')">🎯 Quiz me</button><button onclick="tutorQuick('exam')">📝 Exam tip</button></div><div id="messages" class="messages"><div class="msg bot">नमस्ते! 😊 जिस chapter में हो, उसी से सवाल पूछो। जैसे: “खाना कैसे पचता है? flow chart से समझाओ”</div></div><div id="typing" class="typing hidden"><span></span><span></span><span></span><em>विज्ञान साथी सोच रहा है…</em></div><div class="chat-input"><input id="chatInput" autocomplete="off" placeholder="जैसे: खाना कैसे पचता है? flow chart से समझाओ"><button onclick="sendMessage()">भेजें</button></div></div></div>
-<button class="chat-fab" onclick="toggleChat()" aria-label="Science Tutor खोलें">💬</button>
-<div id="badgeModal" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-card"><div id="badgeIcon" class="unlock-icon">🏆</div><span class="tag">BADGE UNLOCKED</span><h2 id="badgeTitle">नई उपलब्धि!</h2><p id="badgeText" class="muted">अच्छा काम!</p><button class="btn primary full" onclick="closeBadgeModal()">आगे बढ़ें 🚀</button></div></div>
-
-<script src="chapters/chapter-01.js"></script><script src="chapters/chapter-02.js"></script><script src="chapters/chapter-03.js"></script><script src="chapters/chapter-04.js"></script><script src="chapters/chapter-05.js"></script><script src="chapters/chapter-06.js"></script><script src="chapters/chapter-07.js"></script><script src="chapters/chapter-08.js"></script><script src="chapters/chapter-09.js"></script><script src="chapters/chapter-10.js"></script><script src="chapters/chapter-11.js"></script><script src="chapters/chapter-12.js"></script>
-<script src="js/tutor-knowledge.js"></script><script src="js/progress.js"></script><script src="js/quiz-engine.js"></script><script src="js/activities.js"></script><script src="js/revision-engine.js"></script><script src="js/full-test.js"></script><script src="js/science-cbt.js"></script><script src="js/test-review.js"></script><script src="js/tutor.js"></script><script src="js/shared-progress.js"></script><script src="js/home-dashboard.js"></script><script src="js/app.js"></script>
-</body>
-</html>
+<div id="chatWrap" class="chat-wrap hidden"><div class="chat"><div class="chat-head"><div><b>🤖 Science Tutor</b><small id="chatContext">Current chapter</small></div><button aria-label="Close chat" onclick="toggleChat()">×</button></div><div id="quickActions" class="quick-actions"><button onclick="tutorQuick('explain')">💡 आसान</button><button onclick="tutorQuick('example')">🌍 Example</button><button onclick="tutorQuick('hint')">🧩 Hint</button><button onclick="tutorQuick('quiz')">🎯 Quiz me</button><button onclick="tutorQuick('exam')">📝 Exam tip</button></div><div id="messages" class="messages"><div class="msg bot">नमस्ते! 😊 जिस chapter में हो, उसी से सवाल पूछो।</div></div><div id="typing" class="typing hidden"><span></span><span></span><span></span><em>विज्ञान साथी सोच रहा है…</em></div><div class="chat-input"><input id="chatInput" autocomplete="off" placeholder="अपना सवाल लिखें"><button onclick="sendMessage()">भेजें</button></div></div></div><button class="chat-fab" onclick="toggleChat()" aria-label="Science Tutor खोलें">💬</button><div id="badgeModal" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-card"><div id="badgeIcon" class="unlock-icon">🏆</div><span class="tag">BADGE UNLOCKED</span><h2 id="badgeTitle">नई उपलब्धि!</h2><p id="badgeText" class="muted">अच्छा काम!</p><button class="btn primary full" onclick="closeBadgeModal()">आगे बढ़ें 🚀</button></div></div>
+<script src="chapters/chapter-01.js"></script><script src="chapters/chapter-02.js"></script><script src="chapters/chapter-03.js"></script><script src="chapters/chapter-04.js"></script><script src="chapters/chapter-05.js"></script><script src="chapters/chapter-06.js"></script><script src="chapters/chapter-07.js"></script><script src="chapters/chapter-08.js"></script><script src="chapters/chapter-09.js"></script><script src="chapters/chapter-10.js"></script><script src="chapters/chapter-11.js"></script><script src="chapters/chapter-12.js"></script><script src="js/tutor-knowledge.js"></script><script src="js/progress.js"></script><script src="js/quiz-engine.js"></script><script src="js/activities.js"></script><script src="js/revision-engine.js"></script><script src="js/full-test.js"></script><script src="js/science-cbt.js"></script><script src="js/test-review.js"></script><script src="js/tutor.js"></script><script src="js/shared-progress.js"></script><script src="js/app.js"></script>
+</body></html>
