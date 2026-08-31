@@ -20,7 +20,7 @@ This file is the project queue. When the user says `next`, continue with the fir
 - [x] Add spaced-revision / weak-topic recommendations
 - [x] Add a full 12-chapter Science test mode
 - [x] Add 2-hour CBT mode with timer, marks, review and final report
-- [ ] Run a full bug/accessibility/mobile audit
+- [x] Run a full bug/accessibility/mobile audit
 
 ## Phase 3 — Mathematics
 - [ ] Create `subjects/maths/` modular architecture
