@@ -1,0 +1,35 @@
+name: Tutor Backend Check
+
+on:
+  push:
+    paths:
+      - 'server.js'
+      - 'package.json'
+      - 'js/ai-tutor-*.js'
+      - '.github/workflows/tutor-backend.yml'
+  pull_request:
+    paths:
+      - 'server.js'
+      - 'package.json'
+      - 'js/ai-tutor-*.js'
+      - '.github/workflows/tutor-backend.yml'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm install
+      - name: Validate server syntax
+        run: node --check server.js
+      - name: Validate tutor client syntax
+        run: node --check js/ai-tutor-client.js
+      - name: Validate tutor bridge syntax
+        run: node --check js/ai-tutor-bridge.js
