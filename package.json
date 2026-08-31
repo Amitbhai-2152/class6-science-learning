@@ -1,0 +1,12 @@
+{
+  "name": "class6-science-learning-tutor",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "openai": "^5.12.2"
+  }
+}
