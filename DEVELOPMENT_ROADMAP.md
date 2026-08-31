@@ -17,7 +17,7 @@ This file is the project queue. When the user says `next`, continue with the fir
 - [x] Add more chapter-specific SVG/illustrations
 - [x] Add interactive mini activities/simulations
 - [x] Improve tutor to use chapter content more deeply
-- [ ] Add spaced-revision / weak-topic recommendations
+- [x] Add spaced-revision / weak-topic recommendations
 - [ ] Add a full 12-chapter Science test mode
 - [ ] Add 2-hour CBT mode with timer, marks, review and final report
 - [ ] Run a full bug/accessibility/mobile audit
