@@ -26,7 +26,7 @@ This file is the project queue. When the user says `next`, continue with the fir
 - [x] Create `subjects/maths/` modular architecture
 - [x] Add Class 6 NCERT Maths chapter files
 - [x] Build step-by-step solution engine
-- [ ] Add hint system and mistake analysis
+- [x] Add hint system and mistake analysis
 - [ ] Add Maths quiz/CBT engine
 - [ ] Add Maths tutor
 - [ ] Connect Maths progress/XP to shared learner dashboard
