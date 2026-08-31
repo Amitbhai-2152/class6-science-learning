@@ -1,22 +1,22 @@
 const Progress={
- key:'class6ScienceProgressV7',data:null,
+ key:'class6ScienceProgressV8',data:null,
  load(){try{const d=JSON.parse(localStorage.getItem(this.key)||'null');if(d&&Array.isArray(d.completed)&&d.best&&typeof d.best==='object')return {...d,section:d.section&&typeof d.section==='object'?d.section:{},history:Array.isArray(d.history)?d.history:[],xp:Number(d.xp)||0,badges:Array.isArray(d.badges)?d.badges:[],streak:Number(d.streak)||0,lastActive:d.lastActive||null,review:d.review&&typeof d.review==='object'?d.review:{}}}catch(e){}return {completed:[],best:{},section:{},history:[],xp:0,badges:[],streak:0,lastActive:null,review:{}}},
  init(){this.data=this.load()},
- markActive(){const now=new Date(),key=now.toISOString().slice(0,10);if(this.data.lastActive===key)return;const prev=new Date(now);prev.setDate(prev.getDate()-1);const pkey=prev.toISOString().slice(0,10);this.data.streak=this.data.lastActive===pkey?Math.max(1,this.data.streak+1):1;this.data.lastActive=key;this.save()},
- addXP(points){this.markActive();const p=Math.max(0,Number(points)||0);this.data.xp=Math.max(0,this.data.xp+p);this.evaluateBadges();this.save();window.dispatchEvent(new CustomEvent('science:xp',{detail:{points:p,total:this.data.xp}}))},
- complete(id){id=Number(id);this.markActive();if(!this.data.completed.includes(id))this.data.completed.push(id);this.data.completed.sort((a,b)=>a-b);this.addXP(50);this.scheduleReview(id,1);this.save()},
+ localKey(d=new Date()){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${day}`},
+ markActive(){const now=new Date(),key=this.localKey(now);if(this.data.lastActive===key)return;const prev=new Date(now.getFullYear(),now.getMonth(),now.getDate()-1);const pkey=this.localKey(prev);this.data.streak=this.data.lastActive===pkey?Math.max(1,this.data.streak+1):1;this.data.lastActive=key;this.save()},
+ addXP(points){this.markActive();const p=Math.max(0,Number(points)||0);if(!p)return;this.data.xp+=p;this.evaluateBadges();this.save();window.dispatchEvent(new CustomEvent('science:xp',{detail:{points:p,total:this.data.xp}}))},
+ complete(id){id=Number(id);this.markActive();if(this.data.completed.includes(id))return false;this.data.completed.push(id);this.data.completed.sort((a,b)=>a-b);this.addXP(50);this.scheduleReview(id,1);this.save();return true},
  setBest(id,s){id=Number(id);s=Math.max(0,Math.min(100,Number(s)||0));this.data.best[id]=Math.max(Number(this.data.best[id]||0),s);this.save()},
  setSection(id,part){id=Number(id);part=Math.max(0,Number(part)||0);this.data.section[id]=part;this.save()},
  addAttempt(id,score,total,type='challenge'){id=Number(id);const pct=Math.round(score/Math.max(total,1)*100);this.markActive();this.data.history.unshift({id,score,total,pct,type,time:new Date().toISOString()});this.data.history=this.data.history.slice(0,30);this.data.review[id]=this.data.review[id]||{lastScore:pct,attempts:0,nextAt:null,streak:0};this.data.review[id].lastScore=pct;this.data.review[id].attempts++;this.data.review[id].streak=pct>=85?this.data.review[id].streak+1:0;this.scheduleReview(id,pct>=85?2:0);this.addXP(10+score*2);this.save()},
  scheduleReview(id,level=0){id=Number(id);this.data.review[id]=this.data.review[id]||{lastScore:Number(this.data.best[id]||0),attempts:0,nextAt:null,streak:0};const days=level>=2?7:level===1?3:1;const d=new Date();d.setDate(d.getDate()+days);this.data.review[id].nextAt=d.toISOString()},
  isDue(id){const n=this.data.review?.[Number(id)]?.nextAt;return !n||new Date(n).getTime()<=Date.now()},
- dueChapters(){return Object.entries(this.data.review).filter(([id,r])=>this.isDue(id)).map(([id])=>Number(id)).sort((a,b)=>(this.data.best[a]||0)-(this.data.best[b]||0))},
+ dueChapters(){return Object.entries(this.data.review).filter(([id])=>this.isDue(id)).map(([id])=>Number(id)).sort((a,b)=>(this.data.best[a]||0)-(this.data.best[b]||0))},
  recommendations(limit=3){const rows=[];Object.entries(this.data.review).forEach(([id,r])=>rows.push({id:Number(id),score:Number(r.lastScore||this.data.best[id]||0),due:this.isDue(id),nextAt:r.nextAt||null}));rows.sort((a,b)=>Number(b.due)-Number(a.due)||(a.score-b.score));return rows.slice(0,limit)},
  evaluateBadges(){const add=name=>{if(!this.data.badges.includes(name))this.data.badges.push(name)};if(this.data.xp>=100)add('🌱 First Steps');if(this.data.xp>=300)add('🚀 Science Explorer');if(this.data.completed.length>=1)add('🏅 Chapter Starter');if(this.data.completed.length>=5)add('🔥 Science Streak');if(this.data.completed.length>=12)add('🏆 Science Master');if(this.data.streak>=3)add('⚡ 3-Day Streak')},
  average(){const a=this.data.history;if(!a.length)return 0;return Math.round(a.reduce((s,x)=>s+x.pct,0)/a.length)},
  strongest(){return Object.entries(this.data.best).sort((a,b)=>b[1]-a[1])[0]||null},
  weakest(){const attempted=Object.entries(this.data.best);if(!attempted.length)return null;return attempted.sort((a,b)=>a[1]-b[1])[0]},
  reset(){this.data={completed:[],best:{},section:{},history:[],xp:0,badges:[],streak:0,lastActive:null,review:{}};this.save();localStorage.removeItem('scienceCurrentChapter')},
- save(){localStorage.setItem(this.key,JSON.stringify(this.data))
-}
+ save(){localStorage.setItem(this.key,JSON.stringify(this.data))}
 };Progress.init();
