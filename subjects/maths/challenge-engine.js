@@ -34,12 +34,23 @@ function ChallengeEngine(){
 
   function renderQuestion(){
     const m=mount(); if(!m)return;
-    const q=questions[index]; const current=answers[index]; const done=locked && current!=null; const currentScore=scoreNow();
+    const q=questions[index];
+    if(!q){renderResult();return;}
+    const current=answers[index]; const done=locked && current!=null; const currentScore=scoreNow();
     const pct=Math.round((index+1)/questions.length*100);
     const combo=done?streak():0;
     m.innerHTML=`<div class="mc-top"><div><span class="mc-badge">🎯 CHALLENGE</span><strong>Q${index+1}/${questions.length}</strong></div><div class="mc-score">Score ${currentScore}</div></div><div class="mc-progress"><i style="width:${pct}%"></i></div><article class="mc-question"><div class="mc-qmeta">अध्याय ${q.chapterId??chapter.id} • ${escapeHtml(q.chapterTitle||chapter.title||'')}</div><h3>${escapeHtml(q.question)}</h3><div class="mc-options">${(q.options||[]).map((o,i)=>`<button type="button" class="mc-option ${done&&i===q.answer?'mc-correct':''} ${done&&i===current&&current!==q.answer?'mc-wrong':''} ${current===i?'mc-selected':''}" data-i="${i}" ${done?'disabled':''}><span>${String.fromCharCode(65+i)}</span>${escapeHtml(o)}</button>`).join('')}</div>${done?`<div class="mc-feedback ${current===q.answer?'ok':'bad'}"><b>${current===q.answer?'✅ सही उत्तर!':'❌ यह उत्तर सही नहीं है'}</b><p><b>सही उत्तर:</b> ${escapeHtml(q.options?.[q.answer]??'')}</p><p><b>💡 क्यों?</b> ${escapeHtml(q.explanation||'सही विकल्प दिए गए concept के अनुसार है।')}</p>${q.example?`<p><b>🌍 उदाहरण:</b> ${escapeHtml(q.example)}</p>`:''}${combo>=2?`<div class="mc-combo">🔥 ${combo} correct streak!</div>`:''}</div><button class="mc-primary" id="mcNext">${index===questions.length-1?'Result देखें 🏆':'अगला प्रश्न →'}</button>`:'<p class="mc-hint">पहले अपना answer चुनो—फिर explanation मिलेगा।</p>'}</article>`;
     m.querySelectorAll('.mc-option').forEach(btn=>btn.onclick=()=>choose(Number(btn.dataset.i)));
-    const next=m.querySelector('#mcNext'); if(next)next.onclick=()=>{index++;locked=false;renderQuestion();};
+    const next=m.querySelector('#mcNext');
+    if(next)next.onclick=()=>{
+      if(index===questions.length-1){
+        renderResult();
+      }else{
+        index++;
+        locked=false;
+        renderQuestion();
+      }
+    };
   }
 
   function choose(i){if(locked)return;answers[index]=i;locked=true;renderQuestion();}
