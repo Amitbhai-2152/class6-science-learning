@@ -1,0 +1,22 @@
+window.ENGLISH_ERROR_BANK=[
+{q:'Choose the correct sentence.',o:['She go to school every day.','She goes to school every day.','She going to school every day.','She gone to school every day.'],a:1,e:'“She” is singular, so the simple-present verb is “goes”.'},
+{q:'Choose the correct sentence.',o:['They was late.','They is late.','They were late.','They be late.'],a:2,e:'“They” is plural, so the past form of “be” is “were”.'},
+{q:'Choose the corrected sentence: “I has a pencil.”',o:['I have a pencil.','I has a pencil.','I having a pencil.','I had has a pencil.'],a:0,e:'With “I”, use “have”, not “has”.'},
+{q:'Choose the correct article: “He ate ___ apple.”',o:['a','an','the','no article'],a:1,e:'“Apple” begins with a vowel sound, so use “an”.'},
+{q:'Choose the correct sentence.',o:['Riya is my friend. she is kind.','Riya is my friend. She is kind.','Riya is my friend she is kind.','riya is my friend. She is kind.'],a:1,e:'A new sentence begins with a capital letter, so “She” must be capitalized.'},
+{q:'Choose the correct punctuation.',o:['Where are you.','Where are you!','Where are you?','Where are you,'],a:2,e:'A direct question ends with a question mark.'},
+{q:'Choose the correct sentence.',o:['The books is on the table.','The books are on the table.','The books am on the table.','The books be on the table.'],a:1,e:'“Books” is plural, so use “are”.'},
+{q:'Choose the correct pronoun: “Ravi and Aman are ready. ___ will start now.”',o:['He','It','They','She'],a:2,e:'“Ravi and Aman” refers to two people, so “they” is correct.'},
+{q:'Choose the correct preposition: “The cat is ___ the table.”',o:['on','at','from','to'],a:0,e:'“On the table” correctly shows the cat’s position.'},
+{q:'Choose the correct tense: “We ___ the museum yesterday.”',o:['visit','visited','will visit','visiting'],a:1,e:'“Yesterday” refers to a completed past action, so use “visited”.'},
+{q:'Choose the corrected sentence: “He do not like milk.”',o:['He do not likes milk.','He does not like milk.','He does not likes milk.','He not like milk.'],a:1,e:'With “he”, use “does not” + base verb “like”.'},
+{q:'Choose the correct sentence.',o:['There is two books.','There are two books.','There am two books.','There be two books.'],a:1,e:'“Two books” is plural, so use “there are”.'},
+{q:'Choose the correct word: “She sings ___.”',o:['beautiful','beautifully','beauty','beautify'],a:1,e:'“Beautifully” is an adverb that describes how she sings.'},
+{q:'Choose the corrected sentence: “My brother have a red bag.”',o:['My brother have a red bag.','My brother has a red bag.','My brother having a red bag.','My brother had have a red bag.'],a:1,e:'“My brother” is singular, so use “has”.'},
+{q:'Choose the correct sentence.',o:['I am going to school on Monday.','I am going school on Monday.','I going to school on Monday.','I am go to school on Monday.'],a:0,e:'The present continuous form is “am going”; “to school” needs the preposition “to”.'},
+{q:'Choose the correct word order.',o:['Always I help my mother.','I always help my mother.','I help always my mother.','Help I always my mother.'],a:1,e:'In this sentence, “always” naturally comes before the main verb “help”.'},
+{q:'Choose the corrected sentence: “Delhi is a city in india.”',o:['Delhi is a city in India.','delhi is a city in india.','Delhi is a city in india.','Delhi is a City in India.'],a:0,e:'“Delhi” and “India” are proper nouns and need capital letters.'},
+{q:'Choose the correct sentence.',o:['Me and Riya went home.','Riya and I went home.','Riya and me went home.','I and Riya went home.'],a:1,e:'“Riya and I” is the correct subject form in standard school English.'},
+{q:'Choose the corrected sentence: “The child were playing.”',o:['The child was playing.','The child were playing.','The child are playing.','The child be playing.'],a:0,e:'“Child” is singular, so use “was”.'},
+{q:'Choose the correct sentence.',o:['Can you helps me?','Can you help me?','Can you helping me?','Can you helped me?'],a:1,e:'After the modal “can”, use the base verb “help”.'}
+];
