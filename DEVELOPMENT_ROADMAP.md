@@ -32,7 +32,7 @@ This file is the project queue. When the user says `next`, continue with the fir
 - [x] Connect Maths progress/XP to shared learner dashboard
 
 ## Phase 4 — English Grammar & Translation
-- [ ] Create modular English architecture
+- [x] Create modular English architecture
 - [ ] Grammar lessons with examples
 - [ ] Translation practice
 - [ ] Error correction and answer explanation
