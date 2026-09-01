@@ -1,5 +1,22 @@
 /* Keep the floating AI Tutor control clear of page navigation buttons. */
 .chat-fab{bottom:14px;}
+
+/* On the Science lesson screen, never place the Tutor control at the bottom.
+   The lesson's Back/Next navigation lives near the bottom of the viewport while
+   scrolling, so a fixed bottom FAB can cover it regardless of z-index. */
+#lessonView:not(.hidden) ~ .chat-fab{
+  top:74px;
+  right:14px;
+  bottom:auto;
+  z-index:50;
+}
+#lessonView:not(.hidden) ~ #chatWrap{
+  top:142px;
+  right:14px;
+  bottom:auto;
+  z-index:50;
+}
+
 @media(max-width:580px){
   .chat-fab{right:12px;bottom:82px;}
   .chat-wrap{right:10px;bottom:144px;}
@@ -7,4 +24,14 @@
   #lessonView .nav .btn{position:relative;z-index:71;}
   #lessonView .chat-fab{z-index:50;}
   #lessonView .chat-wrap{z-index:50;}
+  #lessonView:not(.hidden) ~ .chat-fab{
+    top:68px;
+    right:12px;
+    bottom:auto;
+  }
+  #lessonView:not(.hidden) ~ #chatWrap{
+    top:136px;
+    right:10px;
+    bottom:auto;
+  }
 }
