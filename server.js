@@ -3,7 +3,7 @@ import express from "express";
 const app = express();
 const port = Number(process.env.PORT || 3000);
 const host = process.env.HOST || "0.0.0.0";
-const model = process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
+const model = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite";
 const configuredOrigin = String(process.env.ALLOWED_ORIGIN || "").trim();
 const allowedOrigins = new Set([configuredOrigin, "https://amitbhai-2152.github.io"].filter(Boolean));
 const geminiBase = "https://generativelanguage.googleapis.com/v1beta";
@@ -102,7 +102,7 @@ async function callGemini(messages, instructions) {
     body: JSON.stringify({
       systemInstruction: { parts: [{ text: instructions }] },
       contents: geminiContents(messages),
-      generationConfig: { maxOutputTokens: 900, temperature: 0.25 }
+      generationConfig: { maxOutputTokens: 900 }
     })
   });
 
