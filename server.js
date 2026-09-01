@@ -3,6 +3,7 @@ import OpenAI from "openai";
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
+const host = process.env.HOST || "0.0.0.0";
 const model = process.env.OPENAI_MODEL || "gpt-5.6-luna";
 const allowedOrigin = process.env.ALLOWED_ORIGIN || "*";
 
@@ -71,4 +72,4 @@ app.post("/api/tutor", rateLimit, async (req, res) => {
   }
 });
 
-app.listen(port, () => console.log(`Class 6 Tutor API listening on :${port}`));
+app.listen(port, host, () => console.log(`Class 6 Tutor API listening on http://${host}:${port}`));
