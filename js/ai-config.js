@@ -1,2 +1,1 @@
 window.CLASS6_AI_CONFIG=window.CLASS6_AI_CONFIG||{endpoint:"https://class6-science-learning.onrender.com/api/tutor"};
-(function(){function boot(){if(window.Tutor&&window.AITutorClient){if(typeof window.bindDirectAITutor==='function')window.bindDirectAITutor();else if(!document.querySelector('script[data-direct-ai-tutor]')){const s=document.createElement('script');s.src='js/tutor-ai-direct.js?v=3';s.dataset.directAiTutor='1';document.head.appendChild(s)}}else setTimeout(boot,100)}boot()})();
