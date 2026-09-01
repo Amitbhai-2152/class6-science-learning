@@ -42,7 +42,7 @@ This file is the project queue. When the user says `next`, continue with the fir
 - [x] Paragraph learning
 - [x] Hindi grammar lessons
 - [x] Practice and objective tests
-- [ ] Tutor and progress integration
+- [x] Tutor and progress integration
 
 ## Phase 6 — GK + Mind/Thinking
 - [x] Topic modules
