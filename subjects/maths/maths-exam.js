@@ -7,8 +7,22 @@ const escapeHtml=s=>String(s??'').replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;
 const shuffle=a=>{const x=[...a];for(let i=x.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[x[i],x[j]]=[x[j],x[i]]}return x};
 const uid=()=>`maths-exam-${Date.now()}`;
 
-function buildPool(){
+function getPracticeBank(){
+ const candidates=[window.mathsPracticeBank,window.MathsPracticeBank,window.practiceBank,window.mathsPracticeQuestions];
+ const bank=candidates.find(x=>Array.isArray(x));
+ if(!bank)return [];
+ return bank.filter(q=>q&&Array.isArray(q.options)&&Number.isInteger(q.answer)&&q.answer>=0&&q.answer<q.options.length&&q.question);
+}
+
+function getChapterPool(){
  return getChapters().flatMap(c=>(c.challenge||[]).map((q,i)=>({...q,chapterId:c.id,chapterTitle:c.title,id:`${c.id}-${i}`})));
+}
+function buildPool(mode){
+ if(mode==='PRACTICE'){
+   const dedicated=getPracticeBank().map((q,i)=>({...q,chapterId:q.chapterId||0,chapterTitle:q.chapterTitle||`अध्याय ${q.chapterId||''}`,id:`practice-${i}`}));
+   if(dedicated.length)return dedicated;
+ }
+ return getChapterPool();
 }
 function exampleFor(q){return q.example||'इसे अपने आसपास की किसी छोटी संख्या, वस्तु या दैनिक जीवन की स्थिति से जोड़कर दोबारा सोचो।';}
 function showXP(n){if(window.showXP) window.showXP(n);}
@@ -27,17 +41,17 @@ function createShell(mode,title,subtitle){
 }
 
 function renderStart(mode){
- const pool=buildPool();
- if(!pool.length){const b=createShell(mode,'Maths Exam','Questions अभी उपलब्ध नहीं हैं।');b.innerHTML='<div class="mx-empty">Maths chapter files load नहीं हुए हैं। Page refresh करके फिर कोशिश करें।</div>';return}
+ const pool=buildPool(mode);
+ if(!pool.length){const b=createShell(mode,'Maths Exam','Questions अभी उपलब्ध नहीं हैं।');b.innerHTML='<div class="mx-empty">Maths question bank load नहीं हुआ। Page refresh करके फिर कोशिश करें।</div>';return}
  const count=mode==='PRACTICE'?30:60;
  const selected=shuffle(pool).slice(0,Math.min(count,pool.length));
  const marks=selected.length;
- const body=createShell(mode,mode==='PRACTICE'?'📝 Maths Practice Test':'⏱️ 2-Hour Maths CBT',mode==='PRACTICE'?`${marks} questions • ${marks} marks • No negative marking`:`${marks} questions • 120 minutes • ${marks} marks • No negative marking`);
+ const body=createShell(mode,mode==='PRACTICE'?'📝 Maths Practice Test':'⏱️ 2-Hour Maths CBT',mode==='PRACTICE'?`${marks} questions • ${marks} marks • No negative marking • Dedicated Practice Bank`:`${marks} questions • 120 minutes • ${marks} marks • No negative marking`);
  if(mode==='CBT'){
   body.innerHTML=`<div class="mx-instructions"><div><b>Marking scheme</b><span>✅ सही +1</span><span>❌ गलत 0</span><span>⚪ छोड़ा 0</span><span>🚫 Negative marking नहीं</span></div><p>पहले attempt करो, फिर submit से पहले review करो।</p></div><form class="mx-candidate" id="mxCandidate"><label>विद्यार्थी का नाम<input name="name" required maxlength="60" autocomplete="name"></label><label>पिता का नाम<input name="father" maxlength="60"></label><label>माता का नाम<input name="mother" maxlength="60"></label><label>आप कहाँ रहते हैं?<input name="place" maxlength="80" autocomplete="address-level2"></label><button class="mx-primary" type="submit">CBT शुरू करें 🚀</button></form>`;
   document.getElementById('mxCandidate').addEventListener('submit',e=>{e.preventDefault();const fd=new FormData(e.currentTarget);runExam(selected,mode,{name:fd.get('name'),father:fd.get('father'),mother:fd.get('mother'),place:fd.get('place')});});
  }else{
-  body.innerHTML=`<div class="mx-instructions"><div><b>Marking scheme</b><span>✅ सही +1</span><span>❌ गलत 0</span><span>⚪ छोड़ा 0</span><span>🚫 Negative marking नहीं</span></div><p>हर question के बाद सही/गलत result नहीं दिखेगा। पूरा test finish करने के बाद detailed review मिलेगा।</p></div><button class="mx-primary" id="mxStart">Test शुरू करें 🚀</button>`;
+  body.innerHTML=`<div class="mx-instructions"><div><b>Practice structure</b><span>🟢 Easy</span><span>🟡 Medium</span><span>🔴 Hard</span><span>🟣 HOTS</span><span>🚫 Negative marking नहीं</span></div><p>30 questions random dedicated bank से आएँगे। पूरा test finish करने के बाद detailed review मिलेगा।</p></div><button class="mx-primary" id="mxStart">Test शुरू करें 🚀</button>`;
   document.getElementById('mxStart').onclick=()=>runExam(selected,mode,{});
  }
 }
@@ -46,9 +60,10 @@ function runExam(questions,mode,candidate){
  const body=document.querySelector('.maths-exam-shell #mxBody');if(!body)return;
  let current=0;const answers=Array(questions.length).fill(null);const review=Array(questions.length).fill(false);let remaining=mode==='CBT'?120*60:null;let timer=null;
  function answerLabel(i){const a=answers[i];return a==null?'छोड़ा':String.fromCharCode(65+a)}
+ function difficultyBadge(q){if(mode!=='PRACTICE'||!q.difficulty)return '';const map={EASY:'🟢 Easy',MEDIUM:'🟡 Medium',HARD:'🔴 Hard',HOTS:'🟣 HOTS'};return `<span class="mx-difficulty">${map[q.difficulty]||escapeHtml(q.difficulty)}</span>`}
  function render(){
   const q=questions[current];
-  body.innerHTML=`<div class="mx-progress-head"><div><b>प्रश्न ${current+1} / ${questions.length}</b><small>${escapeHtml(q.chapterTitle)}</small></div>${mode==='CBT'?'<strong id="mxTimer" class="mx-timer">120:00</strong>':''}</div><div class="mx-progress"><i style="width:${(current+1)/questions.length*100}%"></i></div><div class="mx-layout"><aside class="mx-palette">${questions.map((_,i)=>`<button class="${answers[i]!=null?'answered ':''}${review[i]?'marked ':''}${i===current?'active':''}" data-i="${i}" title="प्रश्न ${i+1}">${i+1}</button>`).join('')}</aside><main class="mx-question"><span class="mx-qtag">अध्याय ${q.chapterId}</span><h3>${escapeHtml(q.question)}</h3><div class="mx-options">${q.options.map((o,i)=>`<label class="mx-option ${answers[current]===i?'selected':''}"><input type="radio" name="mxopt" value="${i}" ${answers[current]===i?'checked':''}><span><b>${String.fromCharCode(65+i)}</b>${escapeHtml(o)}</span></label>`).join('')}</div><div class="mx-actions"><button class="mx-secondary" id="mxMark">${review[current]?'★ Review से हटाएँ':'☆ Mark for Review'}</button><div><button class="mx-secondary" id="mxPrev" ${current===0?'disabled':''}>← पिछला</button><button class="mx-primary" id="mxNext">${current===questions.length-1?'📋 Review':'अगला →'}</button></div></div></main></div>`;
+  body.innerHTML=`<div class="mx-progress-head"><div><b>प्रश्न ${current+1} / ${questions.length}</b><small>${escapeHtml(q.chapterTitle||`अध्याय ${q.chapterId||''}`)} ${difficultyBadge(q)}</small></div>${mode==='CBT'?'<strong id="mxTimer" class="mx-timer">120:00</strong>':''}</div><div class="mx-progress"><i style="width:${(current+1)/questions.length*100}%"></i></div><div class="mx-layout"><aside class="mx-palette">${questions.map((_,i)=>`<button class="${answers[i]!=null?'answered ':''}${review[i]?'marked ':''}${i===current?'active':''}" data-i="${i}" title="प्रश्न ${i+1}">${i+1}</button>`).join('')}</aside><main class="mx-question"><span class="mx-qtag">अध्याय ${q.chapterId||''}</span><h3>${escapeHtml(q.question)}</h3><div class="mx-options">${q.options.map((o,i)=>`<label class="mx-option ${answers[current]===i?'selected':''}"><input type="radio" name="mxopt" value="${i}" ${answers[current]===i?'checked':''}><span><b>${String.fromCharCode(65+i)}</b>${escapeHtml(o)}</span></label>`).join('')}</div><div class="mx-actions"><button class="mx-secondary" id="mxMark">${review[current]?'★ Review से हटाएँ':'☆ Mark for Review'}</button><div><button class="mx-secondary" id="mxPrev" ${current===0?'disabled':''}>← पिछला</button><button class="mx-primary" id="mxNext">${current===questions.length-1?'📋 Review':'अगला →'}</button></div></div></main></div>`;
   body.querySelectorAll('input[name="mxopt"]').forEach(inp=>inp.onchange=()=>{answers[current]=Number(inp.value);render()});
   body.querySelectorAll('.mx-palette button').forEach(btn=>btn.onclick=()=>{current=Number(btn.dataset.i);render()});
   body.querySelector('#mxMark').onclick=()=>{review[current]=!review[current];render()};
@@ -74,7 +89,7 @@ function runExam(questions,mode,candidate){
   body.querySelector('#mxTour').onclick=()=>renderTour(score);
  }
  function renderTour(){
-  body.innerHTML=`<div class="mx-tour-head"><div><span class="mx-pill">ANSWER TOUR</span><h2>हर प्रश्न का Review</h2><p>सही उत्तर के साथ reasoning और example देखो।</p></div><button class="mx-secondary" id="mxDone">← Result</button></div><div class="mx-tour-list">${questions.map((q,i)=>{const ok=answers[i]===q.answer,chosen=answers[i];return `<article class="mx-tour-card ${ok?'correct':'wrong'}"><div class="mx-tour-q"><b>Q${i+1}</b><span>${escapeHtml(q.chapterTitle)}</span><em>${ok?'✅ सही':'❌ गलत/छोड़ा'}</em></div><h3>${escapeHtml(q.question)}</h3><div class="mx-answer-line"><b>आपका उत्तर:</b> ${chosen==null?'छोड़ा':escapeHtml(q.options[chosen])}</div><div class="mx-answer-line good"><b>सही उत्तर:</b> ${escapeHtml(q.options[q.answer])}</div><div class="mx-explain"><b>💡 क्यों?</b><p>${escapeHtml(q.explanation||'सही विकल्प दिए गए concept के अनुसार है।')}</p><b>🌍 उदाहरण</b><p>${escapeHtml(exampleFor(q))}</p></div></article>`}).join('')}</div>`;
+  body.innerHTML=`<div class="mx-tour-head"><div><span class="mx-pill">ANSWER TOUR</span><h2>हर प्रश्न का Review</h2><p>सही उत्तर के साथ reasoning और example देखो।</p></div><button class="mx-secondary" id="mxDone">← Result</button></div><div class="mx-tour-list">${questions.map((q,i)=>{const ok=answers[i]===q.answer,chosen=answers[i];return `<article class="mx-tour-card ${ok?'correct':'wrong'}"><div class="mx-tour-q"><b>Q${i+1}</b><span>${escapeHtml(q.chapterTitle||`अध्याय ${q.chapterId||''}`)}${q.difficulty?` • ${escapeHtml(q.difficulty)}`:''}</span><em>${ok?'✅ सही':'❌ गलत/छोड़ा'}</em></div><h3>${escapeHtml(q.question)}</h3><div class="mx-answer-line"><b>आपका उत्तर:</b> ${chosen==null?'छोड़ा':escapeHtml(q.options[chosen])}</div><div class="mx-answer-line good"><b>सही उत्तर:</b> ${escapeHtml(q.options[q.answer])}</div><div class="mx-explain"><b>💡 क्यों?</b><p>${escapeHtml(q.explanation||'सही विकल्प दिए गए concept के अनुसार है।')}</p><b>🌍 उदाहरण</b><p>${escapeHtml(exampleFor(q))}</p></div></article>`}).join('')}</div>`;
   body.querySelector('#mxDone').onclick=()=>renderResult(score,false);
  }
  render();startTimer();
