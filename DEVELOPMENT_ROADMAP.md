@@ -33,7 +33,7 @@ This file is the project queue. When the user says `next`, continue with the fir
 
 ## Phase 4 — English Grammar & Translation
 - [x] Create modular English architecture
-- [ ] Grammar lessons with examples
+- [x] Grammar lessons with examples
 - [ ] Translation practice
 - [ ] Error correction and answer explanation
 - [ ] Quiz/CBT and tutor
