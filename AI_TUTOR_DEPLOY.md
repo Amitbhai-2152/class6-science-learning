@@ -1,25 +1,39 @@
-# Class 6 AI Tutor — deployment
+# Class 6 AI Tutor — live deployment
 
-The frontend is still safe for GitHub Pages, while the OpenAI call runs on a Node server. Never put `OPENAI_API_KEY` in browser JavaScript.
+The website frontend can stay on GitHub Pages. The OpenAI call must run from a secure Node backend.
 
 ## 1. Deploy the backend
 
-The repository includes `render.yaml`, `server.js`, and `package.json`. Deploy the Node service to a Node-capable host and expose:
+The repository contains `server.js`, `package.json`, and `render.yaml`.
+
+The backend exposes:
 
 - `GET /api/health`
 - `POST /api/tutor`
 
 Set these server environment variables:
 
-- `OPENAI_API_KEY` — your OpenAI API key (server secret)
-- `OPENAI_MODEL` — recommended starting value: `gpt-5.6-luna`
-- `ALLOWED_ORIGIN` — the exact origin where the GitHub Pages frontend is hosted, for example `https://example.github.io`
+- `OPENAI_API_KEY` — your OpenAI API key. Keep this server-side only.
+- `OPENAI_MODEL` — `gpt-5.6-luna` is the current cost-sensitive model configured for this project.
+- `ALLOWED_ORIGIN` — the exact browser origin hosting the frontend, for example `https://your-user.github.io`.
 
-After deployment, `/api/health` should report `ok: true` and `configured: true`.
+Do not put `OPENAI_API_KEY` into `js/ai-config.js`, HTML, or any browser-side JavaScript.
 
-## 2. Point the frontend at the backend
+## 2. Verify the backend
 
-Edit `js/ai-config.js` and set:
+Open your deployed backend's `/api/health` endpoint.
+
+Expected shape:
+
+```json
+{"ok":true,"configured":true,"model":"gpt-5.6-luna"}
+```
+
+`configured: false` means the server secret has not been configured yet.
+
+## 3. Connect GitHub Pages
+
+Edit `js/ai-config.js`:
 
 ```js
 window.CLASS6_AI_CONFIG = {
@@ -27,16 +41,32 @@ window.CLASS6_AI_CONFIG = {
 };
 ```
 
-Do not add the OpenAI key to this file.
+Only the backend URL belongs in this file. Never add the OpenAI key.
 
-## 3. Verify both tutors
+## 4. Test Science
 
-Open the Science Tutor and ask a chapter-specific question. Then open Maths and ask a question from a different chapter. The bridge sends subject/chapter/section context to the backend.
+Open the Science Tutor and ask a chapter-specific question, for example:
 
-## 4. CORS
+`पाचन की प्रक्रिया flow chart से समझाओ।`
 
-Use the exact frontend origin in `ALLOWED_ORIGIN`; do not leave it as `*` in production.
+The bridge sends the current Science chapter and section as context.
 
-## 5. Model note
+## 5. Test Maths
 
-The backend uses the OpenAI Responses API. The model is configurable through `OPENAI_MODEL`, so it can be changed later without editing frontend code.
+Open a Maths chapter such as Chapter 7 and ask:
+
+`इस chapter का एक कठिन सवाल step-by-step समझाओ।`
+
+The bridge derives the active Maths chapter from the page URL so the backend receives the correct chapter context.
+
+## 6. CORS
+
+For production, `ALLOWED_ORIGIN` should be the exact frontend origin, not `*`.
+
+## 7. Runtime checks
+
+The repository includes a GitHub Actions workflow that validates Node syntax, installs dependencies, and runs the Tutor server health check before changes are considered safe.
+
+## 8. OpenAI API
+
+The backend uses the OpenAI Responses API. Model selection is controlled by the `OPENAI_MODEL` environment variable so it can be changed without rewriting the frontend.
