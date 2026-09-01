@@ -3,6 +3,8 @@
 @media(max-width:580px){
   .chat-fab{right:12px;bottom:82px;}
   .chat-wrap{right:10px;bottom:144px;}
-  #lessonView .nav{padding-bottom:74px;}
-  #lessonView .nav .btn{position:relative;z-index:1;}
+  #lessonView .nav{position:relative;z-index:70;padding-bottom:74px;}
+  #lessonView .nav .btn{position:relative;z-index:71;}
+  #lessonView .chat-fab{z-index:50;}
+  #lessonView .chat-wrap{z-index:50;}
 }
