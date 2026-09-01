@@ -45,10 +45,10 @@ This file is the project queue. When the user says `next`, continue with the fir
 - [ ] Tutor and progress integration
 
 ## Phase 6 — GK + Mind/Thinking
-- [ ] Topic modules
-- [ ] Reasoning and thinking challenges
-- [ ] Timed quizzes
-- [ ] Progress and mastery tracking
+- [x] Topic modules
+- [x] Reasoning and thinking challenges
+- [x] Timed quizzes
+- [x] Progress and mastery tracking
 
 ## Rule for `next`
 1. Take the first unchecked task in this queue.
