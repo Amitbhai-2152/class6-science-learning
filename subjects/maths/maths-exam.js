@@ -16,9 +16,18 @@ function getPracticeBank(){
 function getChapterPool(){
  return getChapters().flatMap(c=>(c.challenge||[]).map((q,i)=>({...q,chapterId:c.id,chapterTitle:c.title,id:`${c.id}-${i}`})));
 }
+function getCbtPool(){
+ const practice=getPracticeBank().map((q,i)=>({...q,chapterId:q.chapterId||0,chapterTitle:q.chapterTitle||`अध्याय ${q.chapterId||''}`,id:`practice-${i}`}));
+ const challenge=getChapterPool().map(q=>({...q,id:`challenge-${q.id}`}));
+ return [...practice,...challenge];
+}
 function buildPool(mode){
  if(mode==='PRACTICE'){
    const dedicated=getPracticeBank().map((q,i)=>({...q,chapterId:q.chapterId||0,chapterTitle:q.chapterTitle||`अध्याय ${q.chapterId||''}`,id:`practice-${i}`}));
+   if(dedicated.length)return dedicated;
+ }
+ if(mode==='CBT'){
+   const dedicated=getCbtPool();
    if(dedicated.length)return dedicated;
  }
  return getChapterPool();
@@ -32,20 +41,23 @@ function saveAttempt(mode,score,total,details){
 }
 
 function createShell(mode,title,subtitle){
- document.querySelectorAll('.maths-exam-shell').forEach(e=>e.remove());
+ document.querySelectorAll('.maths-exam-shell').forEach(e=>{if(window.__mathsExamStop)window.__mathsExamStop();e.remove()});
  const root=document.createElement('section');root.className='maths-exam-shell';root.id=uid();
  root.innerHTML=`<div class="maths-exam-backdrop"></div><div class="maths-exam-panel" role="dialog" aria-modal="true" aria-label="${escapeHtml(title)}"><div class="mx-head"><div><span class="mx-pill">${escapeHtml(mode)}</span><h2>${escapeHtml(title)}</h2><p>${escapeHtml(subtitle)}</p></div><button class="mx-close" type="button" aria-label="बंद करें">×</button></div><div class="mx-body" id="mxBody"></div></div>`;
- document.body.appendChild(root);root.querySelector('.mx-close').onclick=()=>root.remove();root.querySelector('.maths-exam-backdrop').onclick=()=>root.remove();
+ document.body.appendChild(root);
+ const close=()=>{if(window.__mathsExamStop)window.__mathsExamStop();window.__mathsExamStop=null;root.remove()};
+ root.querySelector('.mx-close').onclick=close;
+ root.querySelector('.maths-exam-backdrop').onclick=close;
  return root.querySelector('#mxBody');
 }
 
 function renderStart(mode){
  const pool=buildPool(mode);
  if(!pool.length){const b=createShell(mode,'Maths Exam','Questions अभी उपलब्ध नहीं हैं।');b.innerHTML='<div class="mx-empty">Maths question bank load नहीं हुआ। Page refresh करके फिर कोशिश करें।</div>';return}
- const count=mode==='PRACTICE'?30:60;
- const selected=shuffle(pool).slice(0,Math.min(count,pool.length));
+ const requested=mode==='PRACTICE'?30:60;
+ const selected=shuffle(pool).slice(0,Math.min(requested,pool.length));
  const marks=selected.length;
- const body=createShell(mode,mode==='PRACTICE'?'📝 Maths Practice Test':'⏱️ 2-Hour Maths CBT',mode==='PRACTICE'?`${marks} questions • ${marks} marks • No negative marking • Dedicated Practice Bank`:`${marks} questions • 120 minutes • ${marks} marks • No negative marking`);
+ const body=createShell(mode,mode==='PRACTICE'?'📝 Maths Practice Test':'⏱️ Maths CBT',mode==='PRACTICE'?`${marks} questions • ${marks} marks • No negative marking • Dedicated Practice Bank`:`${marks} questions • 120 minutes • ${marks} marks • No negative marking`);
  if(mode==='CBT'){
   body.innerHTML=`<div class="mx-instructions"><div><b>Marking scheme</b><span>✅ सही +1</span><span>❌ गलत 0</span><span>⚪ छोड़ा 0</span><span>🚫 Negative marking नहीं</span></div><p>पहले attempt करो, फिर submit से पहले review करो।</p></div><form class="mx-candidate" id="mxCandidate"><label>विद्यार्थी का नाम<input name="name" required maxlength="60" autocomplete="name"></label><label>पिता का नाम<input name="father" maxlength="60"></label><label>माता का नाम<input name="mother" maxlength="60"></label><label>आप कहाँ रहते हैं?<input name="place" maxlength="80" autocomplete="address-level2"></label><button class="mx-primary" type="submit">CBT शुरू करें 🚀</button></form>`;
   body.querySelector('#mxCandidate').addEventListener('submit',e=>{e.preventDefault();const fd=new FormData(e.currentTarget);runExam(selected,mode,{name:fd.get('name'),father:fd.get('father'),mother:fd.get('mother'),place:fd.get('place')});});
@@ -58,6 +70,7 @@ function renderStart(mode){
 function runExam(questions,mode,candidate){
  const body=document.querySelector('.maths-exam-shell #mxBody');if(!body)return;
  let current=0;const answers=Array(questions.length).fill(null);const review=Array(questions.length).fill(false);let remaining=mode==='CBT'?120*60:null;let timer=null;
+ window.__mathsExamStop=()=>{if(timer){clearInterval(timer);timer=null}};
  function answerLabel(i){const a=answers[i];return a==null?'छोड़ा':String.fromCharCode(65+a)}
  function difficultyBadge(q){if(mode!=='PRACTICE'||!q.difficulty)return '';const map={EASY:'🟢 Easy',MEDIUM:'🟡 Medium',HARD:'🔴 Hard',HOTS:'🟣 HOTS'};return `<span class="mx-difficulty">${map[q.difficulty]||escapeHtml(q.difficulty)}</span>`}
  function render(){
@@ -80,7 +93,7 @@ function runExam(questions,mode,candidate){
   body.querySelector('#mxBackReview').onclick=()=>render();
   body.querySelector('#mxSubmit').onclick=()=>finish(false);
  }
- function finish(auto){if(timer)clearInterval(timer);let score=0;questions.forEach((q,i)=>{if(answers[i]===q.answer)score++});saveAttempt(mode,score,questions.length,{candidate,auto});showXP(score);renderResult(score,auto)}
+ function finish(auto){if(timer)clearInterval(timer);timer=null;window.__mathsExamStop=null;let score=0;questions.forEach((q,i)=>{if(answers[i]===q.answer)score++});saveAttempt(mode,score,questions.length,{candidate,auto});showXP(score);renderResult(score,auto)}
  function renderResult(score,auto){
   const pct=Math.round(score/questions.length*100);const grade=pct>=90?'🏆 उत्कृष्ट':pct>=75?'🌟 बहुत अच्छा':pct>=60?'👍 अच्छा':'📚 और अभ्यास करो';
   body.innerHTML=`<div class="mx-result"><div class="mx-score-ring"><strong>${score}</strong><span>/ ${questions.length}</span></div><h2>${grade}</h2><p class="mx-percent">${pct}% • ${auto?'समय समाप्त होने पर auto-submitted':'Test submitted'}</p><div class="mx-result-note"><span>✅ सही: ${score}</span><span>❌ गलत: ${questions.filter((q,i)=>answers[i]!=null&&answers[i]!==q.answer).length}</span><span>⚪ छोड़ा: ${answers.filter(x=>x==null).length}</span></div><div class="mx-actions"><button class="mx-secondary" id="mxRetake">🔄 फिर से दें</button><button class="mx-primary" id="mxTour">🔎 हर प्रश्न का Review देखें</button></div></div>`;
