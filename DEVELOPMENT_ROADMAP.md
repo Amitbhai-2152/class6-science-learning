@@ -39,7 +39,7 @@ This file is the project queue. When the user says `next`, continue with the fir
 - [x] Quiz/CBT and tutor
 
 ## Phase 5 — Hindi
-- [ ] Paragraph learning
+- [x] Paragraph learning
 - [ ] Hindi grammar lessons
 - [ ] Practice and objective tests
 - [ ] Tutor and progress integration
