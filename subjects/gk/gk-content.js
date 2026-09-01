@@ -24,3 +24,5 @@ const REASONING_QUESTIONS=[
 ['A boy walks north, then turns right. He is now facing…',['West','East','South','North'],1],
 ['Arrange from smallest to largest: 0.5, 0.05, 0.55',['0.05, 0.5, 0.55','0.5, 0.05, 0.55','0.55, 0.5, 0.05','0.05, 0.55, 0.5'],0]
 ];
+window.GK_TOPICS=GK_TOPICS;
+window.REASONING_QUESTIONS=REASONING_QUESTIONS;
