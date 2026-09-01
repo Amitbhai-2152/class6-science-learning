@@ -1,20 +1,33 @@
 /* Keep the floating AI Tutor control clear of page navigation buttons. */
 .chat-fab{bottom:14px;}
 
-/* On the Science lesson screen, never place the Tutor control at the bottom.
-   The lesson's Back/Next navigation lives near the bottom of the viewport while
-   scrolling, so a fixed bottom FAB can cover it regardless of z-index. */
+/* The lesson navigation is at the bottom of the lesson. Do not let the
+   fixed Tutor FAB occupy that same area while a lesson is visible. */
 #lessonView:not(.hidden) ~ .chat-fab{
-  top:74px;
-  right:14px;
-  bottom:auto;
-  z-index:50;
+  top:72px !important;
+  right:14px !important;
+  bottom:auto !important;
+  z-index:50 !important;
 }
 #lessonView:not(.hidden) ~ #chatWrap{
-  top:142px;
-  right:14px;
-  bottom:auto;
-  z-index:50;
+  top:140px !important;
+  right:14px !important;
+  bottom:auto !important;
+  z-index:50 !important;
+}
+
+/* Fallback for browsers/DOM states where sibling matching is unreliable. */
+body:has(#lessonView:not(.hidden)) .chat-fab{
+  top:72px !important;
+  right:14px !important;
+  bottom:auto !important;
+  z-index:50 !important;
+}
+body:has(#lessonView:not(.hidden)) .chat-wrap{
+  top:140px !important;
+  right:14px !important;
+  bottom:auto !important;
+  z-index:50 !important;
 }
 
 @media(max-width:580px){
@@ -22,16 +35,17 @@
   .chat-wrap{right:10px;bottom:144px;}
   #lessonView .nav{position:relative;z-index:70;padding-bottom:74px;}
   #lessonView .nav .btn{position:relative;z-index:71;}
-  #lessonView .chat-fab{z-index:50;}
-  #lessonView .chat-wrap{z-index:50;}
-  #lessonView:not(.hidden) ~ .chat-fab{
-    top:68px;
-    right:12px;
-    bottom:auto;
+
+  #lessonView:not(.hidden) ~ .chat-fab,
+  body:has(#lessonView:not(.hidden)) .chat-fab{
+    top:68px !important;
+    right:12px !important;
+    bottom:auto !important;
   }
-  #lessonView:not(.hidden) ~ #chatWrap{
-    top:136px;
-    right:10px;
-    bottom:auto;
+  #lessonView:not(.hidden) ~ #chatWrap,
+  body:has(#lessonView:not(.hidden)) .chat-wrap{
+    top:136px !important;
+    right:10px !important;
+    bottom:auto !important;
   }
 }
