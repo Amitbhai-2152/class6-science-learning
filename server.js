@@ -102,6 +102,33 @@ app.get("/api/health", async (_req, res) => {
   }
 });
 
+app.get("/api/health/deep", async (_req, res) => {
+  if (!process.env.OPENAI_API_KEY) {
+    return res.status(503).json({ ok: false, configured: false, model, test: "missing_api_key" });
+  }
+  try {
+    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const response = await client.responses.create({
+      model,
+      instructions: "Reply with exactly: Tutor connection successful.",
+      input: [{ role: "user", content: [{ type: "input_text", text: "Connection test." }] }],
+      max_output_tokens: 30
+    });
+    return res.json({ ok: true, configured: true, model, test: "ok", answer: String(response.output_text || "").trim() });
+  } catch (error) {
+    const status = Number(error?.status) || 502;
+    return res.status(status >= 400 && status < 600 ? status : 502).json({
+      ok: false,
+      configured: true,
+      model,
+      test: "error",
+      errorType: error?.name || "OpenAIError",
+      errorCode: error?.code || error?.type || "unknown",
+      errorMessage: String(error?.message || "").slice(0, 300)
+    });
+  }
+});
+
 app.post("/api/tutor", rateLimit, async (req, res) => {
   try {
     if (!process.env.OPENAI_API_KEY) {
@@ -140,7 +167,8 @@ app.post("/api/tutor", rateLimit, async (req, res) => {
     const status = Number(error?.status) || 500;
     res.status(status >= 400 && status < 600 ? status : 500).json({
       error: "Tutor से अभी उत्तर नहीं मिल पाया।",
-      code: error?.code || error?.type || "openai_request_failed"
+      code: error?.code || error?.type || "openai_request_failed",
+      errorMessage: String(error?.message || "").slice(0, 300)
     });
   }
 });
