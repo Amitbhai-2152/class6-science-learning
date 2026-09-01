@@ -1,8 +1,9 @@
 (function(){
 'use strict';
-if(!window.ENGLISH_EXPANSION||!Array.isArray(window.ENGLISH_CHAPTERS))return;
+const expansion=(typeof ENGLISH_EXPANSION!=='undefined')?ENGLISH_EXPANSION:(window.ENGLISH_EXPANSION||null);
+if(!expansion||!Array.isArray(window.ENGLISH_CHAPTERS))return;
 window.ENGLISH_CHAPTERS.forEach(function(ch){
-  const extra=window.ENGLISH_EXPANSION[ch.id];
+  const extra=expansion[ch.id];
   if(!extra)return;
   ch.sections=Array.isArray(ch.sections)?ch.sections:[];
   ch.practice=Array.isArray(ch.practice)?ch.practice:[];
