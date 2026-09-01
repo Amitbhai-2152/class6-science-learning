@@ -3,26 +3,29 @@
   const AI=window.AITutorClient;
   if(!AI)return;
 
-  function pushScience(text,who){const box=document.getElementById('messages');if(!box)return;const d=document.createElement('div');d.className='msg '+who;d.textContent=text;box.appendChild(d);box.scrollTop=box.scrollHeight}
-  function scienceContext(){const c=window.CHAPTERS?.[window.currentChapter-1],s=c?.sections?.[window._part];return {subject:'Science',chapter:c?.title||'',section:s?.title||''}}
+  function push(text,who){const box=document.getElementById('messages');if(!box)return;const d=document.createElement('div');d.className='msg '+who;d.textContent=text;box.appendChild(d);box.scrollTop=box.scrollHeight}
+  function context(){const c=window.CHAPTERS?.[window.currentChapter-1],s=c?.sections?.[window._part];return {subject:'Science',chapter:c?.title||'',section:s?.title||''}}
+  function errorText(err){
+    const msg=String(err?.message||err||'Unknown error');
+    return `⚠️ AI Tutor request failed: ${msg}`;
+  }
   function replaceScience(){
     const T=window.Tutor;if(!T||T.__aiBound)return;
     T.__aiBound=true;T.__history=[];
     T.send=async function(qOverride){
       const input=document.getElementById('chatInput');const q=String(qOverride||input?.value||'').trim();if(!q)return;
-      if(input)input.value='';pushScience(q,'user');T.updateContext?.();T.setTyping?.(true);
+      if(input)input.value='';push(q,'user');T.updateContext?.();T.setTyping?.(true);
       try{
-        const ctx=scienceContext();T.__history.push({role:'user',content:q});
+        const ctx=context();T.__history.push({role:'user',content:q});
         const answer=await AI.ask({messages:T.__history,subject:ctx.subject,chapter:ctx.chapter,section:ctx.section});
-        T.__history.push({role:'assistant',content:answer});pushScience(answer,'bot');
+        T.__history.push({role:'assistant',content:answer});push(answer,'bot');
       }catch(err){
         T.__history.pop();
-        pushScience('⚠️ AI Tutor से connection नहीं हो पाया। यह local fallback नहीं है। कृपया backend/deployment check करें।','bot');
         console.error('Science AI Tutor error:',err);
+        push(errorText(err),'bot');
       }finally{T.setTyping?.(false)}
     };
   }
-
   function mathHistory(){return window.__mathsAIHistory||(window.__mathsAIHistory=[])}
   function activeMathsChapter(){
     const chapters=[1,2,3,4,5,6,7,8].map(n=>window['mathsChapter0'+n]).filter(Boolean);
@@ -44,12 +47,11 @@
         const bot=document.createElement('div');bot.className='mt-bot';bot.textContent=answer;msgs.appendChild(bot);msgs.scrollTop=msgs.scrollHeight;
       }catch(err){
         history.pop();
-        const bot=document.createElement('div');bot.className='mt-bot';bot.textContent='⚠️ AI Tutor से connection नहीं हो पाया। यह local fallback नहीं है। कृपया backend/deployment check करें.';msgs.appendChild(bot);msgs.scrollTop=msgs.scrollHeight;
         console.error('Maths AI Tutor error:',err);
+        const bot=document.createElement('div');bot.className='mt-bot';bot.textContent=errorText(err);msgs.appendChild(bot);msgs.scrollTop=msgs.scrollHeight;
       }
     };
   }
-
   const start=()=>{replaceScience();replaceMaths()};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(start,50));else setTimeout(start,50);
 })();
