@@ -1,0 +1,8 @@
+/* Keep the floating AI Tutor control clear of page navigation buttons. */
+.chat-fab{bottom:14px;}
+@media(max-width:580px){
+  .chat-fab{right:12px;bottom:82px;}
+  .chat-wrap{right:10px;bottom:144px;}
+  #lessonView .nav{padding-bottom:74px;}
+  #lessonView .nav .btn{position:relative;z-index:1;}
+}
