@@ -68,14 +68,33 @@ Teaching style:
 ${context || "No current lesson context is available; answer as a general Class 6 tutor."}`;
 }
 
-app.get("/api/health", (_req, res) => {
-  res.json({ ok: true, configured: Boolean(process.env.OPENAI_API_KEY), model });
+app.get("/api/health", async (_req, res) => {
+  const configured = Boolean(process.env.OPENAI_API_KEY);
+  if (!configured) {
+    return res.status(503).json({ ok: false, configured: false, model, openai: "missing_api_key" });
+  }
+
+  try {
+    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    await client.models.retrieve(model);
+    return res.json({ ok: true, configured: true, model, openai: "ok" });
+  } catch (error) {
+    const status = Number(error?.status) || 502;
+    return res.status(status >= 400 && status < 600 ? status : 502).json({
+      ok: false,
+      configured: true,
+      model,
+      openai: "error",
+      errorType: error?.name || "OpenAIError",
+      errorCode: error?.code || error?.type || "unknown"
+    });
+  }
 });
 
 app.post("/api/tutor", rateLimit, async (req, res) => {
   try {
     if (!process.env.OPENAI_API_KEY) {
-      return res.status(503).json({ error: "AI Tutor server अभी configured नहीं है। OPENAI_API_KEY सेट करें।" });
+      return res.status(503).json({ error: "AI Tutor server अभी configured नहीं है। OPENAI_API_KEY सेट करें।", code: "missing_api_key" });
     }
 
     const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -89,7 +108,7 @@ app.post("/api/tutor", rateLimit, async (req, res) => {
       .filter(m => m.content);
 
     if (!safeMessages.length) {
-      return res.status(400).json({ error: "सवाल भेजें।" });
+      return res.status(400).json({ error: "सवाल भेजें।", code: "empty_messages" });
     }
 
     const response = await client.responses.create({
@@ -101,13 +120,17 @@ app.post("/api/tutor", rateLimit, async (req, res) => {
 
     const text = String(response.output_text || "").trim();
     if (!text) {
-      return res.status(502).json({ error: "AI ने खाली उत्तर दिया। फिर से कोशिश करें।" });
+      return res.status(502).json({ error: "AI ने खाली उत्तर दिया। फिर से कोशिश करें।", code: "empty_output" });
     }
 
     res.json({ answer: text, model });
   } catch (error) {
     console.error("Tutor API error:", error?.message || error);
-    res.status(500).json({ error: "Tutor से अभी उत्तर नहीं मिल पाया। थोड़ी देर बाद फिर कोशिश करें।" });
+    const status = Number(error?.status) || 500;
+    res.status(status >= 400 && status < 600 ? status : 500).json({
+      error: "Tutor से अभी उत्तर नहीं मिल पाया।",
+      code: error?.code || error?.type || "openai_request_failed"
+    });
   }
 });
 
