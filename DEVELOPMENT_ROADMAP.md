@@ -50,6 +50,16 @@ This file is the project queue. When the user says `next`, continue with the fir
 - [x] Timed quizzes
 - [x] Progress and mastery tracking
 
+## Phase 7 — Social Science (पूर्ण हिंदी)
+- [x] Create Social Science architecture and 14-chapter Hindi learning hub
+- [ ] Add detailed chapter lessons, examples and source-based learning
+- [ ] Add map skills and interactive map activities
+- [ ] Add large Hindi practice bank with explanations
+- [ ] Add chapter tests and full Social Science CBT
+- [ ] Add Hindi Social Science Tutor with chapter context
+- [ ] Add Social Science progress, XP, mastery, revision and badges
+- [ ] Run Social Science mobile/accessibility/runtime QA
+
 ## Rule for `next`
 1. Take the first unchecked task in this queue.
 2. Make the change in GitHub.
