@@ -1,31 +1,7 @@
 (function(){
-  'use strict';
-  function mathsStats(){
-    try{
-      const h=JSON.parse(localStorage.getItem('mathsExamHistory')||'[]');
-      if(!Array.isArray(h)||!h.length)return {pct:0,xp:0,attempts:0,best:0};
-      const total=h.reduce((s,x)=>s+Number(x.total||0),0);
-      const score=h.reduce((s,x)=>s+Number(x.score||0),0);
-      const pct=total?Math.round(score/total*100):0;
-      const xp=h.reduce((s,x)=>s+10+(Number(x.score)||0)*2,0);
-      const best=Math.max(...h.map(x=>Number(x.pct)||0));
-      return {pct,xp,attempts:h.length,best};
-    }catch(_){return {pct:0,xp:0,attempts:0,best:0};}
-  }
-  function sync(){
-    const m=mathsStats();
-    const pct=document.getElementById('homeMathsPct');
-    const bar=document.getElementById('homeMathsBar');
-    if(pct)pct.textContent=m.pct+'%';
-    if(bar)bar.style.width=m.pct+'%';
-    const total=document.getElementById('homeTotalXP');
-    try{
-      const sci=Number(JSON.parse(localStorage.getItem('class6ScienceProgressV9')||'{}').xp||0);
-      if(total)total.textContent=sci+m.xp;
-    }catch(_){/* keep existing total */}
-  }
-  window.HomeProgressSync={refresh:sync};
-  window.addEventListener('DOMContentLoaded',()=>setTimeout(sync,50));
-  window.addEventListener('storage',e=>{if(e.key==='mathsExamHistory')sync();});
-  setInterval(()=>{if(document.visibilityState==='visible')sync();},2000);
+'use strict';
+function mathsStats(){try{const h=JSON.parse(localStorage.getItem('mathsExamHistory')||'[]');if(!Array.isArray(h)||!h.length)return {pct:0,xp:0};const total=h.reduce((s,x)=>s+Number(x.total||0),0),score=h.reduce((s,x)=>s+Number(x.score||0),0),pct=total?Math.round(score/total*100):0,xp=h.reduce((s,x)=>s+10+(Number(x.score)||0)*2,0);return {pct,xp}}catch(_){return {pct:0,xp:0}}}
+function hindiStats(){try{const h=JSON.parse(localStorage.getItem('class6HindiProgressV2')||'null');if(!h)return {pct:0,xp:0,badges:0,streak:0};const topics=Object.values(h.topics||{}),pct=topics.length?Math.round(topics.reduce((a,b)=>a+Number(b||0),0)/topics.length):Number(h.best||0);return {pct,xp:Number(h.xp)||0,badges:(h.badges||[]).length,streak:Number(h.streak)||0}}catch(_){return {pct:0,xp:0,badges:0,streak:0}}}
+function sync(){const m=mathsStats(),h=hindiStats();const pct=document.getElementById('homeMathsPct'),bar=document.getElementById('homeMathsBar');if(pct)pct.textContent=m.pct+'%';if(bar)bar.style.width=m.pct+'%';let row=document.getElementById('homeHindiProgressRow');if(!row){const anchor=document.getElementById('homeMathsBar')?.closest('.home-bar-row');if(anchor){row=document.createElement('div');row.id='homeHindiProgressRow';row.className='home-bar-row';row.innerHTML='<div class="home-bar-top"><span>🪔 Hindi</span><span id="homeHindiPct">0%</span></div><div class="home-bar"><i id="homeHindiBar"></i></div>';anchor.after(row)}}const hp=document.getElementById('homeHindiPct'),hb=document.getElementById('homeHindiBar');if(hp)hp.textContent=h.pct+'%';if(hb)hb.style.width=h.pct+'%';const total=document.getElementById('homeTotalXP');try{const sci=Number(JSON.parse(localStorage.getItem('class6ScienceProgressV9')||'{}').xp||0);if(total)total.textContent=sci+m.xp+h.xp}catch(_){}const streak=document.getElementById('homeStreak');if(streak){const sci=Number(JSON.parse(localStorage.getItem('class6ScienceProgressV9')||'{}').streak||0);streak.textContent=Math.max(sci,h.streak)}const badge=document.getElementById('badgeHome');if(badge){const sci=(JSON.parse(localStorage.getItem('class6ScienceProgressV9')||'{}').badges||[]).length;badge.textContent=sci+h.badges}}
+window.HomeProgressSync={refresh:sync};window.addEventListener('DOMContentLoaded',()=>setTimeout(sync,50));window.addEventListener('storage',sync);window.addEventListener('hindi:progress',sync);setInterval(()=>{if(document.visibilityState==='visible')sync()},2000);
 })();
