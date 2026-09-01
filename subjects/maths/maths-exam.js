@@ -13,7 +13,6 @@ function getPracticeBank(){
  if(!bank)return [];
  return bank.filter(q=>q&&Array.isArray(q.options)&&Number.isInteger(q.answer)&&q.answer>=0&&q.answer<q.options.length&&q.question);
 }
-
 function getChapterPool(){
  return getChapters().flatMap(c=>(c.challenge||[]).map((q,i)=>({...q,chapterId:c.id,chapterTitle:c.title,id:`${c.id}-${i}`})));
 }
@@ -49,10 +48,10 @@ function renderStart(mode){
  const body=createShell(mode,mode==='PRACTICE'?'📝 Maths Practice Test':'⏱️ 2-Hour Maths CBT',mode==='PRACTICE'?`${marks} questions • ${marks} marks • No negative marking • Dedicated Practice Bank`:`${marks} questions • 120 minutes • ${marks} marks • No negative marking`);
  if(mode==='CBT'){
   body.innerHTML=`<div class="mx-instructions"><div><b>Marking scheme</b><span>✅ सही +1</span><span>❌ गलत 0</span><span>⚪ छोड़ा 0</span><span>🚫 Negative marking नहीं</span></div><p>पहले attempt करो, फिर submit से पहले review करो।</p></div><form class="mx-candidate" id="mxCandidate"><label>विद्यार्थी का नाम<input name="name" required maxlength="60" autocomplete="name"></label><label>पिता का नाम<input name="father" maxlength="60"></label><label>माता का नाम<input name="mother" maxlength="60"></label><label>आप कहाँ रहते हैं?<input name="place" maxlength="80" autocomplete="address-level2"></label><button class="mx-primary" type="submit">CBT शुरू करें 🚀</button></form>`;
-  document.getElementById('mxCandidate').addEventListener('submit',e=>{e.preventDefault();const fd=new FormData(e.currentTarget);runExam(selected,mode,{name:fd.get('name'),father:fd.get('father'),mother:fd.get('mother'),place:fd.get('place')});});
+  body.querySelector('#mxCandidate').addEventListener('submit',e=>{e.preventDefault();const fd=new FormData(e.currentTarget);runExam(selected,mode,{name:fd.get('name'),father:fd.get('father'),mother:fd.get('mother'),place:fd.get('place')});});
  }else{
   body.innerHTML=`<div class="mx-instructions"><div><b>Practice structure</b><span>🟢 Easy</span><span>🟡 Medium</span><span>🔴 Hard</span><span>🟣 HOTS</span><span>🚫 Negative marking नहीं</span></div><p>30 questions random dedicated bank से आएँगे। पूरा test finish करने के बाद detailed review मिलेगा।</p></div><button class="mx-primary" id="mxStart">Test शुरू करें 🚀</button>`;
-  document.getElementById('mxStart').onclick=()=>runExam(selected,mode,{});
+  body.querySelector('#mxStart').onclick=()=>runExam(selected,mode,{});
  }
 }
 
@@ -76,7 +75,7 @@ function runExam(questions,mode,candidate){
  function renderReview(){
   if(timer){clearInterval(timer);timer=null}
   const unanswered=answers.filter(x=>x==null).length,marked=review.filter(Boolean).length;
-  body.innerHTML=`<div class="mx-review-summary"><div><b>${questions.length}</b><span>कुल प्रश्न</span></div><div><b>${answers.length-unanswered}</b><span>Attempted</span></div><div><b>${unanswered}</b><span>Unanswered</span></div><div><b>${marked}</b><span>Marked</span></div></div><div class="mx-instructions"><b>Final check</b><p>Submit करने के बाद हर question का answer, सही उत्तर, explanation और example मिलेगा।</p></div><div class="mx-review-grid">${questions.map((q,i)=>`<button class="${answers[i]==null?'unanswered ':''}${review[i]?'marked':''}" data-i="${i}">Q${i+1}<small>${answerLabel(i)}</small></button>`).join('')}</div><div class="mx-actions"><button class="mx-secondary" id="mxBackReview">← Test में वापस</button><button class="mx-primary" id="mxSubmit">✅ Submit Test</button></div>`;
+  body.innerHTML=`<div class="mx-review-summary"><div><b>${questions.length}</b><span>कुल प्रश्न</span></div><div><b>${answers.length-unanswered}</b><span>Attempted</span></div><div><b>${unanswered}</b><span>Unanswered</span></div><div><b>${marked}</b><span>Marked</span></div></div><div class="mx-instructions"><b>Final check</b><p>Submit करने के बाद हर question का answer, explanation और example मिलेगा।</p></div><div class="mx-review-grid">${questions.map((q,i)=>`<button class="${answers[i]==null?'unanswered ':''}${review[i]?'marked':''}" data-i="${i}">Q${i+1}<small>${answerLabel(i)}</small></button>`).join('')}</div><div class="mx-actions"><button class="mx-secondary" id="mxBackReview">← Test में वापस</button><button class="mx-primary" id="mxSubmit">✅ Submit Test</button></div>`;
   body.querySelectorAll('.mx-review-grid button').forEach(btn=>btn.onclick=()=>{current=Number(btn.dataset.i);render()});
   body.querySelector('#mxBackReview').onclick=()=>render();
   body.querySelector('#mxSubmit').onclick=()=>finish(false);
@@ -88,7 +87,7 @@ function runExam(questions,mode,candidate){
   body.querySelector('#mxRetake').onclick=()=>renderStart(mode);
   body.querySelector('#mxTour').onclick=()=>renderTour(score);
  }
- function renderTour(){
+ function renderTour(score){
   body.innerHTML=`<div class="mx-tour-head"><div><span class="mx-pill">ANSWER TOUR</span><h2>हर प्रश्न का Review</h2><p>सही उत्तर के साथ reasoning और example देखो।</p></div><button class="mx-secondary" id="mxDone">← Result</button></div><div class="mx-tour-list">${questions.map((q,i)=>{const ok=answers[i]===q.answer,chosen=answers[i];return `<article class="mx-tour-card ${ok?'correct':'wrong'}"><div class="mx-tour-q"><b>Q${i+1}</b><span>${escapeHtml(q.chapterTitle||`अध्याय ${q.chapterId||''}`)}${q.difficulty?` • ${escapeHtml(q.difficulty)}`:''}</span><em>${ok?'✅ सही':'❌ गलत/छोड़ा'}</em></div><h3>${escapeHtml(q.question)}</h3><div class="mx-answer-line"><b>आपका उत्तर:</b> ${chosen==null?'छोड़ा':escapeHtml(q.options[chosen])}</div><div class="mx-answer-line good"><b>सही उत्तर:</b> ${escapeHtml(q.options[q.answer])}</div><div class="mx-explain"><b>💡 क्यों?</b><p>${escapeHtml(q.explanation||'सही विकल्प दिए गए concept के अनुसार है।')}</p><b>🌍 उदाहरण</b><p>${escapeHtml(exampleFor(q))}</p></div></article>`}).join('')}</div>`;
   body.querySelector('#mxDone').onclick=()=>renderResult(score,false);
  }
