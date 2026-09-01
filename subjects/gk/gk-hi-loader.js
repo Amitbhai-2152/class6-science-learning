@@ -1,1 +1,1 @@
-(function(){'use strict';if(!Array.isArray(window.GK_HI_TOPICS)||!Array.isArray(window.REASONING_HI))return;window.GK_HI_TOPICS.forEach(function(t,i){var base=window.GK_TOPICS&&window.GK_TOPICS[i];if(base){t.lessons=base.lessons;t.icon=base.icon;}});window.GK_HI_READY=true;})();
+(function(){'use strict';if(!Array.isArray(window.GK_HI_TOPICS))return;window.GK_HI_TOPICS.forEach(function(t,i){var base=window.GK_TOPICS&&window.GK_TOPICS[i];if(base){t.icon=base.icon;}});window.GK_HI_READY=true;})();
