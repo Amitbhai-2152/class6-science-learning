@@ -53,7 +53,7 @@ This file is the project queue. When the user says `next`, continue with the fir
 ## Phase 7 — Social Science (पूर्ण हिंदी)
 - [x] Create Social Science architecture and 14-chapter Hindi learning hub
 - [x] Add detailed chapter lessons, examples and source-based learning
-- [ ] Add map skills and interactive map activities
+- [x] Add map skills and interactive map activities
 - [ ] Add large Hindi practice bank with explanations
 - [ ] Add chapter tests and full Social Science CBT
 - [ ] Add Hindi Social Science Tutor with chapter context
