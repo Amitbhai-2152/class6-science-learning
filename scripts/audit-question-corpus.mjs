@@ -32,7 +32,7 @@ const similarity = (a, b) => {
   return common / (A.size + B.size - common);
 };
 
-function addQuestion(source, index, question, options = [], answer = -1, explanation = '') {
+function addQuestion(source, index, question, options = [], answer = -1, explanation = '', { legacyTuple = false } = {}) {
   const stem = normalize(question);
   if (!stem) return;
   const key = `${source}#${index}`;
@@ -54,12 +54,24 @@ function addQuestion(source, index, question, options = [], answer = -1, explana
       if (normalizedOptions[i] && normalizedOptions[i] === correct) {
         report.push(`[DISTRACTOR] ${key} repeats the correct answer as an option.`);
       }
-      if (normalizedOptions[i] && correct && (normalizedOptions[i].includes(correct) || correct.includes(normalizedOptions[i])) && normalizedOptions[i].length > 2) {
-        report.push(`[DISTRACTOR-OVERLAP] ${key} has a distractor that contains the correct-answer wording.`);
+      // Do not treat ordinary morphology or compound words as defective overlap.
+      // Example: clear / clearly / cleared and पारदर्शिता / अपारदर्शिता are useful
+      // distractor relationships rather than answer leakage by themselves.
+      const correctTokens = tokens(correct);
+      const distractorTokens = tokens(normalizedOptions[i]);
+      if (correctTokens.size >= 2 && distractorTokens.size >= 2) {
+        let shared = 0;
+        for (const token of correctTokens) if (distractorTokens.has(token)) shared++;
+        if (shared >= 2 && shared / Math.min(correctTokens.size, distractorTokens.size) >= 0.8) {
+          report.push(`[DISTRACTOR-OVERLAP] ${key} has a distractor with unusually high phrase overlap.`);
+        }
       }
     }
   }
-  if (!explanation || normalize(explanation).length < 12) {
+  // Tuple-form GK banks intentionally use the legacy [question, options, answer]
+  // contract and have no explanation field. Their structural validity is checked
+  // elsewhere; do not report absent explanation metadata as an editorial defect.
+  if (!legacyTuple && (!explanation || normalize(explanation).length < 12)) {
     report.push(`[EXPLANATION] ${key} has no sufficiently specific explanation.`);
   }
 }
@@ -99,7 +111,7 @@ function extractTuples(source, relative) {
   for (const match of source.matchAll(re)) {
     const options = [...match[3].matchAll(/(['"])((?:\\.|(?!\1).)*)\1/g)].map(m => m[2]);
     index++;
-    addQuestion(relative, `tuple-${index}`, match[2], options, Number(match[4]), '');
+    addQuestion(relative, `tuple-${index}`, match[2], options, Number(match[4]), '', { legacyTuple: true });
   }
 }
 
