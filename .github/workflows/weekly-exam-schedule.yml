@@ -12,9 +12,8 @@ on:
       - 'scripts/check-question-quality.mjs'
       - 'scripts/audit-question-corpus.mjs'
       - 'scripts/check-challenge-review-quality.mjs'
+      - 'scripts/check-final-syllabus-contract.mjs'
       - 'js/quiz-engine.js'
-      - 'js/test-review.js'
-      - 'index.html'
       - 'chapters/**'
       - 'subjects/**'
       - 'package.json'
@@ -23,16 +22,14 @@ on:
     paths:
       - 'tests/weekly-exam-plan.js'
       - 'tests/weekly-exam.js'
-      - 'tests/index.html'
       - 'tests/planner.html'
       - 'scripts/check-weekly-exam.mjs'
       - 'scripts/check-weekly-exam-runtime.mjs'
       - 'scripts/check-question-quality.mjs'
       - 'scripts/audit-question-corpus.mjs'
       - 'scripts/check-challenge-review-quality.mjs'
+      - 'scripts/check-final-syllabus-contract.mjs'
       - 'js/quiz-engine.js'
-      - 'js/test-review.js'
-      - 'index.html'
       - 'chapters/**'
       - 'subjects/**'
       - 'package.json'
@@ -50,7 +47,7 @@ jobs:
         with:
           node-version: 22
       - name: Validate JavaScript syntax
-        run: node --check tests/weekly-exam-plan.js && node --check tests/weekly-exam.js && node --check scripts/check-question-quality.mjs && node --check scripts/check-weekly-exam-runtime.mjs && node --check scripts/audit-question-corpus.mjs && node --check scripts/check-challenge-review-quality.mjs && node --check js/quiz-engine.js && node --check js/test-review.js
+        run: node --check tests/weekly-exam-plan.js && node --check tests/weekly-exam.js && node --check scripts/check-question-quality.mjs && node --check scripts/check-weekly-exam-runtime.mjs && node --check scripts/audit-question-corpus.mjs && node --check scripts/check-challenge-review-quality.mjs && node --check scripts/check-final-syllabus-contract.mjs && node --check js/quiz-engine.js && node --check js/test-review.js
       - name: Run static weekly exam contract check
         run: npm run check:weekly-exam
       - name: Run executable weekly exam schedule test
@@ -59,5 +56,7 @@ jobs:
         run: npm run check:question-quality
       - name: Run challenge review quality check
         run: npm run check:challenge-review-quality
+      - name: Run final syllabus contract check
+        run: npm run check:final-syllabus
       - name: Run corpus educational audit
         run: node scripts/audit-question-corpus.mjs
