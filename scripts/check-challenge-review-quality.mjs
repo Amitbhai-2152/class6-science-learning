@@ -5,6 +5,8 @@ import vm from 'node:vm';
 const root = process.cwd();
 const chapterPaths = Array.from({ length: 12 }, (_, i) => path.join(root, 'chapters', `chapter-${String(i + 1).padStart(2, '0')}.js`));
 const quizEnginePath = path.join(root, 'js', 'quiz-engine.js');
+const reviewPath = path.join(root, 'js', 'test-review.js');
+const indexPath = path.join(root, 'index.html');
 
 function loadChapter(file) {
   const source = fs.readFileSync(file, 'utf8');
@@ -42,8 +44,19 @@ function effectiveExplanation(chapter, question) {
 }
 
 const quizEngine = fs.readFileSync(quizEnginePath, 'utf8');
+const review = fs.readFileSync(reviewPath, 'utf8');
+const indexHtml = fs.readFileSync(indexPath, 'utf8');
+
 if (!quizEngine.includes('window.ExamReview?.explanation?.(q)')) {
   throw new Error('[challenge-review] QuizEngine is not using the chapter-aware explanation resolver.');
+}
+if (!review.includes('explanation(q)')) {
+  throw new Error('[challenge-review] Shared ExamReview explanation resolver is missing.');
+}
+const reviewScript = indexHtml.indexOf('js/test-review.js');
+const quizScript = indexHtml.indexOf('js/quiz-engine.js');
+if (reviewScript < 0 || quizScript < 0 || reviewScript < quizScript) {
+  throw new Error('[challenge-review] index.html must load quiz-engine.js before test-review.js so the resolver is available by submit time.');
 }
 
 let questionCount = 0;
@@ -74,4 +87,4 @@ if (problems.length) {
   process.exit(1);
 }
 
-console.log(`Challenge review quality check passed: ${questionCount} Science challenge questions across 12 chapters have usable review explanations (${explicitCount} explicit + ${fallbackCount} chapter-aware fallbacks), and QuizEngine is wired to the shared resolver.`);
+console.log(`Challenge review quality check passed: ${questionCount} Science challenge questions across 12 chapters have usable review explanations (${explicitCount} explicit + ${fallbackCount} chapter-aware fallbacks), and the production page wires QuizEngine to the shared ExamReview resolver.`);
