@@ -125,16 +125,16 @@ This file is the project queue. When the user says `next`, continue with the fir
 - [x] Add runtime assertions for prep/preview/exam/closed state transitions and T1–T13 syllabus/config contracts
 - [x] Add `npm run check:weekly-exam-runtime` so the executable test is repeatable locally and in CI
 - [x] Add GitHub Actions workflow to execute the runtime schedule test on relevant changes and manual dispatch
-- [ ] Verify the newly added runtime test passes in a GitHub Actions run
+- [x] Verify the newly added runtime test passes in a GitHub Actions run
 
 ### Phase 8 QA boundary
 The final QA pass is repository/static verification of the committed implementation. A live browser/device session is still the appropriate place for final human visual acceptance testing; this queue does not claim a browser session was executed by the assistant.
 
 ### Maintenance QA boundary
-Revision, platform-integrity, entry/exit navigation, Sunday examination planner, Sunday examination hardening, exact weekly syllabus enforcement, candidate test UX hardening, and executable weekly schedule verification are verified from the committed GitHub source, route wiring, schedule/syllabus contracts and feature integration. A live browser/device session is still the appropriate place for final human visual acceptance testing; the repository does not claim such a session was executed by the assistant. The executable weekly schedule test is wired into GitHub Actions, but its CI result has not yet been independently confirmed here.
+Revision, platform-integrity, entry/exit navigation, Sunday examination planner, Sunday examination hardening, exact weekly syllabus enforcement, candidate test UX hardening, and executable weekly schedule verification are verified from the committed GitHub source, route wiring, schedule/syllabus contracts and feature integration. A live browser/device session is still the appropriate place for final human visual acceptance testing; the repository does not claim such a session was executed by the assistant. The executable weekly schedule test was independently confirmed by a successful GitHub Actions run after the workflow was added.
 
 ## Queue status
-**Current queue is pending the first GitHub Actions pass of executable weekly schedule verification.** Future work should be treated as a new feature/maintenance request after that verification is confirmed.
+**Current queue is ready for a new feature/maintenance request.** The executable weekly schedule verification checkpoint is complete. Future `next` work should be treated as a new feature/maintenance request after this verified checkpoint.
 
 ## Rule for `next`
 1. Take the first unchecked task in this queue.
