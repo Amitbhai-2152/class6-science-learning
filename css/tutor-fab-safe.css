@@ -30,6 +30,50 @@ body:has(#lessonView:not(.hidden)) .chat-wrap{
   z-index:50 !important;
 }
 
+/* Unified Revision layout guard.
+   The revision hub is mounted inside the legacy .lesson-head wrapper.
+   That wrapper is a flex row for lesson pages, which makes the new revision
+   dashboard collapse into a distorted horizontal layout. Keep the revision
+   page itself block-flow and let the dashboard own its responsive grid. */
+#revisionView > .lesson-head{
+  display:block !important;
+  width:100%;
+}
+#revisionView > .lesson-head > h1{margin:7px 0 4px;}
+#revisionView > .lesson-head > .muted{margin:0 0 12px;}
+#revisionView #revisionPlan{
+  display:block !important;
+  width:100%;
+  min-width:0;
+  margin-top:14px;
+}
+#revisionView #revisionContent{
+  display:block;
+  width:100%;
+  min-width:0;
+}
+#revisionView .ur-shell,
+#revisionView .ur-grid,
+#revisionView .ur-card,
+#revisionView .ur-hero,
+#revisionView .ur-toolbar,
+#revisionView .ur-tabs{
+  min-width:0;
+}
+#revisionView .ur-tabs,
+#revisionView .ur-toolbar{width:100%;}
+#revisionView .ur-search{max-width:none;}
+
+@media(max-width:700px){
+  #revisionView > .lesson-head{padding:15px;}
+  #revisionView .ur-stats{grid-template-columns:repeat(2,minmax(0,1fr));}
+  #revisionView .ur-grid{grid-template-columns:1fr;}
+}
+@media(max-width:430px){
+  #revisionView .ur-stats{grid-template-columns:repeat(2,minmax(0,1fr));}
+  #revisionView .ur-card{padding:13px;}
+}
+
 @media(max-width:580px){
   .chat-fab{right:12px;bottom:82px;}
   .chat-wrap{right:10px;bottom:144px;}
