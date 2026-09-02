@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "check:navigation": "node scripts/check-navigation.mjs"
   },
   "dependencies": {
     "express": "^5.1.0",
