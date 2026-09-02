@@ -1,6 +1,15 @@
 (function(){
   'use strict';
+  function refreshTutorSafeStyle(){
+    if(document.querySelector('link[data-tutor-safe-v2]'))return;
+    const link=document.createElement('link');
+    link.rel='stylesheet';
+    link.href='css/tutor-fab-safe.css?v=2';
+    link.dataset.tutorSafeV2='true';
+    document.head.appendChild(link);
+  }
   function route(){
+    refreshTutorSafeStyle();
     try{
       const params=new URLSearchParams(location.search);
       const view=params.get('view');
