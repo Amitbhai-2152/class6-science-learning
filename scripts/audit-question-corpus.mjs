@@ -23,7 +23,11 @@ const normalize = (value) => String(value ?? '')
   .replace(/\s+/g, ' ')
   .trim();
 
-const tokens = (value) => new Set(normalize(value).split(/\s+/).filter(x => x.length > 1));
+const tokens = (value) => new Set(
+  normalize(value)
+    .split(/\s+/)
+    .filter(x => x.length > 1 || /^[a-z0-9]$/i.test(x))
+);
 const similarity = (a, b) => {
   const A = tokens(a), B = tokens(b);
   if (A.size < 5 || B.size < 5) return 0;
@@ -55,8 +59,6 @@ function addQuestion(source, index, question, options = [], answer = -1, explana
         report.push(`[DISTRACTOR] ${key} repeats the correct answer as an option.`);
       }
       // Do not treat ordinary morphology or compound words as defective overlap.
-      // Example: clear / clearly / cleared and पारदर्शिता / अपारदर्शिता are useful
-      // distractor relationships rather than answer leakage by themselves.
       const correctTokens = tokens(correct);
       const distractorTokens = tokens(normalizedOptions[i]);
       if (correctTokens.size >= 2 && distractorTokens.size >= 2) {
@@ -68,9 +70,6 @@ function addQuestion(source, index, question, options = [], answer = -1, explana
       }
     }
   }
-  // Tuple-form GK banks intentionally use the legacy [question, options, answer]
-  // contract and have no explanation field. Their structural validity is checked
-  // elsewhere; do not report absent explanation metadata as an editorial defect.
   if (!legacyTuple && (!explanation || normalize(explanation).length < 12)) {
     report.push(`[EXPLANATION] ${key} has no sufficiently specific explanation.`);
   }
