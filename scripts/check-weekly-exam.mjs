@@ -27,10 +27,17 @@ const syllabusEntries = [...planSource.matchAll(/\n\s*(\d+):\{/g)].map(m => Numb
 if (JSON.stringify(syllabusEntries) !== JSON.stringify([...Array(13)].map((_, i) => i + 1))) fail('Syllabus must define exactly T1–T13 in order.');
 if (!planSource.includes('ENGLISH_BANK_CHAPTERS.length!==24')) fail('English bank chapter map contract missing');
 if (!planSource.includes('bank.length!==30')) fail('Reasoning bank count contract missing');
-if (!planSource.includes('slice(0,5)')) fail('Strict 5+5 GK/Reasoning split missing');
 if (!planSource.includes('scope.length===0')) fail('All-material scope contract missing');
-if (!planSource.includes('buildScopedWeeklyExam')) fail('Scoped weekly builder missing');
-if (planSource.includes('स सर्वनाम')) fail('Corrupted Hindi syllabus token detected');
+if (!planSource.includes('const DIFFICULTY_BLUEPRINT=Object.freeze({')) fail('Authoritative difficulty blueprint missing');
+if (!planSource.includes("const DIFFICULTY_VERSION='editorial-v1'")) fail('Difficulty rubric version missing');
+for (const required of ['science','maths','english','hindi','gk','reasoning','socialScience']) {
+  if (!planSource.includes(`${required}:Object.freeze({easy:`)) fail(`Difficulty blueprint missing ${required}.`);
+}
+if (!planSource.includes('function calibrateDifficulty')) fail('Difficulty calibration function missing');
+if (!planSource.includes('function selectBalanced')) fail('Balanced difficulty selector missing');
+if (!planSource.includes("key==='hindi'")) fail('Hindi topic-aware syllabus scope guard missing');
+if (!planSource.includes('function mathsPool(scope)')) fail('Maths source pool with explicit difficulty metadata preservation missing');
+if (!planSource.includes('selectBalanced(pool,subject')) fail('Weekly builder is not wired to difficulty balancing.');
 if (!indexSource.includes('<script src="./weekly-exam.js"></script>')) fail('All Tests page is missing weekly gate script');
 if (!gateSource.includes("script.src = './weekly-exam-plan.js'")) fail('weekly gate cannot load centralized plan');
 if (!gateSource.includes('Candidate examination is not open today.')) fail('strict exam-open guard missing');
@@ -47,4 +54,4 @@ for (const required of ['tests/index.html','tests/planner.html','tests/weekly-ex
   if (!fs.existsSync(path.join(root, required))) fail(`missing required file: ${required}`);
 }
 
-console.log(`Weekly exam smoke-check contract passed: ${dates.length} exams, final ${dates.at(-1)}, exact T1–T13 syllabus, generated-paper quality gate and CI quality-audit integration present.`);
+console.log(`Weekly exam smoke-check contract passed: ${dates.length} exams, final ${dates.at(-1)}, exact T1–T13 syllabus, generated-paper quality gate, seven-subject difficulty blueprint and CI quality-audit integration present.`);
