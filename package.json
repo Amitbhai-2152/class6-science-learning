@@ -9,6 +9,7 @@
     "check:weekly-exam-runtime": "node scripts/check-weekly-exam-runtime.mjs",
     "check:challenge-review-quality": "node scripts/check-challenge-review-quality.mjs",
     "check:final-syllabus": "node scripts/check-final-syllabus-contract.mjs",
+    "check:all-tests-validation": "node scripts/check-all-tests-validation.mjs",
     "check:question-quality": "node scripts/check-question-quality.mjs"
   },
   "dependencies": {
