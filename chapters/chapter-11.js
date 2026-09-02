@@ -29,7 +29,7 @@ window.chapter11={
  {question:"कौन-सा cause-effect chain सबसे उचित है?",options:["पेड़ काटना → habitat loss → कई जीव प्रभावित","पेड़ काटना → तुरंत बारिश बढ़ना","पानी बचाना → प्रदूषण बढ़ना","reusing → resources का तुरंत नाश"],answer:0},
  {question:"एक ही प्राकृतिक संसाधन को लंबे समय तक उपलब्ध रखने के लिए कौन-सा विचार बेहतर है?",options:["अनावश्यक consumption बढ़ाना","efficient use और responsible management","wastage को नजरअंदाज करना","सिर्फ एक बार उपयोग करना"],answer:1},
  {question:"पर्यावरणीय decision में trade-off का अर्थ क्या समझ सकते हैं?",options:["हर decision का zero effect होता है","किसी उपयोगी काम के साथ कुछ environmental cost/impact भी हो सकता है और उसे balance करना पड़ता है","केवल नुकसान","केवल लाभ"],answer:1},
- {question:"कौन-सा कथन सही है?",options:["प्राकृतिक संसाधन असीमित हैं","conservation का मतलब कोई resource कभी उपयोग न करना","जल, वायु और मिट्टी जैसे resources जीवन के लिए महत्वपूर्ण हैं","केवल बड़े जानवर महत्वपूर्ण हैं"],answer:2},
+ {question:"प्राकृतिक संसाधनों और conservation के बारे में कौन-सा कथन सही है?",options:["प्राकृतिक संसाधन असीमित हैं","conservation का मतलब कोई resource कभी उपयोग न करना","जल, वायु और मिट्टी जैसे resources जीवन के लिए महत्वपूर्ण हैं","केवल बड़े जानवर महत्वपूर्ण हैं"],answer:2},
  {question:"Exam में conservation पर strong answer किस structure में होगा?",options:["केवल एक शब्द","Cause → Effect → Responsible action","केवल example बिना reason","केवल definition copy करना"],answer:1}
  ]
 };
