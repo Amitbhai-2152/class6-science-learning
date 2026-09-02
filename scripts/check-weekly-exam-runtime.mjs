@@ -158,9 +158,15 @@ for (const exam of cfg.exams) {
     assert(!stems.has(stem), `T${exam.n} contains duplicate generated stem: ${q.question}`);
     stems.add(stem);
     subjectCounts[q.subject] = (subjectCounts[q.subject] || 0) + 1;
-    difficultyCounts[q.subject] ||= {EASY:0,MEDIUM:0,HARD:0};
+    const difficultyKey = q.subject === 'Science' ? 'science'
+      : q.subject === 'Mathematics' ? 'maths'
+      : q.subject === 'English' ? 'english'
+      : q.subject === 'Hindi' ? 'hindi'
+      : q.subject === 'Social Science' ? 'socialScience'
+      : q.topic === 'Reasoning' ? 'reasoning' : 'gk';
+    difficultyCounts[difficultyKey] ||= {EASY:0,MEDIUM:0,HARD:0};
     assert(['EASY','MEDIUM','HARD'].includes(q.difficulty), `T${exam.n} question has no resolved difficulty.`);
-    difficultyCounts[q.subject][q.difficulty] += 1;
+    difficultyCounts[difficultyKey][q.difficulty] += 1;
 
     const s = syllabus[exam.n];
     if (q.subject === 'Science') assert(s.science.length === 0 || s.science.includes(Number(q.chapterId)), `T${exam.n} Science question escaped syllabus scope.`);
