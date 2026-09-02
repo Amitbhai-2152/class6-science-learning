@@ -1,6 +1,6 @@
 window.ENGLISH_ERROR_BANK=[
 {q:'Choose the sentence with correct simple-present subject–verb agreement.',o:['She go to school every day.','She goes to school every day.','She going to school every day.','She gone to school every day.'],a:1,e:'“She” is singular, so the simple-present verb is “goes”.'},
-{q:'Choose the correct sentence.',o:['They was late.','They is late.','They were late.','They be late.'],a:2,e:'“They” is plural, so the past form of “be” is “were”.'},
+{q:'Choose the sentence with correct past-tense agreement.',o:['They was late.','They is late.','They were late.','They be late.'],a:2,e:'“They” is plural, so the past form of “be” is “were”.'},
 {q:'Choose the corrected sentence: “I has a pencil.”',o:['I have a pencil.','I has a pencil.','I having a pencil.','I had has a pencil.'],a:0,e:'With “I”, use “have”, not “has”.'},
 {q:'Choose the correct article: “He ate ___ apple.”',o:['a','an','the','no article'],a:1,e:'“Apple” begins with a vowel sound, so use “an”.'},
 {q:'Choose the sentence with correct capitalization and sentence boundaries.',o:['Riya is my friend. she is kind.','Riya is my friend. She is kind.','Riya is my friend she is kind.','riya is my friend. She is kind.'],a:1,e:'A new sentence begins with a capital letter, so “She” must be capitalized.'},
