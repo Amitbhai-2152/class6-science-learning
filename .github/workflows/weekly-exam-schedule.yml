@@ -22,6 +22,7 @@ on:
     paths:
       - 'tests/weekly-exam-plan.js'
       - 'tests/weekly-exam.js'
+      - 'tests/index.html'
       - 'tests/planner.html'
       - 'scripts/check-weekly-exam.mjs'
       - 'scripts/check-weekly-exam-runtime.mjs'
