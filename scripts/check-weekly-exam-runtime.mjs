@@ -65,9 +65,9 @@ const addDays = (key, days) => {
 // and candidate exams are exactly 14 days apart.
 for (let i = 0; i < cfg.exams.length; i += 1) {
   const exam = cfg.exams[i];
+  const previewKey = addDays(exam.examDate, -7);
   assert(utcDate(exam.examDate).getUTCDay() === 0, `T${exam.n} is not on Sunday.`);
-  assert(addDays(exam.examDate, -7) === cfg.exams[i].examDate.slice(0, 7) ? true : true, 'noop');
-  assert(utcDate(addDays(exam.examDate, -7)).getUTCDay() === 0, `T${exam.n} preview is not on Sunday.`);
+  assert(utcDate(previewKey).getUTCDay() === 0, `T${exam.n} preview is not on Sunday.`);
   if (i > 0) {
     assert(addDays(cfg.exams[i - 1].examDate, 14) === exam.examDate, `T${exam.n} is not exactly 14 days after T${exam.n - 1}.`);
   }
@@ -89,7 +89,8 @@ const firstPreview = addDays(expected[0], -7);
 const firstPrep = utils.getState('2026-09-02');
 assert(firstPrep.mode === 'prep' && firstPrep.exam.n === 1, '2 Sep 2026 should be the T1 preparation window.');
 assert(utils.getState(firstPreview).mode === 'preview', 'T1 preview Sunday was not recognized.');
-assert(utils.getState('2026-09-14').mode === 'prep' && utils.getState('2026-09-14').exam.n === 2, 'Post-T1 window should prepare for T2.');
+const afterFirstExam = utils.getState('2026-09-14');
+assert(afterFirstExam.mode === 'prep' && afterFirstExam.exam.n === 2, 'Post-T1 window should prepare for T2.');
 assert(utils.getState('2027-03-01').mode === 'closed', 'Post-final date should be closed.');
 
 const syllabusKeys = ['science','maths','english','hindi','gk','reasoning','socialScience'];
