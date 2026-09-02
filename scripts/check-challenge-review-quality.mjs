@@ -8,39 +8,22 @@ const quizEnginePath = path.join(root, 'js', 'quiz-engine.js');
 const reviewPath = path.join(root, 'js', 'test-review.js');
 const indexPath = path.join(root, 'index.html');
 
-function loadChapter(file) {
+function loadChapterWithReview(file, reviewSource) {
   const source = fs.readFileSync(file, 'utf8');
   const context = { window: {} };
   vm.runInNewContext(source, context, { filename: file, timeout: 1000 });
   const chapterKey = Object.keys(context.window).find((key) => /^chapter\d{2}$/.test(key));
   if (!chapterKey) throw new Error(`[challenge-review] No chapter object found in ${path.relative(root, file)}`);
-  return context.window[chapterKey];
+  const chapter = context.window[chapterKey];
+  context.window.CHAPTERS = [chapter];
+  context.window.currentChapter = chapter.id;
+  vm.runInNewContext(reviewSource, context, { filename: reviewPath, timeout: 1000 });
+  if (!context.window.ExamReview?.explanation) throw new Error('[challenge-review] ExamReview explanation resolver did not load.');
+  return { chapter, explanation: (question) => context.window.ExamReview.explanation(question) };
 }
 
 function normalize(value) {
   return String(value ?? '').normalize('NFKC').toLocaleLowerCase().replace(/[“”\"'’‘`.,!?;:()[\]{}]/g, ' ').replace(/\s+/g, ' ').trim();
-}
-
-function findSection(chapter, question) {
-  const words = normalize(question).split(/\s+/).filter((word) => word.length > 2);
-  let best = null;
-  let score = 0;
-  for (const section of chapter.sections || []) {
-    const text = normalize(`${section.title} ${section.body} ${section.remember || ''}`);
-    const current = words.reduce((total, word) => total + (text.includes(word) ? 1 : 0), 0);
-    if (current > score) {
-      score = current;
-      best = section;
-    }
-  }
-  return best;
-}
-
-function effectiveExplanation(chapter, question) {
-  if (question.explanation && normalize(question.explanation).length >= 12) return question.explanation;
-  const section = findSection(chapter, question.question);
-  if (section?.remember) return section.remember;
-  return section?.body?.split('।')[0] || '';
 }
 
 const quizEngine = fs.readFileSync(quizEnginePath, 'utf8');
@@ -48,10 +31,10 @@ const review = fs.readFileSync(reviewPath, 'utf8');
 const indexHtml = fs.readFileSync(indexPath, 'utf8');
 
 if (!quizEngine.includes('window.ExamReview?.explanation?.(q)')) {
-  throw new Error('[challenge-review] QuizEngine is not using the chapter-aware explanation resolver.');
+  throw new Error('[challenge-review] QuizEngine is not using the shared ExamReview explanation resolver.');
 }
-if (!review.includes('explanation(q)')) {
-  throw new Error('[challenge-review] Shared ExamReview explanation resolver is missing.');
+if (!review.includes('window.currentChapter') || !review.includes('explanation(q)')) {
+  throw new Error('[challenge-review] Shared ExamReview resolver is missing chapter-context fallback support.');
 }
 const reviewScript = indexHtml.indexOf('js/test-review.js');
 const quizScript = indexHtml.indexOf('js/quiz-engine.js');
@@ -65,7 +48,7 @@ let fallbackCount = 0;
 const problems = [];
 
 for (const file of chapterPaths) {
-  const chapter = loadChapter(file);
+  const { chapter, explanation } = loadChapterWithReview(file, review);
   const relative = path.relative(root, file);
   if (!Array.isArray(chapter.challenge) || chapter.challenge.length !== 12) {
     problems.push(`${relative}: expected exactly 12 challenge questions.`);
@@ -75,9 +58,9 @@ for (const file of chapterPaths) {
     questionCount++;
     if (question.explanation && normalize(question.explanation).length >= 12) explicitCount++;
     else fallbackCount++;
-    const explanation = effectiveExplanation(chapter, question);
-    if (normalize(explanation).length < 12) {
-      problems.push(`${relative}#${index + 1}: effective review explanation is too short or missing.`);
+    const text = explanation(question);
+    if (normalize(text).length < 12) {
+      problems.push(`${relative}#${index + 1}: production review resolver returned a too-short explanation.`);
     }
   });
 }
@@ -87,4 +70,4 @@ if (problems.length) {
   process.exit(1);
 }
 
-console.log(`Challenge review quality check passed: ${questionCount} Science challenge questions across 12 chapters have usable review explanations (${explicitCount} explicit + ${fallbackCount} chapter-aware fallbacks), and the production page wires QuizEngine to the shared ExamReview resolver.`);
+console.log(`Challenge review quality check passed: ${questionCount} Science challenge questions across 12 chapters have usable production review explanations (${explicitCount} explicit + ${fallbackCount} chapter-aware fallbacks). QuizEngine and index.html wiring are also verified.`);
