@@ -9,6 +9,7 @@ on:
       - 'tests/planner.html'
       - 'scripts/check-weekly-exam.mjs'
       - 'scripts/check-weekly-exam-runtime.mjs'
+      - 'scripts/check-question-quality.mjs'
       - 'package.json'
       - '.github/workflows/weekly-exam-schedule.yml'
   pull_request:
@@ -19,6 +20,7 @@ on:
       - 'tests/planner.html'
       - 'scripts/check-weekly-exam.mjs'
       - 'scripts/check-weekly-exam-runtime.mjs'
+      - 'scripts/check-question-quality.mjs'
       - 'package.json'
       - '.github/workflows/weekly-exam-schedule.yml'
   workflow_dispatch:
@@ -34,8 +36,10 @@ jobs:
         with:
           node-version: 22
       - name: Validate JavaScript syntax
-        run: node --check tests/weekly-exam-plan.js && node --check scripts/check-weekly-exam-runtime.mjs
+        run: node --check tests/weekly-exam-plan.js && node --check tests/weekly-exam.js && node --check scripts/check-question-quality.mjs && node --check scripts/check-weekly-exam-runtime.mjs
       - name: Run static weekly exam contract check
         run: npm run check:weekly-exam
       - name: Run executable weekly exam schedule test
         run: npm run check:weekly-exam-runtime
+      - name: Run question quality audit
+        run: npm run check:question-quality
