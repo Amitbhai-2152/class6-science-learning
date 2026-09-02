@@ -111,14 +111,22 @@ This file is the project queue. When the user says `next`, continue with the fir
 - [x] Surface the same exact syllabus on the All Tests banner and planner
 - [x] Extend the repository smoke-check to cover syllabus structure and scoped-paper contracts
 
+## Post-Phase-8 maintenance — Candidate test UX hardening
+- [x] Prevent the Science AI Tutor floating control from overlapping lesson Back/Next navigation on mobile and desktop layouts
+- [x] Add a pre-test candidate-instruction gate for the Science full test
+- [x] Add a pre-start instruction gate for Science CBT after candidate details are filled
+- [x] Add candidate instructions before Science chapter challenges
+- [x] Add a visible candidate-instruction block before Maths Practice/CBT entry
+- [x] Preserve test landing pages as the explicit place where candidates review rules before starting timed tests
+
 ### Phase 8 QA boundary
 The final QA pass is repository/static verification of the committed implementation. A live browser/device session is still the appropriate place for final human visual acceptance testing; this queue does not claim a browser session was executed by the assistant.
 
 ### Maintenance QA boundary
-Revision, platform-integrity, entry/exit navigation, Sunday examination planner, Sunday examination hardening, and exact weekly syllabus enforcement are verified from the committed GitHub source, route wiring, schedule/syllabus contracts and feature integration. A live browser/device session is still the appropriate place for final human visual acceptance testing; the repository does not claim such a session was executed by the assistant.
+Revision, platform-integrity, entry/exit navigation, Sunday examination planner, Sunday examination hardening, exact weekly syllabus enforcement, and candidate test UX hardening are verified from the committed GitHub source, route wiring, schedule/syllabus contracts and feature integration. A live browser/device session is still the appropriate place for final human visual acceptance testing; the repository does not claim such a session was executed by the assistant.
 
 ## Queue status
-**Current queue is complete through exact weekly syllabus enforcement.** Future work should be treated as a new feature/maintenance request rather than assuming an unfinished queue item.
+**Current queue is complete through candidate test UX hardening.** Future work should be treated as a new feature/maintenance request rather than assuming an unfinished queue item.
 
 ## Rule for `next`
 1. Take the first unchecked task in this queue.
