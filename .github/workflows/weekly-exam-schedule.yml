@@ -13,6 +13,7 @@ on:
       - 'scripts/audit-question-corpus.mjs'
       - 'scripts/check-challenge-review-quality.mjs'
       - 'scripts/check-final-syllabus-contract.mjs'
+      - 'scripts/check-all-tests-validation.mjs'
       - 'js/quiz-engine.js'
       - 'chapters/**'
       - 'subjects/**'
@@ -30,6 +31,7 @@ on:
       - 'scripts/audit-question-corpus.mjs'
       - 'scripts/check-challenge-review-quality.mjs'
       - 'scripts/check-final-syllabus-contract.mjs'
+      - 'scripts/check-all-tests-validation.mjs'
       - 'js/quiz-engine.js'
       - 'chapters/**'
       - 'subjects/**'
@@ -48,11 +50,13 @@ jobs:
         with:
           node-version: 22
       - name: Validate JavaScript syntax
-        run: node --check tests/weekly-exam-plan.js && node --check tests/weekly-exam.js && node --check scripts/check-question-quality.mjs && node --check scripts/check-weekly-exam-runtime.mjs && node --check scripts/audit-question-corpus.mjs && node --check scripts/check-challenge-review-quality.mjs && node --check scripts/check-final-syllabus-contract.mjs && node --check js/quiz-engine.js && node --check js/test-review.js
+        run: node --check tests/weekly-exam-plan.js && node --check tests/weekly-exam.js && node --check scripts/check-question-quality.mjs && node --check scripts/check-weekly-exam-runtime.mjs && node --check scripts/audit-question-corpus.mjs && node --check scripts/check-challenge-review-quality.mjs && node --check scripts/check-final-syllabus-contract.mjs && node --check scripts/check-all-tests-validation.mjs && node --check js/quiz-engine.js && node --check js/test-review.js
       - name: Run static weekly exam contract check
         run: npm run check:weekly-exam
       - name: Run executable weekly exam schedule test
         run: npm run check:weekly-exam-runtime
+      - name: Run All Tests validation check
+        run: npm run check:all-tests-validation
       - name: Run question quality audit
         run: npm run check:question-quality
       - name: Run challenge review quality check
