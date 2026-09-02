@@ -10,7 +10,7 @@ const assert = (condition, message) => { if (!condition) fail(message); };
 const options = ['Option A','Option B','Option C','Option D'];
 const normalized = (subject, chapterId, index, topic = '') => ({
   subject, topic, question:`${subject} ${topic || `chapter ${chapterId}`} synthetic question ${index}`,
-  options, answer:0, explanation:'synthetic explanation', example:'synthetic example', chapterId, difficulty:'MEDIUM'
+  options, answer:0, explanation:'synthetic explanation', example:'synthetic example', chapterId
 });
 const norm = (q, subject, extra = {}) => ({
   subject,
@@ -27,8 +27,7 @@ const norm = (q, subject, extra = {}) => ({
 const poolFor = (key) => {
   if (key === 'science' || key === 'socialScience') {
     const subject = key === 'science' ? 'Science' : 'Social Science';
-    const chapters = 14;
-    return Array.from({length:chapters}, (_,c) => Array.from({length:5}, (_,i) => normalized(subject,c+1,i+1))).flat();
+    return Array.from({length:14}, (_,c) => Array.from({length:5}, (_,i) => normalized(subject,c+1,i+1))).flat();
   }
   if (key === 'hindi') {
     return ['संज्ञा','सर्वनाम','विशेषण','क्रिया-काल'].flatMap((topic,t) => Array.from({length:5}, (_,i) => normalized('Hindi','',t*5+i+1,topic)));
