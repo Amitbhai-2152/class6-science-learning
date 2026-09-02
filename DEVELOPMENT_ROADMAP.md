@@ -56,7 +56,7 @@ This file is the project queue. When the user says `next`, continue with the fir
 - [x] Add map skills and interactive map activities
 - [x] Add large Hindi practice bank with explanations
 - [x] Add chapter tests and full Social Science CBT
-- [ ] Add Hindi Social Science Tutor with chapter context
+- [x] Add Hindi Social Science Tutor with chapter context
 - [ ] Add Social Science progress, XP, mastery, revision and badges
 - [ ] Run Social Science mobile/accessibility/runtime QA
 
