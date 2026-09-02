@@ -2,7 +2,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const root = process.cwd();
-const IGNORE = new Set(['node_modules', '.git']);
 const QUESTION_START = /\{\s*(?:question|q)\s*:/g;
 const TUPLE_QUESTION = /\[\s*(['"])((?:\\.|(?!\1).)*)\1\s*,\s*\[([^\]]+)\]\s*,\s*(-?\d+)\s*\]/g;
 const REQUIRED_BANKS = [
@@ -18,7 +17,6 @@ const REQUIRED_BANKS = [
 ];
 const fail = (message) => { throw new Error(`[question-quality] ${message}`); };
 const warnings = [];
-const files = [];
 const globalStems = new Map();
 const metrics = {
   total: 0,
@@ -38,15 +36,6 @@ function normalizeText(value) {
     .replace(/\s+/g, ' ')
     .trim()
     .toLocaleLowerCase();
-}
-
-function walk(dir) {
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    if (IGNORE.has(entry.name)) continue;
-    const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) walk(full);
-    else if (/\.(?:js|html)$/i.test(entry.name)) files.push(full);
-  }
 }
 
 function quoted(source, start) {
@@ -152,7 +141,6 @@ function registerStem(relative, index, question) {
   } else {
     globalStems.set(stem, { file: relative, index });
   }
-  return stem;
 }
 
 function validateOptions(relative, index, options, answer) {
@@ -205,23 +193,22 @@ function inspectTupleQuestions(relative, source) {
     count++;
     metrics.total++;
     metrics.tupleQuestions++;
-    const question = match[2];
-    registerStem(relative, count, question);
+    registerStem(relative, count, match[2]);
     const options = splitTopLevel(match[3]).map(tokenValue).filter(Boolean);
     validateOptions(relative, count, options, Number(match[4]));
   }
   return count;
 }
 
-walk(root);
-
+/* Only inspect authoritative question-bank sources. Scanning every JS/HTML file
+   causes UI helpers (for example { q: dynamicValue }) to be mistaken for test
+   question records. The quality gate must judge the actual banks, not UI code. */
 for (const required of REQUIRED_BANKS) {
   if (!fs.existsSync(path.join(root, required))) fail(`required question bank file is missing: ${required}`);
 }
 
-for (const file of files) {
-  const source = fs.readFileSync(file, 'utf8');
-  const relative = path.relative(root, file).replaceAll(path.sep, '/');
+for (const relative of REQUIRED_BANKS) {
+  const source = fs.readFileSync(path.join(root, relative), 'utf8');
   inspectObjectQuestions(relative, source);
   if (relative === 'subjects/gk/gk-hi-content.js' || relative === 'subjects/gk/gk-hi-reasoning.js') {
     inspectTupleQuestions(relative, source);
@@ -234,8 +221,7 @@ if (metrics.fallbackExplanations > 0) warnings.push(`${metrics.fallbackExplanati
 if (metrics.difficultyMetadata === 0) warnings.push('No explicit difficulty metadata was found in the inspected question objects; difficulty balancing is therefore not yet authoritative.');
 if (metrics.skillMetadata === 0) warnings.push('No explicit skill/cognitive metadata was found in the inspected question objects; cognitive-level balancing is therefore not yet authoritative.');
 
-const fileCount = REQUIRED_BANKS.length;
-console.log(`Question quality audit PASSED: ${metrics.total} question items validated (${metrics.objectQuestions} object-form + ${metrics.tupleQuestions} tuple-form) across required Class 6 banks. Structural checks: non-empty stems, unique stems within each source file, 4+ unique options, valid answer indexes, bank presence. Explicit explanations: ${metrics.explicitExplanation}; examples/hints: ${metrics.exampleOrHint}; warnings: ${warnings.length}. Difficulty metadata: ${metrics.difficultyMetadata}; skill/cognitive metadata: ${metrics.skillMetadata}. Required banks checked: ${fileCount}.`);
+console.log(`Question quality audit PASSED: ${metrics.total} question items validated (${metrics.objectQuestions} object-form + ${metrics.tupleQuestions} tuple-form) across ${REQUIRED_BANKS.length} authoritative Class 6 banks. Structural checks: non-empty stems, unique stems within each source file, 4+ unique options, valid answer indexes, bank presence. Explicit explanations: ${metrics.explicitExplanation}; examples/hints: ${metrics.exampleOrHint}; warnings: ${warnings.length}. Difficulty metadata: ${metrics.difficultyMetadata}; skill/cognitive metadata: ${metrics.skillMetadata}.`);
 if (warnings.length) {
   console.log('Non-blocking quality findings:');
   for (const warning of warnings.slice(0, 40)) console.log(`- ${warning}`);
