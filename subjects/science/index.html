@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f766e">
+<title>Science • कक्षा 6</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f3fafb;color:#17252b;font-family:system-ui,-apple-system,"Noto Sans Devanagari","Segoe UI",sans-serif}.top{background:linear-gradient(120deg,#164e63,#0f766e);color:#fff;padding:24px 16px 30px}.wrap,.main{max-width:1120px;margin:auto}.back{color:#e5fffb;text-decoration:none;font-weight:900}.pill{display:inline-block;margin-top:17px;padding:7px 10px;border-radius:999px;background:#ffffff1c;font-size:11px;font-weight:900}.top h1{margin:9px 0 5px;font-size:clamp(30px,6vw,50px)}.top p{margin:0;color:#d9f4f0;line-height:1.6}.main{padding:22px 16px 65px}.hero{background:#fff;border:1px solid #d9e8eb;border-radius:20px;padding:20px;box-shadow:0 12px 30px rgba(15,61,72,.08)}.hero h2{margin:0 0 6px}.hero p{margin:0;color:#62747b;line-height:1.65}..grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;margin-top:18px}.card{display:flex;flex-direction:column;min-height:175px;padding:17px;border:1px solid #d9e8eb;border-radius:18px;background:#fff;color:inherit;text-decoration:none;box-shadow:0 10px 26px rgba(15,61,72,.06);transition:transform .16s ease,box-shadow .16s ease}.card:hover{transform:translateY(-3px);box-shadow:0 15px 30px rgba(15,61,72,.1)}.num{font-size:12px;font-weight:950;color:#0f766e}.icon{font-size:34px;margin-top:9px}.card h2{margin:7px 0 5px;font-size:19px}.card p{margin:0;color:#62747b;font-size:12px;line-height:1.55}.go{margin-top:auto;padding-top:14px;font-weight:950;color:#0f766e}.note{margin-top:18px;padding:13px 15px;border-radius:13px;background:#eaf7f5;border:1px solid #c5e5df;color:#315760;line-height:1.6;font-size:13px}@media(max-width:850px){.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:560px){.main{padding:18px 12px 55px}.grid{grid-template-columns:1fr}.card{min-height:150px}.top{padding:20px 13px 27px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap"><a class="back" href="../all-classes.html">← All Classes</a><div class="pill">CLASS 6 • SCIENCE</div><h1>विज्ञान प्रयोगशाला 🔬</h1><p>12 अध्याय • Visual learning • Activities • Quiz • Tutor</p></div></header>
+<main class="main">
+<section class="hero"><h2>📚 Science Learning Hub</h2><p>पहले अपना chapter चुनो। Chapter खोलने के बाद उसका exit हमेशा इसी Science subject section पर लौटेगा — सीधे main Home पर नहीं।</p></section>
+<section class="grid" id="chapters"></section>
+<div class="note">Learning path: Chapter → concept → activity → quiz. किसी दूसरे subject पर जाने के लिए पहले All Classes पर लौटें।</div>
+</main>
+<script src="../../chapters/chapter-01.js"></script><script src="../../chapters/chapter-02.js"></script><script src="../../chapters/chapter-03.js"></script><script src="../../chapters/chapter-04.js"></script><script src="../../chapters/chapter-05.js"></script><script src="../../chapters/chapter-06.js"></script><script src="../../chapters/chapter-07.js"></script><script src="../../chapters/chapter-08.js"></script><script src="../../chapters/chapter-09.js"></script><script src="../../chapters/chapter-10.js"></script><script src="../../chapters/chapter-11.js"></script><script src="../../chapters/chapter-12.js"></script>
+<script>
+const icons=['🌱','🍃','🍽️','💧','🧲','🔥','🔭','🌧️','🧂','📏','💡','🌍'];
+const chapters=window.CHAPTERS||[window.chapter01,window.chapter02,window.chapter03,window.chapter04,window.chapter05,window.chapter06,window.chapter07,window.chapter08,window.chapter09,window.chapter10,window.chapter11,window.chapter12].filter(Boolean);
+document.getElementById('chapters').innerHTML=chapters.map((c,i)=>`<a class="card" href="../../index.html?view=science&chapter=${c.id}"><span class="num">अध्याय ${c.id}</span><span class="icon">${icons[i]||'🔬'}</span><h2>${c.title}</h2><p>${c.goal||'Concept समझो और अभ्यास करो।'}</p><span class="go">अध्याय खोलें →</span></a>`).join('');
+</script>
+</body></html>
