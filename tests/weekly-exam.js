@@ -64,7 +64,7 @@
     if (s.mode === 'exam') {
       label = '🟢 EXAM SUNDAY';
       title = `T${exam.n} • ${safe(exam.type)} is LIVE`;
-      text = `Official candidate examination is open today. Exam ID: ${safe(examId(exam))}. The candidate details below are required before the 60-question paper starts.`;
+      text = `Official candidate examination is open today. Exam ID: ${safe(examId(exam))}. The candidate details below are required before the ${cfg().questionCount}-question paper starts.`;
       count = 'LIVE';
       countLabel = `Exam date: ${utils().formatKey(exam.examDate)}`;
       action = `<a class="wb-primary" href="#candidateCard">📝 Start Candidate Registration</a><a class="wb-secondary" href="planner.html">🗓️ Test Planner</a>`;
@@ -106,9 +106,7 @@
       submit.textContent = unlocked ? '📝 Candidate Details Confirm करें और Exam शुरू करें' : '🔒 Candidate Exam — Scheduled Sunday पर खुलेगा';
       submit.title = unlocked ? `Start ${examId(exam)}` : 'Candidate examination is locked until its scheduled Sunday.';
     }
-    if (candidate && !unlocked) {
-      candidate.setAttribute('aria-describedby', 'weeklyExamBanner');
-    }
+    if (candidate && !unlocked) candidate.setAttribute('aria-describedby', 'weeklyExamBanner');
   }
 
   function guardForm() {
@@ -123,7 +121,7 @@
           event.stopImmediatePropagation();
           alert(`Candidate examination locked. The next scheduled exam is ${utils().formatKey(s.exam.examDate)}.`);
         }
-      } catch (error) {
+      } catch (_) {
         event.preventDefault();
         event.stopImmediatePropagation();
         alert('Weekly exam schedule validation failed. The exam is locked for safety.');
@@ -132,8 +130,6 @@
   }
 
   function hardenExamBuilder() {
-    /* Make the weekly paper deterministic so a refresh cannot silently generate
-       a different official paper for the same exam date. */
     if (typeof window.buildExam !== 'function' || window.__weeklyDeterministicBuilder) return;
     const original = window.buildExam;
     window.buildExam = function () {
@@ -171,6 +167,18 @@
     }
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
-  else init();
+  function boot() {
+    if (window.WEEKLY_EXAM_CONFIG && window.WEEKLY_EXAM_UTILS) { init(); return; }
+    const existing = document.querySelector('script[data-weekly-plan]');
+    if (existing) { existing.addEventListener('load', init, { once: true }); return; }
+    const script = document.createElement('script');
+    script.src = './weekly-exam-plan.js';
+    script.dataset.weeklyPlan = 'true';
+    script.onload = init;
+    script.onerror = () => init();
+    document.head.appendChild(script);
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });
+  else boot();
 })();
