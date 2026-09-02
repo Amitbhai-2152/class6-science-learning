@@ -8,10 +8,26 @@ function englishStats(){const h=readJson('class6EnglishProgressV1',{}),pct=Numbe
 function gkStats(){const h=readJson('class6GKProgressV1',{}),q=Number(h.totalQuestions)||0,s=Number(h.totalScore)||0,p=q?Math.round(s/q*100):Number(h.best)||0;return {pct:Math.max(0,Math.min(100,p)),xp:Number(h.xp)||0,badges:Array.isArray(h.badges)?h.badges.length:0,streak:0}}
 function scienceStats(){const h=readJson('class6ScienceProgressV9',{}),completed=Array.isArray(h.completed)?h.completed.length:0;return {pct:Math.round(completed/12*100),completed,xp:Number(h.xp)||0,badges:Array.isArray(h.badges)?h.badges.length:0,streak:Number(h.streak)||0}}
 function sync(){const root=document.querySelector('.home-continue .home-card:nth-child(2)');if(!root)return;const sci=scienceStats(),m=mathsStats(),e=englishStats(),h=hindiStats(),g=gkStats(),ss=sstStats();const set=(id,v)=>{const x=document.getElementById(id);if(x)x.textContent=v};const width=(id,v)=>{const x=document.getElementById(id);if(x)x.style.width=Math.max(0,Math.min(100,Number(v)||0))+'%'};const update=(row,label,pct,meta)=>{row.querySelector('.home-bar-top span').textContent=label;row.querySelector('.home-bar-top span+span').textContent=pct+'%';row.querySelector('.home-bar i').style.width=pct+'%';let small=row.querySelector('small');if(!small){small=document.createElement('small');row.appendChild(small)}small.textContent=meta};set('homeSciencePct2',sci.pct+'%');width('homeScienceBar',sci.pct);const sr=document.getElementById('homeScienceBar')?.closest('.home-bar-row');if(sr)update(sr,'🔬 Science',sci.pct,`${sci.completed}/12 chapters`);set('homeMathsPct',m.pct+'%');width('homeMathsBar',m.pct);const mr=document.getElementById('homeMathsBar')?.closest('.home-bar-row');if(mr)update(mr,'➗ Maths',m.pct,m.pct?'Current subject progress':'Not attempted yet');const make=(id,label,data,afterId)=>{let row=document.getElementById(id);if(!row){row=document.createElement('div');row.id=id;row.className='home-bar-row';row.innerHTML='<div class="home-bar-top"><span></span><span>0%</span></div><div class="home-bar"><i></i></div><small></small>';const anchor=document.getElementById(afterId)?.closest('.home-bar-row');if(anchor)anchor.after(row);else root.appendChild(row)}update(row,label,Math.max(0,Math.min(100,Math.round(Number(data.pct)||0))),data.meta||'Not attempted yet')};make('homeEnglishProgressRow','📘 English',{pct:e.pct,meta:e.pct?'Current subject progress':'Not attempted yet'},'homeMathsBar');make('homeHindiProgressRow','🪔 Hindi',{pct:h.pct,meta:h.pct?'Current subject progress':'Not attempted yet'},'homeEnglishProgressRow');make('homeGKProgressRow','🧠 GK + Reasoning',{pct:g.pct,meta:g.pct?'Current subject progress':'Not attempted yet'},'homeHindiProgressRow');make('homeSstProgressRow','🌏 Social Science',{pct:ss.pct,meta:`${ss.completed}/14 chapters`},'homeGKProgressRow');const combined=window.SharedProgress?.combined?.();set('homeTotalXP',String(combined?.totalXP??(sci.xp+m.xp+e.xp+h.xp+g.xp+ss.xp)));set('homeStreak',String(Math.max(sci.streak,h.streak,ss.streak)));set('badgeHome',String(sci.badges+e.badges+h.badges+g.badges+ss.badges));}
-function installProgressEntry(){window.openProgress=function(){const view=document.getElementById('progressView');if(!view)return;document.querySelectorAll('.view').forEach(x=>x.classList.add('hidden'));view.classList.remove('hidden');const legacy=document.getElementById('progressContent');if(legacy)legacy.innerHTML='';window.SharedProgress?.refresh?.();window.scrollTo({top:0,behavior:'smooth'})};window.dispatchEvent(new Event('home-progress-ready'))}
+function installProgressEntry(){
+ const originalGoHome=window.goHome;
+ window.goHome=function(){try{history.replaceState(null,'',location.pathname+location.search)}catch(_){ }if(typeof originalGoHome==='function')originalGoHome()};
+ window.openProgress=function(){
+  const view=document.getElementById('progressView');
+  if(!view)return;
+  try{location.hash='progress'}catch(_){ }
+  document.querySelectorAll('.view').forEach(x=>x.classList.add('hidden'));
+  view.classList.remove('hidden');
+  const legacy=document.getElementById('progressContent');
+  if(legacy)legacy.innerHTML='';
+  window.SharedProgress?.refresh?.();
+  window.scrollTo({top:0,behavior:'smooth'});
+ };
+ window.dispatchEvent(new Event('home-progress-ready'));
+}
 window.HomeProgressSync={refresh:sync};
-window.addEventListener('DOMContentLoaded',()=>{sync();installProgressEntry();window.SharedProgress?.refresh?.()});
-window.addEventListener('load',()=>{sync();installProgressEntry();window.SharedProgress?.refresh?.()});
+window.addEventListener('DOMContentLoaded',()=>{sync();installProgressEntry();window.SharedProgress?.refresh?.();if(location.hash==='#progress')window.openProgress()});
+window.addEventListener('load',()=>{sync();installProgressEntry();window.SharedProgress?.refresh?.();if(location.hash==='#progress')window.openProgress()});
+window.addEventListener('hashchange',()=>{if(location.hash==='#progress')window.openProgress()});
 window.addEventListener('storage',()=>{sync();window.SharedProgress?.refresh?.()});
 window.addEventListener('science:xp',()=>{sync();window.SharedProgress?.refresh?.()});
 window.addEventListener('hindi:progress',()=>{sync();window.SharedProgress?.refresh?.()});
