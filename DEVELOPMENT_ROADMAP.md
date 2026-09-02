@@ -60,6 +60,16 @@ This file is the project queue. When the user says `next`, continue with the fir
 - [x] Add Social Science progress, XP, mastery, revision and badges
 - [x] Run Social Science mobile/accessibility/runtime QA
 
+## Phase 8 — Platform Final QA & Polish
+- [x] Audit and unify Social Science progress storage compatibility (V1/V2/V3 migration + cache refresh)
+- [ ] Full repository internal-link and redirect audit
+- [ ] Platform-wide script loading and dependency audit
+- [ ] Platform-wide mobile layout, overflow and touch-target audit
+- [ ] Accessibility and keyboard/focus audit across learning, practice, test and tutor flows
+- [ ] CBT/practice scoring, timer, restart and review consistency audit
+- [ ] Remove or quarantine obsolete/duplicate entry pages after verifying all inbound links
+- [ ] Final production smoke-check and roadmap closeout
+
 ## Rule for `next`
 1. Take the first unchecked task in this queue.
 2. Make the change in GitHub.
