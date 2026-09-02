@@ -14,7 +14,7 @@ This file is the project queue. When the user says `next`, continue with the fir
 - [x] Strengthen the repository question-quality audit with explicit structural validation, required bank presence checks, duplicate-stem detection and explanation/metadata reporting
 - [x] Add a runtime quality gate to the scheduled paper for exactly 60 questions, exact subject counts, strict 5-question Reasoning split, unique stems, valid options/answers and syllabus-scope protection
 - [x] Run the strengthened question-quality audit automatically in the weekly examination GitHub Actions workflow
-- [ ] Curate authoritative difficulty metadata across all seven subject question banks and enforce a balanced difficulty blueprint per test
+- [x] Curate authoritative difficulty metadata across all seven subject question banks and enforce a balanced difficulty blueprint per test
 - [ ] Curate authoritative skill/cognitive-level metadata across all seven subject question banks and enforce a balanced cognitive blueprint per test
 - [ ] Audit and repair weak/duplicate question concepts, explanations and distractors across the complete Class 6 corpus
 - [ ] Make T12 and T13 final-exam syllabus coverage explicit chapter/topic contracts instead of relying only on all-material semantics
@@ -23,10 +23,10 @@ This file is the project queue. When the user says `next`, continue with the fir
 The final QA pass is repository/static verification of the committed implementation. A live browser/device session is still the appropriate place for final human visual acceptance testing; this queue does not claim a browser session was executed by the assistant.
 
 ### Maintenance QA boundary
-Revision, platform-integrity, entry/exit navigation, Sunday examination planner, Sunday examination hardening, exact weekly syllabus enforcement, candidate test UX hardening, executable weekly schedule verification, and the first question-bank quality hardening layer are verified from committed GitHub source, route wiring, schedule/syllabus contracts, runtime assertions and CI execution. A live browser/device session is still the appropriate place for final human visual acceptance testing; the repository does not claim such a session was executed by the assistant. The first quality-audit CI attempt exposed an audit-scope bug: the scanner was treating unrelated UI objects such as `{ q: dynamicValue }` in `js/revision-flashcards-v2.js` as question records. That false failure was corrected so the audit inspects only authoritative question-bank sources. The corrected GitHub Actions run #8 then passed syntax validation, the static weekly exam contract, the executable weekly schedule test, and the question-quality audit.
+Revision, platform-integrity, entry/exit navigation, Sunday examination planner, Sunday examination hardening, exact weekly syllabus enforcement, candidate test UX hardening, executable weekly schedule verification, the structural question-quality hardening layer, and the difficulty-blueprint hardening are verified from committed GitHub source, route wiring, schedule/syllabus contracts, runtime assertions and CI execution. A live browser/device session is still the appropriate place for final human visual acceptance testing; the repository does not claim such a session was executed by the assistant. The corrected question-quality CI run #8 passed the structural audit, and the difficulty hardening CI run #14 passed syntax validation, the weekly schedule contract, the executable 13-exam paper-generation/syllabus-scope test, and the question-quality audit.
 
 ## Queue status
-**Current queue is ready for the next quality-hardening task.** The CI checkpoint is complete. The next unchecked item is authoritative difficulty metadata and balanced difficulty enforcement across the seven subject banks.
+**Current queue is ready for the next quality-hardening task.** Difficulty blueprint enforcement is verified. The next unchecked item is authoritative skill/cognitive-level metadata and balanced cognitive blueprint enforcement across the seven subject banks.
 
 ## Rule for `next`
 1. Take the first unchecked task in this queue.
