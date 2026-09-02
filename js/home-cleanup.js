@@ -17,16 +17,14 @@ function clean(){
  if(grid){
   grid.replaceChildren(
    makeCard('🎓','All Classes','Science, Maths, English, Hindi और GK','subjects/all-classes.html'),
-   makeCard('📝','All Tests','सभी available practice tests और CBT','tests/index.html'),
+   makeCard('📝','All Tests','Sunday exam planner, syllabus preview और candidate CBT','tests/planner.html'),
    makeCard('🔁','Revision','कमजोर topics और chapter revision','javascript:void(0)',()=>window.openRevision?.()),
    makeCard('📊','My Progress','Mastery, scores, attempts और XP','javascript:void(0)',()=>window.openProgress?.())
   );
  }
- // These belong inside category pages, not the home screen.
  ['.subject-grid','.test-grid','.home-chapter-section','.reward-stats'].forEach(sel=>{
   const node=home.querySelector(sel); const section=node?.closest('.study-section'); if(section)section.remove();
  });
- // Remove any stale standalone section titles left by older homepage versions.
  home.querySelectorAll('.study-section').forEach(section=>{
   const text=(section.querySelector('h2')?.textContent||'').trim().toLowerCase();
   if(['subjects','test center','science chapters','learning rewards','quick access'].includes(text))section.remove();
