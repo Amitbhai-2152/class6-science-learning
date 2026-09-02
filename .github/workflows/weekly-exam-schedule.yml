@@ -13,6 +13,8 @@ on:
       - 'scripts/audit-question-corpus.mjs'
       - 'scripts/check-challenge-review-quality.mjs'
       - 'js/quiz-engine.js'
+      - 'js/test-review.js'
+      - 'index.html'
       - 'chapters/**'
       - 'subjects/**'
       - 'package.json'
@@ -29,6 +31,8 @@ on:
       - 'scripts/audit-question-corpus.mjs'
       - 'scripts/check-challenge-review-quality.mjs'
       - 'js/quiz-engine.js'
+      - 'js/test-review.js'
+      - 'index.html'
       - 'chapters/**'
       - 'subjects/**'
       - 'package.json'
@@ -46,7 +50,7 @@ jobs:
         with:
           node-version: 22
       - name: Validate JavaScript syntax
-        run: node --check tests/weekly-exam-plan.js && node --check tests/weekly-exam.js && node --check scripts/check-question-quality.mjs && node --check scripts/check-weekly-exam-runtime.mjs && node --check scripts/audit-question-corpus.mjs && node --check scripts/check-challenge-review-quality.mjs && node --check js/quiz-engine.js
+        run: node --check tests/weekly-exam-plan.js && node --check tests/weekly-exam.js && node --check scripts/check-question-quality.mjs && node --check scripts/check-weekly-exam-runtime.mjs && node --check scripts/audit-question-corpus.mjs && node --check scripts/check-challenge-review-quality.mjs && node --check js/quiz-engine.js && node --check js/test-review.js
       - name: Run static weekly exam contract check
         run: npm run check:weekly-exam
       - name: Run executable weekly exam schedule test
