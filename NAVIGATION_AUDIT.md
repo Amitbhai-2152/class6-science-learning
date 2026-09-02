@@ -13,6 +13,8 @@ The platform uses a strict parent-child navigation model for subject learning:
 - Home → All Classes → Subject Hub
 - Subject Hub → Chapter / Subject Tool
 - Chapter / Subject Tool → its own Subject Hub
+- Subject Hub → All Classes
+- All Classes → Home
 - Moving between chapters/topics stays inside the same Subject Hub context.
 
 Child pages must not add global Home / All Classes / All Tests / Revision navigation controls merely to provide an exit. Their primary exit is the immediate parent subject hub.
@@ -37,7 +39,7 @@ Child pages must not add global Home / All Classes / All Tests / Revision naviga
 - Hindi chapters and Hindi learning tools use `← Hindi Home` → `subjects/hindi/index.html`.
 - GK topic/practice/challenge/reasoning flows use `← GK + Reasoning` → `subjects/gk/index.html`.
 - Social Science chapter/practice/tool flows use their local Subject Hub exit → `subjects/social-science/index.html`.
-- Subject hubs themselves exit one level upward to the main Home page.
+- Subject hubs themselves exit one level upward to `subjects/all-classes.html`.
 - Subject chapter links stay within their subject and preserve the `chapter` / `topic` query context.
 
 ## Verified subject tool routes
