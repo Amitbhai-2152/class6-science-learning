@@ -88,14 +88,21 @@ This file is the project queue. When the user says `next`, continue with the fir
 - [x] Preserve full-card subject/chapter entry routes and mobile-sized navigation targets
 - [x] Re-check relative paths from each subject hub after navigation changes
 
+## Post-Phase-8 maintenance — Sunday examination planner
+- [x] Add calendar-driven Sunday Preview → next Sunday Candidate Exam cycle
+- [x] Schedule 13 candidate exams from 13 September 2026 through 28 February 2027
+- [x] Add responsive test planner with live preview/exam status and countdown
+- [x] Route the primary Home All Tests entry to the weekly planner while preserving the existing combined exam engine
+- [x] Document weekly test planner navigation and QA boundary
+
 ### Phase 8 QA boundary
 The final QA pass is repository/static verification of the committed implementation. A live browser/device session is still the appropriate place for final human visual acceptance testing; this queue does not claim a browser session was executed by the assistant.
 
 ### Maintenance QA boundary
-Revision, platform-integrity, and entry/exit navigation maintenance above is verified from the committed GitHub source, route wiring, navigation contracts and progress integration. A live browser/device session is still the appropriate place for final human visual acceptance testing; the repository does not claim such a session was executed by the assistant.
+Revision, platform-integrity, entry/exit navigation, and Sunday examination planner maintenance above is verified from the committed GitHub source, route wiring, navigation contracts and feature integration. A live browser/device session is still the appropriate place for final human visual acceptance testing; the repository does not claim such a session was executed by the assistant.
 
 ## Queue status
-**Development queue closed after Phase 8; Revision, platform-integrity, and entry/exit navigation maintenance items above are completed.** Future work should be treated as a new feature/maintenance request rather than assuming an unfinished queue item.
+**Current queue is complete through the Sunday examination planner maintenance.** Future work should be treated as a new feature/maintenance request rather than assuming an unfinished queue item.
 
 ## Rule for `next`
 1. Take the first unchecked task in this queue.
