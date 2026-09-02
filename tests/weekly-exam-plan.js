@@ -44,12 +44,51 @@ function validateSyllabus(){if(Object.keys(SYLLABUS).length!==13)throw new Error
 window.validateWeeklySyllabus=validateSyllabus;validateSyllabus();
 const hashSeed=text=>{let h=2166136261;for(let i=0;i<text.length;i++)h=Math.imul(h^text.charCodeAt(i),16777619);return h>>>0;};
 const shuffleSeeded=(items,text)=>{let seed=hashSeed(text),out=[...items];const rnd=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};for(let i=out.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[out[i],out[j]]=[out[j],out[i]];}return out;};
-const inScope=(value,scope)=>scope.length===0||scope.includes(Number(value));
+
+/* Editorial difficulty v1. Existing explicit Maths labels are preserved. Other
+   banks receive deterministic subject-calibrated difficulty from a documented rubric. */
+const DIFFICULTY_VERSION='editorial-v1';
+const DIFFICULTY_BLUEPRINT=Object.freeze({
+  science:Object.freeze({easy:3,medium:5,hard:2}),
+  maths:Object.freeze({easy:4,medium:2,hard:4}),
+  english:Object.freeze({easy:3,medium:5,hard:2}),
+  hindi:Object.freeze({easy:3,medium:5,hard:2}),
+  gk:Object.freeze({easy:3,medium:1,hard:1}),
+  reasoning:Object.freeze({easy:2,medium:2,hard:1}),
+  socialScience:Object.freeze({easy:3,medium:5,hard:2})
+});
+const normalizeDifficulty=value=>{const v=String(value??'').trim().toUpperCase();if(v==='HOTS'||v==='HARD')return'HARD';if(v==='MEDIUM')return'MEDIUM';if(v==='EASY')return'EASY';return'';};
+const difficultyStem=q=>String(q?.question??q?.q??'').replace(/\s+/g,' ').trim();
+function rubricScore(q,subject){
+  let score=0;const text=difficultyStem(q);const lower=text.toLocaleLowerCase('hi-IN');
+  if(text.length>90)score+=.9;if(text.length>160)score+=.8;
+  const sentences=(text.match(/[?.!।]/g)||[]).length;if(sentences>=2)score+=.6;
+  if(/\b(why|how|infer|compare|reason|explain|best|statement|cannot|except|correctly|incorrectly)\b|क्यों|कैसे|तुलना|कारण|निष्कर्ष|कथन|नहीं|छोड़कर|सही|गलत/.test(lower))score+=1.1;
+  if(Array.isArray(q?.options)&&q.options.some(o=>String(o).length>36))score+=.4;
+  if(subject==='maths'&&/[×÷=()+\-]/.test(text))score+=.9;
+  if(subject==='science'&&/experiment|evidence|data|measure|compare|cause|प्रयोग|प्रमाण|माप|तुलना|कारण|डेटा/.test(lower))score+=.8;
+  if(subject==='english'&&(text.includes('📖')||/translation|corrected|passage|sentence/.test(lower)))score+=.6;
+  if(subject==='hindi'&&/कौन-सा|में|वाक्य|काल|सर्वनाम|विशेषण|अर्थ|पठित/.test(text))score+=.3;
+  if(subject==='reasoning')score+=.9;
+  if(subject==='socialScience'&&/क्यों|कैसे|तुलना|कारण|स्रोत|मानचित्र|difference|why|how|compare/.test(lower))score+=.7;
+  return Math.min(10,score);
+}
+function validateDifficultyBlueprint(){const keys=Object.keys(DIFFICULTY_BLUEPRINT);if(JSON.stringify(keys)!==JSON.stringify(['science','maths','english','hindi','gk','reasoning','socialScience']))throw new Error('Difficulty blueprint must cover all seven subject banks in order.');keys.forEach(k=>{const b=DIFFICULTY_BLUEPRINT[k],sum=b.easy+b.medium+b.hard,expected=k==='gk'||k==='reasoning'?5:10;if(sum!==expected||Object.values(b).some(v=>!Number.isInteger(v)||v<0))throw new Error(`Difficulty blueprint for ${k} must total ${expected}.`);});return true;}
+validateDifficultyBlueprint();
+function calibrateDifficulty(pool,subject){const blueprint=DIFFICULTY_BLUEPRINT[subject];if(!blueprint)throw new Error(`No difficulty blueprint for ${subject}.`);const items=pool.map((q,i)=>{const explicit=normalizeDifficulty(q?.difficulty??q?.level??q?.d);return{q,index:i,explicit,score:rubricScore(q,subject)};});const missing=items.some(x=>!x.explicit);if(!missing)return items.map(x=>({...x.q,difficulty:x.explicit,difficultyScore:x.score,difficultySource:'explicit'}));
+  const ranked=[...items].sort((a,b)=>a.score-b.score||a.index-b.index);const total=ranked.length;let easyN=Math.round(total*blueprint.easy/(blueprint.easy+blueprint.medium+blueprint.hard));let hardN=Math.round(total*blueprint.hard/(blueprint.easy+blueprint.medium+blueprint.hard));easyN=Math.max(0,Math.min(easyN,total));hardN=Math.max(0,Math.min(hardN,total-easyN));if(easyN+hardN>=total){hardN=Math.max(0,total-easyN-1);}const mediumN=total-easyN-hardN;const band=new Map();ranked.slice(0,easyN).forEach(x=>band.set(x.index,'EASY'));ranked.slice(easyN,easyN+mediumN).forEach(x=>band.set(x.index,'MEDIUM'));ranked.slice(easyN+mediumN).forEach(x=>band.set(x.index,'HARD'));return items.map(x=>({...x.q,difficulty:x.explicit||band.get(x.index)||'MEDIUM',difficultyScore:x.score,difficultySource:x.explicit?'explicit':'rubric-rank-v1'}));}
+function selectBalanced(pool,subject,seedText){const annotated=calibrateDifficulty(pool,subject),blueprint=DIFFICULTY_BLUEPRINT[subject];const selected=[];for(const level of ['easy','medium','hard']){const label=level.toUpperCase(),group=annotated.filter(q=>q.difficulty===label);if(group.length<blueprint[level])throw new Error(`${subject} difficulty pool has only ${group.length} ${label} questions; need ${blueprint[level]}.`);selected.push(...shuffleSeeded(group,`${seedText}:${label}`).slice(0,blueprint[level]));}return shuffleSeeded(selected,`${seedText}:difficulty-paper`);}
+window.WEEKLY_DIFFICULTY_CONTRACT=Object.freeze({version:DIFFICULTY_VERSION,blueprint:DIFFICULTY_BLUEPRINT,normalize:normalizeDifficulty,rubricScore,calibrate:calibrateDifficulty,selectBalanced,validate:validateDifficultyBlueprint});
+
+const inScope=(value,scope)=>scope.length===0||scope.some(x=>String(x)===String(value));
+function mathsPool(scope){const bank=Array.isArray(window.MathsPracticeBank)?window.MathsPracticeBank:[];return bank.map(q=>Object.assign({},norm(q,'Mathematics',{chapterId:q.chapterId}),{difficulty:q.difficulty})).filter(q=>q&&q.question&&q.answer>=0&&(scope.length===0||inScope(q.chapterId,scope)));}
 function englishPool(scope){const bank=window.ENGLISH_PRACTICE_BANK;if(!Array.isArray(bank)||bank.length!==ENGLISH_BANK_CHAPTERS.length)throw new Error('English practice bank/chapter map mismatch.');return bank.map((q,i)=>norm(q,'English',{chapterId:ENGLISH_BANK_CHAPTERS[i]})).filter(q=>q&&q.question&&q.answer>=0&&inScope(q.chapterId,scope));}
-function gkPool(scope){const out=[];if(typeof GK_HI_TOPICS!=='undefined'&&Array.isArray(GK_HI_TOPICS))GK_HI_TOPICS.forEach(t=>{if(inScope(t.id,scope))t.questions.forEach(q=>out.push(norm({q:q[0],o:q[1],a:q[2]},'GK + Reasoning',{topic:t.title})))});return out.filter(q=>q&&q.question&&q.answer>=0);}
-function reasoningPool(scope){const bank=typeof REASONING_HI!=='undefined'&&Array.isArray(REASONING_HI)?REASONING_HI:[];if(bank.length!==30)throw new Error('Reasoning bank must contain exactly 30 questions.');const chosen=scope.length?scope.map(i=>bank[i-1]).filter(Boolean):bank;return chosen.map(q=>norm({q:q[0],o:q[1],a:q[2]},'GK + Reasoning',{topic:'Reasoning'})).filter(q=>q&&q.question&&q.answer>=0);}
-function scopedPool(key,scope){if(key==='english')return englishPool(scope);if(key==='gk')return gkPool(scope);const pool=poolFor(key);return pool.filter(q=>q&&q.question&&q.answer>=0&&(scope.length===0||inScope(q.chapterId,scope)));}
-function buildScopedWeeklyExam(exam){const s=SYLLABUS[exam.n],all=[];SUBJECT_KEYS.forEach(key=>{if(key==='gk'){const gp=scopedPool('gk',s.gk),rp=reasoningPool(s.reasoning);if(gp.length<5)throw new Error(`T${exam.n} GK scope has ${gp.length} usable questions; need 5.`);if(rp.length<5)throw new Error(`T${exam.n} reasoning scope has ${rp.length} usable questions; need 5.`);all.push(...shuffleSeeded(gp,`${exam.examDate}:gk`).slice(0,5),...shuffleSeeded(rp,`${exam.examDate}:reasoning`).slice(0,5));return;}const pool=scopedPool(key,s[key]);if(pool.length<10)throw new Error(`T${exam.n} ${key} scope has ${pool.length} usable questions; need 10.`);all.push(...shuffleSeeded(pool,`${exam.examDate}:${key}`).slice(0,10));});if(all.length!==60)throw new Error(`T${exam.n} generated ${all.length} questions; expected 60.`);return shuffleSeeded(all,`${exam.examDate}:paper`);}
+function gkPool(scope){const out=[];if(typeof GK_HI_TOPICS!=='undefined'&&Array.isArray(GK_HI_TOPICS))GK_HI_TOPICS.forEach(t=>{if(inScope(t.id,scope))t.questions.forEach(q=>out.push(norm({q:q[0],o:q[1],a:q[2]},'GK + Reasoning',{topic:t.title,chapterId:t.id})))});return out.filter(q=>q&&q.question&&q.answer>=0);}
+function reasoningPool(scope){const bank=typeof REASONING_HI!=='undefined'&&Array.isArray(REASONING_HI)?REASONING_HI:[];if(bank.length!==30)throw new Error('Reasoning bank must contain exactly 30 questions.');const chosen=scope.length?scope.map(i=>({q:bank[i-1],id:i})).filter(x=>x.q):bank.map((q,i)=>({q,id:i+1}));return chosen.map(x=>Object.assign(norm({q:x.q[0],o:x.q[1],a:x.q[2]},'GK + Reasoning',{topic:'Reasoning',chapterId:x.id}),{reasoningId:x.id})).filter(q=>q&&q.question&&q.answer>=0);}
+function scopedPool(key,scope){if(key==='maths')return mathsPool(scope);if(key==='english')return englishPool(scope);if(key==='gk')return gkPool(scope);if(key==='reasoning')return reasoningPool(scope);const pool=poolFor(key);if(key==='hindi')return pool.filter(q=>q&&q.question&&q.answer>=0&&(scope.length===0||inScope(q.topic,scope)));return pool.filter(q=>q&&q.question&&q.answer>=0&&(scope.length===0||inScope(q.chapterId,scope)));}
+function buildScopedWeeklyExam(exam){const s=SYLLABUS[exam.n],all=[];const take=(poolKey,scope,subject,count)=>{const pool=scopedPool(poolKey,scope);if(pool.length<count)throw new Error(`T${exam.n} ${subject} scope has ${pool.length} usable questions; need ${count}.`);all.push(...selectBalanced(pool,subject,`${exam.examDate}:${subject}`).slice(0,count));};
+  take('science',s.science,'science',10);take('maths',s.maths,'maths',10);take('english',s.english,'english',10);take('hindi',s.hindi,'hindi',10);take('gk',s.gk,'gk',5);take('reasoning',s.reasoning,'reasoning',5);take('socialScience',s.socialScience,'socialScience',10);
+  if(all.length!==60)throw new Error(`T${exam.n} generated ${all.length} questions; expected 60.`);return shuffleSeeded(all,`${exam.examDate}:paper`);}
 window.buildScopedWeeklyExam=buildScopedWeeklyExam;
 (function installBuilder(){if(typeof window.buildExam==='function'){window.buildExam=function(){const st=window.WEEKLY_EXAM_UTILS.getState();if(st.mode!=='exam')throw new Error('Candidate examination is not open today.');return buildScopedWeeklyExam(st.exam);};}else setTimeout(installBuilder,25);})();
 function summary(n){const s=SYLLABUS[n],range=k=>s[k].length?`Ch ${s[k].join(',')}`:'All';return{science:range('science'),maths:range('maths'),english:range('english'),hindi:s.hindi.length?s.hindi.join(' • '):'All published topics',gk:s.gk.length?`Topics ${s.gk.join(',')}`:'All GK topics',reasoning:s.reasoning.length?`Q${s.reasoning[0]}–Q${s.reasoning.at(-1)}`:'All 30 Q',socialScience:range('socialScience')};}
