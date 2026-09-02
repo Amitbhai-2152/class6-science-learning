@@ -15,20 +15,29 @@ const expected = [
   '2026-12-06','2026-12-20','2027-01-03','2027-01-17','2027-01-31','2027-02-14','2027-02-28'
 ];
 
-const dates = [...planSource.matchAll(/examDate:\s*'([^']+)'/g)].map(m => m[1]);
+const dates = [...planSource.matchAll(/\[\d+,\s*'([^']+)'/g)].map(m => m[1]);
 if (JSON.stringify(dates) !== JSON.stringify(expected)) fail(`unexpected exam date sequence: ${dates.join(', ')}`);
-if (!planSource.includes("finalDate: '2027-02-28'")) fail('finalDate is not 2027-02-28');
-if (!planSource.includes("timeZone: 'Asia/Kolkata'")) fail('Asia/Kolkata schedule timezone missing');
-if (!planSource.includes('gap !== 14')) fail('14-day spacing validation missing');
-if (!planSource.includes('getExamId')) fail('Exam ID contract missing');
+if (!planSource.includes("finalDate:'2027-02-28'")) fail('finalDate is not 2027-02-28');
+if (!planSource.includes("timeZone:'Asia/Kolkata'")) fail('Asia/Kolkata schedule timezone missing');
+if (!planSource.includes('14*86400000')) fail('14-day spacing validation missing');
+if (!planSource.includes('getExamId(exam)')) fail('Exam ID contract missing');
+if (!planSource.includes('const SYLLABUS={')) fail('Exact syllabus table missing');
+const syllabusEntries = [...planSource.matchAll(/\n\s*(\d+):\{/g)].map(m => Number(m[1]));
+if (JSON.stringify(syllabusEntries) !== JSON.stringify([...Array(13)].map((_, i) => i + 1))) fail('Syllabus must define exactly T1–T13 in order.');
+if (!planSource.includes('ENGLISH_BANK_CHAPTERS.length!==24')) fail('English bank chapter map contract missing');
+if (!planSource.includes('bank.length!==30')) fail('Reasoning bank count contract missing');
+if (!planSource.includes('slice(0,5)')) fail('Strict 5+5 GK/Reasoning split missing');
+if (!planSource.includes('scope.length===0')) fail('All-material scope contract missing');
+if (!planSource.includes('buildScopedWeeklyExam')) fail('Scoped weekly builder missing');
+if (planSource.includes('س सर्वनाम')) fail('Corrupted Hindi syllabus token detected');
 if (!indexSource.includes('<script src="./weekly-exam.js"></script>')) fail('All Tests page is missing weekly gate script');
 if (!gateSource.includes("script.src = './weekly-exam-plan.js'")) fail('weekly gate cannot load centralized plan');
 if (!gateSource.includes('Candidate examination is not open today.')) fail('strict exam-open guard missing');
-if (!gateSource.includes('window.__weeklyDeterministicBuilder')) fail('deterministic paper guard missing');
+if (!gateSource.includes('window.__weeklyDeterministicBuilder')) fail('deterministic gate guard missing');
 if (!plannerSource.includes('<script src="./weekly-exam-plan.js"></script>')) fail('planner does not load centralized plan');
 
 for (const required of ['tests/index.html','tests/planner.html','tests/weekly-exam.js','tests/weekly-exam-plan.js']) {
   if (!fs.existsSync(path.join(root, required))) fail(`missing required file: ${required}`);
 }
 
-console.log(`Weekly exam smoke-check passed: ${dates.length} exams, final ${dates.at(-1)}, timezone Asia/Kolkata.`);
+console.log(`Weekly exam smoke-check contract passed: ${dates.length} exams, final ${dates.at(-1)}, exact T1–T13 syllabus present.`);
