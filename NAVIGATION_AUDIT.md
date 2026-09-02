@@ -4,7 +4,7 @@ Audit date: 2026-09-02
 
 ## Scope
 
-This audit covers the repository's primary navigation entry points, subject hubs, chapter/tool pages, test hubs, Revision routes, legacy redirects, and literal internal `href` / `src` references.
+This audit covers the repository's primary navigation entry points, subject hubs, chapter/tool pages, test planner/exam routes, Revision routes, legacy redirects, and literal internal `href` / `src` references.
 
 ## Navigation hierarchy
 
@@ -22,7 +22,8 @@ Child pages must not add global Home / All Classes / All Tests / Revision naviga
 ## Verified primary routes
 
 - Home → All Classes: `subjects/all-classes.html`
-- Home → All Tests: `tests/index.html`
+- Home → All Tests: `tests/planner.html`
+- Weekly Test Planner → Candidate Exam on scheduled exam Sunday: `tests/index.html`
 - Home → Revision: `revision-v2.html`
 - All Classes → Science: `subjects/science/index.html`
 - All Classes → Maths: `subjects/maths/index.html`
@@ -30,6 +31,14 @@ Child pages must not add global Home / All Classes / All Tests / Revision naviga
 - All Classes → Hindi: `subjects/hindi/index.html`
 - All Classes → GK + Reasoning: `subjects/gk/index.html`
 - All Classes → Social Science: `subjects/social-science/index.html`
+
+## Weekly examination navigation
+
+- `tests/planner.html` is the primary All Tests entry surface.
+- The planner uses a two-Sunday cycle: Preview/Syllabus Sunday → next Sunday Candidate Exam.
+- The candidate exam remains the existing combined exam engine at `tests/index.html`.
+- The planner calendar contains 13 candidate exams from 13 September 2026 through the Final Exam on 28 February 2027.
+- On a scheduled exam Sunday the planner exposes the Candidate Exam entry; on preview/preparation days it does not expose the candidate-start action.
 
 ## Verified subject exits
 
