@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "check:navigation": "node scripts/check-navigation.mjs"
+    "check:navigation": "node scripts/check-navigation.mjs",
+    "check:weekly-exam": "node scripts/check-weekly-exam.mjs"
   },
   "dependencies": {
     "express": "^5.1.0",
