@@ -1,19 +1,30 @@
-# Class 6 Science Learning
+# Class 6 Learning Platform
 
-Modular mobile-first digital Science learning project.
+A modular, mobile-first Class 6 learning platform covering Science, Mathematics, English, Hindi, GK/Reasoning, and Social Science.
 
-## Structure
-- `index.html` — interface
-- `css/style.css` — design, responsive layout, animations
-- `js/app.js` — navigation/UI
-- `js/progress.js` — progress state
-- `js/quiz-engine.js` — reusable quiz logic
-- `js/tutor.js` — learner tutor logic
-- `chapters/chapter-01.js` ... `chapter-12.js` — independent chapter content
+## Main platform
+- `index.html` — learner home dashboard and shared progress view
+- `css/` — responsive UI and subject styling
+- `js/` — shared navigation, progress, quiz, CBT and tutor modules
+- `chapters/` — Science chapter modules
+- `subjects/maths/` — Class 6 Mathematics learning, practice, CBT and tutor
+- `subjects/english/` — English grammar, translation, practice, CBT and tutor
+- `subjects/hindi/` — Hindi grammar, paragraph learning, practice, test and tutor
+- `subjects/gk/` — GK, reasoning, challenges and Hindi learning modules
+- `subjects/social-science/` — 14-chapter Hindi Social Science hub, lessons, map activities, practice, CBT, Tutor and progress
+- `assets/diagrams/` — reusable Science SVG diagrams
 
-## Development workflow
-Improve one chapter by editing only its chapter file. Improve the entire design in CSS. Improve quizzes, progress, or tutor in their respective modules.
+## Social Science highlights
+- 14 Class 6 chapters in Hindi
+- Detailed lessons, examples, activities, source-based thinking and revision
+- Real-world interactive world map
+- 112-question Hindi practice bank with explanations
+- Chapter tests and full 40-question CBT
+- Chapter-aware Hindi Tutor
+- XP, mastery, streaks, badges and spaced revision
 
-Chapter 1 is the detailed reference implementation; the remaining chapter files are starter modules ready to be expanded one by one.
+## Development status
+The planned development queue through Phase 8 is closed. See `DEVELOPMENT_ROADMAP.md` for the completed phases and final QA boundary. Future changes should be handled as new feature or maintenance requests.
 
-Never place an AI API key in browser-side JavaScript. A real generative AI tutor should use a secure backend.
+## Security
+Never place an AI API key in browser-side JavaScript. Generative AI tutor requests should use the secure backend configuration provided by the project.
