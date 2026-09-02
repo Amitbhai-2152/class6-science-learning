@@ -181,9 +181,17 @@
       if (!Number.isInteger(q.answer) || q.answer < 0 || q.answer >= q.options.length) throw new Error(`T${exam.n} question ${number} has an invalid answer index.`);
 
       const allowed = scopeFor(q);
-      if (Array.isArray(allowed) && allowed.length && q.chapterId !== '' && q.chapterId !== undefined && q.chapterId !== null) {
-        const chapter = Number(q.chapterId);
-        if (!allowed.includes(chapter)) throw new Error(`T${exam.n} question ${number} escaped its declared syllabus scope.`);
+      if (Array.isArray(allowed) && allowed.length) {
+        const chapterValue = q.subject === 'Hindi' ? q.topic : q.chapterId;
+        if (chapterValue === '' || chapterValue === undefined || chapterValue === null) {
+          const field = q.subject === 'Hindi' ? 'topic' : 'chapterId';
+          throw new Error(`T${exam.n} question ${number} is missing required ${field} metadata for its declared syllabus scope.`);
+        }
+        const normalizedValue = q.subject === 'Hindi' ? String(chapterValue) : Number(chapterValue);
+        if (q.subject !== 'Hindi' && !Number.isFinite(normalizedValue)) {
+          throw new Error(`T${exam.n} question ${number} has invalid chapterId metadata for its declared syllabus scope.`);
+        }
+        if (!allowed.includes(normalizedValue)) throw new Error(`T${exam.n} question ${number} escaped its declared syllabus scope.`);
       }
     });
 

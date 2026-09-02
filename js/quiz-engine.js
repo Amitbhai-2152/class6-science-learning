@@ -22,7 +22,8 @@ const QuizEngine={
   for(let i=0;i<s.questions.length;i++){
    const q=s.questions[i],a=document.querySelector(`input[name="quiz_${s.containerId}_${i}"]:checked`),note=document.getElementById(`note_${i}`),chosen=+a.value;
    document.querySelectorAll(`#qbox_${i} .option`).forEach((lab,j)=>{lab.classList.toggle('quiz-correct',j===q.answer);lab.classList.toggle('quiz-wrong',j===chosen&&chosen!==q.answer);lab.querySelector('input').disabled=true});
-   const explanation=q.explanation||`सही उत्तर: ${q.options[q.answer]}.`;note.classList.remove('hidden');note.innerHTML=`${chosen===q.answer?'✅ सही':'❌ गलत'}<br><b>क्यों?</b> ${escapeHtml(explanation)}`;
+   const explanation=q.explanation||window.ExamReview?.explanation?.(q)||`सही उत्तर: ${q.options[q.answer]}.`;
+   note.classList.remove('hidden');note.innerHTML=`${chosen===q.answer?'✅ सही':'❌ गलत'}<br><b>क्यों?</b> ${escapeHtml(explanation)}`;
   }
   const pct=Math.round(score/s.questions.length*100);const feedback=document.getElementById('quizFeedback');feedback.innerHTML=`<div class="feedback ${pct>=75?'ok':'bad'}"><div class="quiz-score">${score}/${s.questions.length}</div><b>${pct>=90?'🏆 उत्कृष्ट!':pct>=75?'🎯 अच्छा प्रदर्शन':'🔄 एक बार फिर revise करो'}</b><p>${pct>=75?'तुम्हारी समझ अच्छी है। अब कठिन application questions पर जाओ।':'गलत answers के नीचे “क्यों?” पढ़ो और कमजोर concepts दोबारा पढ़ो।'}</p><button class="btn soft" onclick="QuizEngine.retry()">फिर से प्रयास करें ↻</button></div>`;
   document.getElementById('submitQuizBtn').disabled=true;

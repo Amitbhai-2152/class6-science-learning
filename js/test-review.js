@@ -1,7 +1,7 @@
 window.ExamReview={
  _safe(s){return window.escapeHtml?escapeHtml(s):String(s).replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#039;'}[m]))},
- _findSection(q){const c=window.CHAPTERS?.find(x=>x.id===Number(q.chapterId));if(!c)return null;const words=String(q.question).toLowerCase().split(/\s+/).filter(w=>w.length>2);let best=null,score=0;(c.sections||[]).forEach(s=>{const text=(s.title+' '+s.body+' '+(s.remember||'')).toLowerCase();const n=words.reduce((v,w)=>v+(text.includes(w)?1:0),0);if(n>score){score=n;best=s}});return best},
- explanation(q){if(q.explanation)return q.explanation;const s=this._findSection(q);if(s?.remember)return s.remember;return s?.body?.split('।')[0]||'सही उत्तर को concept के आधार पर समझना जरूरी है।'},
+ _findSection(q){const c=window.CHAPTERS?.find(x=>x.id===Number(q.chapterId))||window.CHAPTERS?.find(x=>x.id===Number(window.currentChapter));if(!c)return null;const words=String(q.question+' '+(q.options?.[q.answer]||'')).toLowerCase().split(/\s+/).filter(w=>w.length>2);let best=null,score=0;(c.sections||[]).forEach(s=>{const text=(s.title+' '+s.body+' '+(s.remember||'')).toLowerCase();const n=words.reduce((v,w)=>v+(text.includes(w)?1:0),0);if(n>score){score=n;best=s}});return best},
+ explanation(q){if(q.explanation)return q.explanation;const s=this._findSection(q);if(s?.remember)return s.remember;return s?.body?.split('।')[0]||'सही उत्तर को chapter के मुख्य concept से जोड़कर समझना जरूरी है।'},
  example(q){if(q.example)return q.example;const t=(q.question+' '+(q.options?.[q.answer]||'')).toLowerCase();const examples=[
  [/पानी|जल|वाष्प|evaporation|boiling|condensation/,'जैसे गीले कपड़े का सूखना वाष्पीकरण से जुड़ा है और ठंडी बोतल के बाहर बूंदें संघनन से बन सकती हैं।'],
  [/चुंबक|magnet|ध्रुव|pole/,'जैसे चुंबक लोहे की वस्तु को आकर्षित कर सकता है, लेकिन हर धातु चुंबकीय नहीं होती।'],

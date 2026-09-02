@@ -15,7 +15,7 @@ const EXAMS = [
   [13,'2027-02-28','FINAL EXAM','Complete Class 6 syllabus']
 ];
 window.WEEKLY_EXAM_CONFIG = Object.freeze({timeZone:'Asia/Kolkata',previewLeadDays:7,questionCount:60,marks:60,durationMinutes:90,finalDate:'2027-02-28',exams:Object.freeze(EXAMS.map(x=>Object.freeze({n:x[0],examDate:x[1],type:x[2],focus:x[3]}))),previewTitle:'Sunday Preview + Syllabus',examTitle:'Sunday Candidate Examination'});
-function parseDateKey(key){const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(key));if(!m)throw new Error(`Invalid date key: ${key}`);const d=new Date(Date.UTC(+m[1],+m[2]-1,+m[3]));if(Number.isNaN(d.getTime()))throw new Error(`Invalid date key: ${key}`);return d;}
+function parseDateKey(key){const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(key));if(!m)throw new Error(`Invalid date key: ${key}`);const year=+m[1],month=+m[2],day=+m[3],d=new Date(Date.UTC(year,month-1,day));if(Number.isNaN(d.getTime())||d.getUTCFullYear()!==year||d.getUTCMonth()!==month-1||d.getUTCDate()!==day)throw new Error(`Invalid date key: ${key}`);return d;}
 function addDays(key,days){const d=parseDateKey(key);d.setUTCDate(d.getUTCDate()+Number(days));return d.toISOString().slice(0,10);}
 function formatKey(key){return new Intl.DateTimeFormat('en-IN',{timeZone:'UTC',day:'2-digit',month:'short',year:'numeric'}).format(parseDateKey(key));}
 function todayKey(){const p=new Intl.DateTimeFormat('en-CA',{timeZone:window.WEEKLY_EXAM_CONFIG.timeZone,year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());const o=Object.fromEntries(p.map(x=>[x.type,x.value]));return `${o.year}-${o.month}-${o.day}`;}
@@ -34,13 +34,19 @@ const SYLLABUS={
 9:{science:[1,2,3,4,5,6,7,8],maths:[1,2,3,4,5,6,7,8],english:[1,2,3,4,5,6,7,8],hindi:[],gk:[1,2,3],reasoning:[],socialScience:[1,2,3,4,5,6,7,8,9,10]},
 10:{science:[1,2,3,4,5,6,7,8,9,10],maths:[1,2,3,4,5,6,7,8],english:[1,2,3,4,5,6,7,8],hindi:[],gk:[],reasoning:[],socialScience:[1,2,3,4,5,6,7,8,9,10,11,12]},
 11:{science:[1,2,3,4,5,6,7,8,9,10,11,12],maths:[1,2,3,4,5,6,7,8],english:[1,2,3,4,5,6,7,8],hindi:[],gk:[],reasoning:[],socialScience:[1,2,3,4,5,6,7,8,9,10,11,12,13,14]},
-12:{science:[],maths:[],english:[],hindi:[],gk:[],reasoning:[],socialScience:[]},
-13:{science:[],maths:[],english:[],hindi:[],gk:[],reasoning:[],socialScience:[]}
+12:{science:[1,2,3,4,5,6,7,8,9,10,11,12],maths:[1,2,3,4,5,6,7,8],english:[1,2,3,4,5,6,7,8],hindi:['संज्ञा','सर्वनाम','विशेषण','क्रिया-काल'],gk:[1,2,3],reasoning:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30],socialScience:[1,2,3,4,5,6,7,8,9,10,11,12,13,14]},
+13:{science:[1,2,3,4,5,6,7,8,9,10,11,12],maths:[1,2,3,4,5,6,7,8],english:[1,2,3,4,5,6,7,8],hindi:['संज्ञा','सर्वनाम','विशेषण','क्रिया-काल'],gk:[1,2,3],reasoning:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30],socialScience:[1,2,3,4,5,6,7,8,9,10,11,12,13,14]}
 };
+const FINAL_SYLLABUS_CONTRACT=Object.freeze({
+12:Object.freeze({science:Object.freeze([1,2,3,4,5,6,7,8,9,10,11,12]),maths:Object.freeze([1,2,3,4,5,6,7,8]),english:Object.freeze([1,2,3,4,5,6,7,8]),hindi:Object.freeze(['संज्ञा','सर्वनाम','विशेषण','क्रिया-काल']),gk:Object.freeze([1,2,3]),reasoning:Object.freeze([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]),socialScience:Object.freeze([1,2,3,4,5,6,7,8,9,10,11,12,13,14])}),
+13:Object.freeze({science:Object.freeze([1,2,3,4,5,6,7,8,9,10,11,12]),maths:Object.freeze([1,2,3,4,5,6,7,8]),english:Object.freeze([1,2,3,4,5,6,7,8]),hindi:Object.freeze(['संज्ञा','सर्वनाम','विशेषण','क्रिया-काल']),gk:Object.freeze([1,2,3]),reasoning:Object.freeze([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]),socialScience:Object.freeze([1,2,3,4,5,6,7,8,9,10,11,12,13,14])})
+});
+window.WEEKLY_EXAM_FINAL_SYLLABUS=FINAL_SYLLABUS_CONTRACT;
 window.WEEKLY_EXAM_SYLLABUS=Object.freeze(SYLLABUS);
 const SUBJECT_KEYS=['science','maths','english','hindi','gk','socialScience'];
 const ENGLISH_BANK_CHAPTERS=Object.freeze([1,3,1,4,4,5,5,6,2,3,3,2,4,7,8,8,8,7,4,2,8,8,8,5]);
-function validateSyllabus(){if(Object.keys(SYLLABUS).length!==13)throw new Error('Exactly 13 syllabus entries are required.');Object.entries(SYLLABUS).forEach(([n,s])=>{[...SUBJECT_KEYS,'reasoning'].forEach(k=>{if(!Array.isArray(s[k]))throw new Error(`T${n} ${k} scope must be an array.`);if(new Set(s[k]).size!==s[k].length)throw new Error(`T${n} ${k} scope contains duplicates.`);});if(s.reasoning.some(i=>i<1||i>30))throw new Error(`T${n} reasoning scope out of range.`);});if(ENGLISH_BANK_CHAPTERS.length!==24||ENGLISH_BANK_CHAPTERS.some(i=>i<1||i>8))throw new Error('English bank chapter map contract failed.');return true;}
+const sameArray=(a,b)=>Array.isArray(a)&&Array.isArray(b)&&a.length===b.length&&a.every((v,i)=>String(v)===String(b[i]));
+function validateSyllabus(){if(Object.keys(SYLLABUS).length!==13)throw new Error('Exactly 13 syllabus entries are required.');Object.entries(SYLLABUS).forEach(([n,s])=>{[...SUBJECT_KEYS,'reasoning'].forEach(k=>{if(!Array.isArray(s[k]))throw new Error(`T${n} ${k} scope must be an array.`);if(new Set(s[k]).size!==s[k].length)throw new Error(`T${n} ${k} scope contains duplicates.`);});if(s.reasoning.some(i=>i<1||i>30))throw new Error(`T${n} reasoning scope out of range.`);});if(ENGLISH_BANK_CHAPTERS.length!==24||ENGLISH_BANK_CHAPTERS.some(i=>i<1||i>8))throw new Error('English bank chapter map contract failed.');for(const n of [12,13]){for(const key of [...SUBJECT_KEYS,'reasoning']){if(!sameArray(SYLLABUS[n][key],FINAL_SYLLABUS_CONTRACT[n][key]))throw new Error(`T${n} ${key} final syllabus contract mismatch.`);}}return true;}
 window.validateWeeklySyllabus=validateSyllabus;validateSyllabus();
 const hashSeed=text=>{let h=2166136261;for(let i=0;i<text.length;i++)h=Math.imul(h^text.charCodeAt(i),16777619);return h>>>0;};
 const shuffleSeeded=(items,text)=>{let seed=hashSeed(text),out=[...items];const rnd=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};for(let i=out.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[out[i],out[j]]=[out[j],out[i]];}return out;};

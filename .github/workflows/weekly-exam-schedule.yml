@@ -10,6 +10,13 @@ on:
       - 'scripts/check-weekly-exam.mjs'
       - 'scripts/check-weekly-exam-runtime.mjs'
       - 'scripts/check-question-quality.mjs'
+      - 'scripts/audit-question-corpus.mjs'
+      - 'scripts/check-challenge-review-quality.mjs'
+      - 'scripts/check-final-syllabus-contract.mjs'
+      - 'scripts/check-all-tests-validation.mjs'
+      - 'js/quiz-engine.js'
+      - 'chapters/**'
+      - 'subjects/**'
       - 'package.json'
       - '.github/workflows/weekly-exam-schedule.yml'
   pull_request:
@@ -21,6 +28,13 @@ on:
       - 'scripts/check-weekly-exam.mjs'
       - 'scripts/check-weekly-exam-runtime.mjs'
       - 'scripts/check-question-quality.mjs'
+      - 'scripts/audit-question-corpus.mjs'
+      - 'scripts/check-challenge-review-quality.mjs'
+      - 'scripts/check-final-syllabus-contract.mjs'
+      - 'scripts/check-all-tests-validation.mjs'
+      - 'js/quiz-engine.js'
+      - 'chapters/**'
+      - 'subjects/**'
       - 'package.json'
       - '.github/workflows/weekly-exam-schedule.yml'
   workflow_dispatch:
@@ -36,10 +50,18 @@ jobs:
         with:
           node-version: 22
       - name: Validate JavaScript syntax
-        run: node --check tests/weekly-exam-plan.js && node --check tests/weekly-exam.js && node --check scripts/check-question-quality.mjs && node --check scripts/check-weekly-exam-runtime.mjs
+        run: node --check tests/weekly-exam-plan.js && node --check tests/weekly-exam.js && node --check scripts/check-question-quality.mjs && node --check scripts/check-weekly-exam-runtime.mjs && node --check scripts/audit-question-corpus.mjs && node --check scripts/check-challenge-review-quality.mjs && node --check scripts/check-final-syllabus-contract.mjs && node --check scripts/check-all-tests-validation.mjs && node --check js/quiz-engine.js && node --check js/test-review.js
       - name: Run static weekly exam contract check
         run: npm run check:weekly-exam
       - name: Run executable weekly exam schedule test
         run: npm run check:weekly-exam-runtime
+      - name: Run All Tests validation check
+        run: npm run check:all-tests-validation
       - name: Run question quality audit
         run: npm run check:question-quality
+      - name: Run challenge review quality check
+        run: npm run check:challenge-review-quality
+      - name: Run final syllabus contract check
+        run: npm run check:final-syllabus
+      - name: Run corpus educational audit
+        run: node scripts/audit-question-corpus.mjs
