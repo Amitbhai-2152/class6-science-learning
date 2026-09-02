@@ -39,7 +39,7 @@ const englishChapters = [1,3,1,4,4,5,5,6,2,3,3,2,4,7,8,8,8,7,4,2,8,8,8,5];
 const gkTopics = [1,2,3].map(id => ({id,title:`GK Topic ${id}`,questions:Array.from({length:20}, (_,i) => [`GK topic ${id} question ${i+1}`,options,0])}));
 const reasoningQuestions = Array.from({length:30}, (_,i) => [`Reasoning synthetic question ${i+1}`,options,0]);
 const window = {};
-window.MathsPracticeBank = Array.from({length:8}, (_,c) => Array.from({length:5}, (_,i) => ({chapterId:c+1,question:`Maths chapter ${c+1} question ${i+1}`,options,answer:0,difficulty:['EASY','EASY','MEDIUM','HARD','HARD'][i]))).flat();
+window.MathsPracticeBank = Array.from({length:8}, (_,c) => Array.from({length:5}, (_,i) => ({chapterId:c+1,question:`Maths chapter ${c+1} question ${i+1}`,options,answer:0,difficulty:['EASY','EASY','MEDIUM','HARD','HARD'][i]}))).flat();
 window.ENGLISH_PRACTICE_BANK = englishChapters.map((chapterId,i) => ({q:`English chapter ${chapterId} synthetic question ${i+1}`,o:options,a:0}));
 const document = {readyState:'loading',body:null,addEventListener(){},getElementById(){return null;},querySelector(){return null;}};
 const sandbox = {window,document,Intl,Date,Math,Set,Object,String,Number,Array,Error,console,norm,poolFor,GK_HI_TOPICS:gkTopics,REASONING_HI:reasoningQuestions,MutationObserver:undefined,setTimeout(){},setInterval(){}};
