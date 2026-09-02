@@ -78,14 +78,19 @@ This file is the project queue. When the user says `next`, continue with the fir
 - [x] Surface Revision progress, XP and streak in shared learner progress
 - [x] Remove obsolete Revision experiments that were superseded by the stable flow
 
+## Post-Phase-8 maintenance — Platform integrity
+- [x] Audit primary navigation across Home, All Classes, All Tests, all six subject hubs, Revision and compatibility redirects
+- [x] Add repository navigation smoke-check for literal internal links and dynamic route contracts
+- [x] Document navigation QA boundaries and remaining live browser/device acceptance requirement
+
 ### Phase 8 QA boundary
 The final QA pass is repository/static verification of the committed implementation. A live browser/device session is still the appropriate place for final human visual acceptance testing; this queue does not claim a browser session was executed by the assistant.
 
 ### Maintenance QA boundary
-Revision maintenance above is verified from the committed GitHub source, route wiring, and progress integration. A live browser/device session is still the appropriate place for final human visual acceptance testing; the repository does not claim such a session was executed by the assistant.
+Revision and platform-integrity maintenance above is verified from the committed GitHub source, route wiring, navigation contracts and progress integration. A live browser/device session is still the appropriate place for final human visual acceptance testing; the repository does not claim such a session was executed by the assistant.
 
 ## Queue status
-**Development queue closed after Phase 8; Revision maintenance items above are completed.** Future work should be treated as a new feature/maintenance request rather than assuming an unfinished queue item.
+**Development queue closed after Phase 8; Revision maintenance and platform-integrity audit items above are completed.** Future work should be treated as a new feature/maintenance request rather than assuming an unfinished queue item.
 
 ## Rule for `next`
 1. Take the first unchecked task in this queue.
