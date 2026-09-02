@@ -1,0 +1,1 @@
+(function(){'use strict';const X=()=>window.XPSystem;const clamp=n=>Math.max(0,Math.min(100,Number(n)||0));function english(e){const r=e.detail||{},pct=Number(r.pct)||0,kind='english-practice',content=`${kind}:${Date.now()}`;X()?.score('english',content,pct,kind)}window.addEventListener('english:practice-complete',english);})();
