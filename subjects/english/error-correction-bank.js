@@ -8,7 +8,7 @@ window.ENGLISH_ERROR_BANK=[
 {q:'Choose the sentence with correct plural subject–verb agreement.',o:['The books is on the table.','The books are on the table.','The books am on the table.','The books be on the table.'],a:1,e:'“Books” is plural, so use “are”.'},
 {q:'Choose the pronoun that correctly replaces two named people: “Ravi and Aman are ready. ___ will start now.”',o:['He','It','They','She'],a:2,e:'“Ravi and Aman” refers to two people, so “they” is correct.'},
 {q:'Choose the correct preposition: “The cat is ___ the table.”',o:['on','at','from','to'],a:0,e:'“On the table” correctly shows the cat’s position.'},
-{q:'Choose the correct tense: “We ___ the museum yesterday.”',o:['visit','visited','will visit','visiting'],a:1,e:'“Yesterday” refers to a completed past action, so use “visited”.'},
+{q:'Choose the corrected future sentence: “She will goes to the market tomorrow.”',o:['She will goes to the market tomorrow.','She will go to the market tomorrow.','She goes to the market tomorrow yesterday.','She will going to the market tomorrow.'],a:1,e:'After the modal “will”, use the base verb “go”.'},
 {q:'Choose the corrected sentence: “He do not like milk.”',o:['He do not likes milk.','He does not like milk.','He does not likes milk.','He not like milk.'],a:1,e:'With “he”, use “does not” + base verb “like”.'},
 {q:'Choose the correct there-is/there-are form for a plural noun.',o:['There is two books.','There are two books.','There am two books.','There be two books.'],a:1,e:'“Two books” is plural, so use “there are”.'},
 {q:'Choose the correct word: “She sings ___.”',o:['beautiful','beautifully','beauty','beautify'],a:1,e:'“Beautifully” is an adverb that describes how she sings.'},
