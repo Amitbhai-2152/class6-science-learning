@@ -1,0 +1,99 @@
+(function(){'use strict';
+const SUBJECTS=[
+ {id:'science',name:'Science',hi:'विज्ञान',icon:'🔬',units:[
+  ['पौधों में पोषण','प्रकाश संश्लेषण में पौधे प्रकाश, जल और कार्बन डाइऑक्साइड की मदद से भोजन बनाते हैं।','पत्तियों का chlorophyll प्रकाश ऊर्जा को पकड़ने में मदद करता है।'],
+  ['जीव-जगत में गति','पौधों और जानवरों में गति के अलग-अलग तरीके होते हैं।','रेंगना, चलना, तैरना और उड़ना गति के उदाहरण हैं।'],
+  ['विद्युत परिपथ','विद्युत धारा के लिए बंद परिपथ आवश्यक है।','सेल, तार और उपकरण मिलकर सरल circuit बना सकते हैं।'],
+  ['चुंबक और उसके प्रभाव','चुंबक कुछ पदार्थों को आकर्षित करता है और उसके दो ध्रुव होते हैं।','समान ध्रुव प्रतिकर्षित और विपरीत ध्रुव आकर्षित करते हैं।'],
+  ['माप और गति','मापन में सही इकाई और उपकरण चुनना जरूरी है।','दूरी, समय और गति को रोजमर्रा के उदाहरणों से जोड़कर समझो।'],
+  ['जल और उसका चक्र','वाष्पीकरण, संघनन और वर्षण जल चक्र के प्रमुख चरण हैं।','सूर्य की ऊष्मा जल चक्र को चलाने में महत्वपूर्ण भूमिका निभाती है।'],
+  ['हवा और मौसम','हवा का तापमान, नमी और गति मौसम को प्रभावित करते हैं।','हवा स्थानांतरित होती है क्योंकि अलग-अलग स्थानों पर दाब और तापमान बदलते हैं।'],
+  ['कचरा और संसाधन','कचरे को कम करना, पुनः उपयोग और पुनर्चक्रण संसाधन बचाते हैं।','गीले और सूखे कचरे को अलग रखना बेहतर प्रबंधन में मदद करता है।'],
+  ['वस्तुओं का पृथक्करण','मिश्रण के घटकों के गुणों के आधार पर अलग करने की विधि चुनी जाती है।','छानना, निथारना, छनन और वाष्पीकरण अलग-अलग स्थितियों में उपयोगी हैं।'],
+  ['जीवों की विशेषताएँ','जीवों में पोषण, वृद्धि, श्वसन और प्रजनन जैसी जीवन-प्रक्रियाएँ होती हैं।','किसी एक लक्षण से नहीं, लक्षणों के समूह से जीवित चीजों को समझो।'],
+  ['प्रकाश और छाया','प्रकाश सीधी रेखा में चलता है और अपारदर्शी वस्तु छाया बना सकती है।','छाया का आकार स्रोत, वस्तु और पर्दे की स्थिति से बदलता है।'],
+  ['हमारा सौरमंडल','सूर्य एक तारा है और ग्रह उसके चारों ओर परिक्रमा करते हैं।','पृथ्वी का घूर्णन दिन-रात और सूर्य की परिक्रमा वर्ष से जुड़ी है।'] ]},
+ {id:'maths',name:'Maths',hi:'गणित',icon:'➗',units:[
+  ['हमारे आसपास बड़ी संख्याएँ','स्थान-मूल्य और अंकों के समूह से बड़ी संख्याएँ पढ़ो और लिखो।','तुलना करते समय पहले अंकों की संख्या, फिर बाएँ से स्थान-मूल्य देखो।'],
+  ['अंकगणितीय व्यंजक','व्यंजक में संख्याएँ और संक्रियाएँ मिलकर गणितीय संबंध दिखाती हैं।','कोष्ठक और संक्रियाओं के क्रम को ध्यान से लागू करो।'],
+  ['दशमलव के आगे एक झलक','दशमलव बिंदु पूर्ण और आंशिक मात्राओं को अलग करता है।','दशमलव की तुलना में स्थान-मूल्य का उपयोग करो।'],
+  ['अक्षर-संख्याओं वाले व्यंजक','अक्षर अज्ञात या बदलने वाली संख्या को दर्शा सकते हैं।','एक ही अक्षर के लिए एक ही मान रखकर व्यंजक का मान निकालो।'],
+  ['समानांतर और प्रतिच्छेदी रेखाएँ','समानांतर रेखाएँ एक-दूसरे को नहीं काटतीं; प्रतिच्छेदी रेखाएँ मिलती हैं।','रेखाओं की दिशा और मिलने के बिंदु से उनका संबंध पहचानो।'],
+  ['संख्या खेल','संख्या पैटर्न में नियम खोजकर अगला या छूटा पद निकाला जाता है।','अनुमान से पहले जोड़, घटाव, गुणा या अन्य पैटर्न जाँचो।'],
+  ['तीन प्रतिच्छेदी रेखाओं की कहानी','तीन रेखाओं के मिलने से कोणों और उनके संबंधों का अध्ययन किया जा सकता है।','शीर्ष, भुजा और कोण को साफ diagram में पहचानो।'],
+  ['भिन्नों के साथ काम','भिन्न पूरे के बराबर भागों को दर्शाते हैं।','समान हर वाले भिन्नों में अंश की तुलना सरल होती है; समतुल्य भिन्न पहचानो।'] ]},
+ {id:'english',name:'English',hi:'अंग्रेज़ी',icon:'🇬🇧',units:[
+  ['Parts of Speech','Noun नाम देता है, pronoun noun की जगह आता है, verb action/state बताता है।','Adjective noun को describe करता है और adverb action के बारे में अधिक बताता है।'],
+  ['Nouns & Pronouns','Common/proper nouns, singular/plural और possessive forms पहचानो।','Pronoun का number/person उस noun से स्पष्ट रूप से मेल खाना चाहिए।'],
+  ['Verbs & Tenses','Present, past और future forms समय का संकेत देते हैं।','Yesterday जैसे clues past, tomorrow future और habits present की ओर संकेत कर सकते हैं।'],
+  ['Adjectives & Adverbs','Adjective noun को describe करता है; adverb verb या अन्य शब्दों को modify कर सकता है।','Quick और quickly जैसे forms का sentence में सही स्थान चुनो।'],
+  ['Articles & Prepositions','a/an/the का चयन sound और context पर निर्भर करता है।','in, on, at, under, between जैसे prepositions संबंध या स्थान बताते हैं।'],
+  ['Subject–Verb Agreement','Singular subject के साथ सामान्यतः singular present verb आता है।','Subject और verb के बीच extra phrase होने पर भी वास्तविक subject पहचानो।'],
+  ['Sentences & Error Correction','Sentence type, capitals और punctuation अर्थ को स्पष्ट करते हैं।','Error check में agreement, tense, article, pronoun और word order जाँचो।'],
+  ['Translation & Everyday English','English में सामान्य word order subject + verb + object होता है।','Translation करते समय शब्द-दर-शब्द नहीं, सही अर्थ और natural expression पर ध्यान दो।'] ]},
+ {id:'hindi',name:'Hindi',hi:'हिंदी',icon:'🪔',units:[
+  ['संज्ञा','व्यक्ति, स्थान, वस्तु, प्राणी या भाव के नाम संज्ञा कहलाते हैं।','खास नाम और भाव के नाम भी संज्ञा के उदाहरण हो सकते हैं।'],
+  ['सर्वनाम','जो शब्द संज्ञा के स्थान पर आते हैं, वे सर्वनाम हैं।','मैं, हम, तुम, वह, वे जैसे शब्द संदर्भ के अनुसार पहचाने जाते हैं।'],
+  ['विशेषण','संज्ञा या सर्वनाम की विशेषता बताने वाले शब्द विशेषण हैं।','गुण, संख्या या मात्रा बताने वाले शब्दों को sentence में पहचानो।'],
+  ['क्रिया और काल','क्रिया काम या अवस्था बताती है; काल काम के समय से जुड़ा है।','वर्तमान, भूत और भविष्य के संकेत sentence के समय को समझने में मदद करते हैं।'],
+  ['वाक्य रचना और विराम चिह्न','सार्थक शब्द-समूह पूरा अर्थ देता है और सही क्रम जरूरी है।','पूर्ण विराम, प्रश्नवाचक और उद्गार चिह्न का उपयोग अर्थ के अनुसार करो।'],
+  ['पर्यायवाची और विलोम','पर्यायवाची समान/लगभग समान अर्थ और विलोम विपरीत अर्थ बताते हैं।','शब्द को केवल याद न करो; उसे वाक्य में प्रयोग करके अर्थ पक्का करो।'],
+  ['मुहावरे और लोकोक्तियाँ','मुहावरे का अर्थ सीधे शब्दों से अलग हो सकता है; लोकोक्ति अनुभव-आधारित कथन है।','संदर्भ देखकर सही अर्थ और प्रयोग चुनो।'],
+  ['अपठित गद्यांश और लेखन','गद्यांश का मुख्य विचार, तथ्य और कारण पहचानकर उत्तर दो।','अनुच्छेद में आरंभ, मुख्य विचार और निष्कर्ष को व्यवस्थित रखो।'] ]},
+ {id:'gk',name:'GK + Reasoning',hi:'सामान्य ज्ञान + तर्क',icon:'🧠',units:[
+  ['भारत और नागरिक शास्त्र','राष्ट्रीय प्रतीक, राज्य, संसद, संविधान और नागरिक जिम्मेदारियाँ याद करो।','किसी तथ्य को व्यक्ति, संस्था या उदाहरण से जोड़कर recall करो।'],
+  ['भूगोल और पर्यावरण','महाद्वीप, महासागर, स्थलरूप, मौसम और संरक्षण के मुख्य विचार दोहराओ।','मानचित्र और दिशा के साथ facts जोड़ने से memory मजबूत होती है।'],
+  ['आसपास का विज्ञान','मानव शरीर, पौधे, अंतरिक्ष, बल और दैनिक जीवन के विज्ञान को जोड़ो।','तथ्य के पीछे कारण पूछना केवल उत्तर याद करने से बेहतर है।'],
+  ['इतिहास और संस्कृति','प्राचीन भारत, व्यक्तित्व, संविधान, कला और विरासत के प्रमुख facts दोहराओ।','घटना को समय, स्थान और कारण के साथ याद करो।'],
+  ['विश्व ज्ञान','देश, राजधानियाँ, विश्व भूगोल और अंतरराष्ट्रीय संगठनों के basic facts revise करो।','मानचित्र देखकर location-based recall का अभ्यास करो।'],
+  ['खेल और खेल-कूद','प्रमुख खेल, ओलंपिक, टीमवर्क और fair play के मूल विचार दोहराओ।','खेल को उसके नियम, उपकरण और उद्देश्य से जोड़कर याद करो।'],
+  ['GK कौशल और सामान्य जागरूकता','Fact, अनुमान और राय में अंतर पहचानो।','विश्वसनीय स्रोत, evidence, map reading और problem-solving skills का अभ्यास करो।'],
+  ['तार्किक Reasoning','Series, analogy, coding, direction, comparison और logic patterns पहचानो।','पहले rule/pattern खोजो, फिर options में उत्तर जाँचो।'] ]},
+ {id:'social',name:'Social Science',hi:'सामाजिक विज्ञान',icon:'🌍',units:[
+  ['पृथ्वी पर स्थानों का पता लगाना','मानचित्र, दिशाएँ, अक्षांश और देशांतर से किसी स्थान की स्थिति समझो।','Equator, Prime Meridian और India के standard time को map context में जोड़ो।'],
+  ['महासागर और महाद्वीप','सात महाद्वीप और पाँच प्रमुख महासागर पहचानो।','भारत की समुद्री स्थिति और आसपास के समुद्री क्षेत्रों को दिशा के साथ याद करो।'],
+  ['स्थलरूप और जीवन','पर्वत, पठार, मैदान, नदियाँ और घाटियाँ मानव जीवन को प्रभावित करते हैं।','स्थलरूप को कृषि, बस्तियों, संसाधनों और परिवहन से जोड़ो।'],
+  ['इतिहास की समयरेखा और स्रोत','इतिहासकार प्रमाणों से अतीत को समझते हैं।','पुरातात्त्विक और साहित्यिक स्रोतों की जानकारी को समयरेखा और तुलना से समझो।'],
+  ['भारत, अर्थात् भारत','भारत की भौगोलिक पहचान और नाम से जुड़े विचारों को map और इतिहास से जोड़ो।','स्थान, लोग और विविधता को एक-दूसरे से जुड़े concepts की तरह revise करो।'],
+  ['भारतीय सभ्यता की शुरुआत','प्रारंभिक सभ्यताओं में बस्तियाँ, संसाधन, कृषि और शिल्प महत्वपूर्ण रहे।','पुरातात्त्विक evidence से जीवन के बारे में निष्कर्ष निकालना सीखो।'],
+  ['भारत की सांस्कृतिक जड़ें','परंपराएँ, विचार, कला और ज्ञान भारत की सांस्कृतिक विरासत बनाते हैं।','विरासत को केवल सूची की तरह नहीं, उसके स्रोत और आज के प्रभाव से जोड़ो।'],
+  ['विविधता में एकता — अनेक में एक','भाषा, भोजन, वेशभूषा और परंपराओं की विविधता के साथ साझा पहचान भी हो सकती है।','विविधता का सम्मान और common values को उदाहरणों से समझो।'],
+  ['परिवार और समुदाय','परिवार और समुदाय सहयोग, जिम्मेदारी और सीखने के महत्वपूर्ण स्थान हैं।','भूमिकाएँ और जिम्मेदारियाँ समय, स्थान और परिस्थिति के अनुसार बदल सकती हैं।'],
+  ['जमीनी लोकतंत्र — भाग 1: शासन','शासन में निर्णय, नियम और नागरिक भागीदारी महत्वपूर्ण हैं।','स्थानीय समस्याओं को लोकतांत्रिक निर्णय और जिम्मेदारी से जोड़ो।'],
+  ['जमीनी लोकतंत्र — भाग 2: ग्रामीण स्थानीय सरकार','ग्राम स्तर पर स्थानीय संस्थाएँ समुदाय की जरूरतों से जुड़ी होती हैं।','स्थानीय सरकार की भूमिका को पानी, सड़क और सार्वजनिक सुविधाओं जैसे उदाहरणों से समझो।'],
+  ['जमीनी लोकतंत्र — भाग 3: शहरी स्थानीय सरकार','शहरी स्थानीय संस्थाएँ शहर की सार्वजनिक सेवाओं और स्थानीय प्रशासन से जुड़ी हैं।','नगर की समस्याओं को स्थानीय निकाय और नागरिक भागीदारी से जोड़ो।'],
+  ['आजीविका और आर्थिक जीवन','लोग अलग-अलग कामों से आजीविका कमाते हैं और अर्थव्यवस्था में योगदान देते हैं।','काम, कौशल, संसाधन और बाजार के संबंध को उदाहरण से समझो।'],
+  ['विविधता, संसाधन और हमारा भविष्य','प्राकृतिक और मानव संसाधनों का जिम्मेदार उपयोग भविष्य के लिए जरूरी है।','संसाधन बचत, समान अवसर और sustainable choices को रोजमर्रा के उदाहरणों से जोड़ो।'] ]}
+];
+const esc=s=>String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+const readJSON=(k,f)=>{try{const x=JSON.parse(localStorage.getItem(k)||'null');return x&&typeof x==='object'?x:f}catch(_){return f}};
+function stats(subject,i){
+ if(subject.id==='science'){
+  const d=window.Progress?.data||readJSON('class6ScienceProgressV9',{});const hist=Array.isArray(d.history)?d.history.filter(x=>Number(x.id)===i+1):[];const best=Number(d.best?.[i+1]||0);return{score:best,attempts:hist.length,due:hist.length&&Number(best)<85};
+ }
+ if(subject.id==='social'){
+  const d=readJSON('socialScienceProgressV3',{}),c=d.chapters?.[i];const best=Number(c?.best||0),attempts=Number(c?.attempts||0);return{score:best,attempts,due:!!c?.nextRevisionAt&&Number(c.nextRevisionAt)<=Date.now()||attempts>0&&best<85};
+ }
+ if(subject.id==='english'){
+  const d=readJSON('class6EnglishProgressV1',{}),h=Array.isArray(d.history)?d.history:[];const score=Number(d.best||0);return{score,attempts:h.length,due:h.length>0&&score<85};
+ }
+ if(subject.id==='hindi'){
+  const p=readJSON('class6HindiPracticeLast',{}),f=readJSON('class6HindiFullTestLast',{});const vals=[Number(p.pct),Number(f.pct)].filter(Number.isFinite),score=vals.length?Math.max(...vals):0;return{score,attempts:(p&&p.pct!=null?1:0)+(f&&f.pct!=null?1:0),due:vals.length>0&&score<85};
+ }
+ if(subject.id==='gk'){
+  const d=readJSON('class6GKProgressV1',{}),score=Number(d.topics?.[i+1]||0);return{score,attempts:Number(d.attempts||0),due:score>0&&score<85};
+ }
+ if(subject.id==='maths'){
+  let score=0;try{score=Number(localStorage.getItem(`mathsChallengeBest:${i+1}`)||0)}catch(_){}return{score:score>100?Math.round(score):score,attempts:score?1:0,due:score>0&&score<85};
+ }
+ return{score:0,attempts:0,due:false};
+}
+function linkFor(subject,i){const n=i+1;if(subject.id==='science')return`javascript:openChapter(${n},0)`;if(subject.id==='maths')return`subjects/maths/chapter.html?chapter=${n}`;if(subject.id==='english')return`subjects/english/chapter.html?chapter=${n}`;if(subject.id==='hindi')return`subjects/hindi/chapter.html?chapter=${n}`;if(subject.id==='gk')return n===8?'subjects/gk/reasoning-hi.html':`subjects/gk/topic-hi.html?topic=${n}`;return`subjects/social-science/chapter-view-expanded-v2.html?chapter=${n}`}
+function injectCSS(){if(document.getElementById('unifiedRevisionCSS'))return;const s=document.createElement('style');s.id='unifiedRevisionCSS';s.textContent=`#revisionView .ur-shell{display:grid;gap:14px}.ur-hero{background:linear-gradient(135deg,#20252b,#49515b);color:#fff;border-radius:20px;padding:18px}.ur-hero h2{margin:0 0 6px}.ur-hero p{margin:0;line-height:1.6;color:#e1e6eb}.ur-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:14px}.ur-stat{background:#ffffff12;border:1px solid #ffffff18;border-radius:13px;padding:11px}.ur-stat b{display:block;font-size:21px}.ur-stat span{font-size:11px;color:#d3d8de}.ur-tabs{display:flex;gap:8px;overflow:auto;padding:2px 1px 5px}.ur-tab{border:1px solid var(--line,#e5e7eb);background:#fff;border-radius:999px;padding:9px 13px;font-weight:900;white-space:nowrap;cursor:pointer}.ur-tab.active{background:#20252b;color:#fff}.ur-toolbar{display:flex;gap:9px;flex-wrap:wrap}.ur-search{flex:1 1 220px;border:1px solid var(--line,#e5e7eb);border-radius:12px;padding:11px 13px;font:inherit;min-width:0}.ur-filter{border:1px solid var(--line,#e5e7eb);background:#fff;border-radius:12px;padding:10px 12px;font-weight:800}.ur-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.ur-card{border:1px solid var(--line,#e5e7eb);border-radius:17px;background:#fff;padding:15px;display:flex;flex-direction:column;gap:9px;box-shadow:0 8px 22px rgba(20,30,50,.06)}.ur-top{display:flex;align-items:flex-start;gap:10px}.ur-icon{font-size:29px}.ur-name{font-size:16px;margin:0}.ur-meta{font-size:11px;color:#667085}.ur-points{margin:0;padding-left:19px;color:#344054;line-height:1.55;font-size:13px}.ur-recall{background:#f8fafc;border:1px dashed #cfd5dd;border-radius:12px;padding:10px;font-size:12px}.ur-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}.ur-btn{border:0;border-radius:10px;padding:9px 11px;font-weight:900;cursor:pointer;text-decoration:none}.ur-btn.primary{background:#20252b;color:#fff}.ur-btn.soft{background:#eef2f5;color:#20252b}.ur-done{background:#ecfdf3;color:#166534;border-radius:999px;padding:4px 8px;font-size:10px;font-weight:900;margin-left:auto}.ur-empty{padding:20px;text-align:center;border:1px dashed #cfd5dd;border-radius:15px;color:#667085}.ur-tip{font-size:12px;color:#667085;line-height:1.55}.ur-mode{font-weight:900;font-size:11px}.ur-subject-head{margin:0 0 4px;font-size:18px}@media(max-width:700px){.ur-stats{grid-template-columns:repeat(2,1fr)}.ur-grid{grid-template-columns:1fr}.ur-hero{padding:15px}.ur-card{padding:14px}}@media(max-width:430px){.ur-stats{grid-template-columns:1fr 1fr}.ur-actions .ur-btn{flex:1 1 130px;text-align:center}.ur-search{flex-basis:100%}}@media(prefers-reduced-motion:reduce){.ur-card{transition:none!important}}`;document.head.appendChild(s)}
+let state={subject:'all',mode:'priority',query:''};
+function allUnits(){return SUBJECTS.flatMap(s=>s.units.map((u,i)=>({subject:s,index:i,title:u[0],points:u.slice(1),stats:stats(s,i),href:linkFor(s,i)})))}
+function render(){injectCSS();const host=document.getElementById('revisionContent'),plan=document.getElementById('revisionPlan');if(!host||!plan)return;const units=allUnits();const due=units.filter(x=>x.stats.due),attempted=units.filter(x=>x.stats.attempts>0),mastered=units.filter(x=>x.stats.score>=85);const subjectsDone=SUBJECTS.filter(s=>s.units.some((_,i)=>stats(s,i).attempts>0)).length;plan.innerHTML=`<div class="ur-shell"><div class="ur-hero"><h2>🧠 Smart Revision Hub</h2><p>सभी 6 learning areas को एक जगह revise करो। System कमजोर, due और untouched topics को priority देता है।</p><div class="ur-stats"><div class="ur-stat"><b>${due.length}</b><span>Priority / due</span></div><div class="ur-stat"><b>${attempted.length}</b><span>Practised units</span></div><div class="ur-stat"><b>${mastered.length}</b><span>Strong units</span></div><div class="ur-stat"><b>${subjectsDone}/6</b><span>Subjects started</span></div></div></div><div class="ur-tabs" role="tablist"><button class="ur-tab ${state.subject==='all'?'active':''}" data-sub="all">🌐 All</button>${SUBJECTS.map(s=>`<button class="ur-tab ${state.subject===s.id?'active':''}" data-sub="${s.id}">${s.icon} ${esc(s.hi)}</button>`).join('')}</div><div class="ur-toolbar"><input class="ur-search" id="urSearch" placeholder="🔎 chapter / topic खोजो…" value="${esc(state.query)}"><select class="ur-filter" id="urMode"><option value="priority" ${state.mode==='priority'?'selected':''}>Priority first</option><option value="all" ${state.mode==='all'?'selected':''}>All topics</option><option value="new" ${state.mode==='new'?'selected':''}>Not practised</option><option value="strong" ${state.mode==='strong'?'selected':''}>Strong / maintenance</option></select></div><div id="urGrid"></div><div class="ur-tip">💡 5-minute routine: <b>Recall → Check → Open lesson → 2 practice questions → mark revised.</b> Revision status इस browser में locally save होता है.</div></div>`;
+ const grid=document.getElementById('urGrid');const filtered=units.filter(x=>state.subject==='all'||x.subject.id===state.subject).filter(x=>!state.query||`${x.subject.name} ${x.subject.hi} ${x.title}`.toLowerCase().includes(state.query.toLowerCase())).filter(x=>state.mode==='all'||state.mode==='priority'&&x.stats.due||state.mode==='new'&&x.stats.attempts===0||state.mode==='strong'&&x.stats.score>=85);const ordered=state.mode==='priority'?[...filtered].sort((a,b)=>Number(b.stats.due)-Number(a.stats.due)||a.stats.score-b.stats.score):filtered;grid.innerHTML=ordered.length?`<div class="ur-grid">${ordered.map(x=>{const revised=readJSON('class6RevisionDoneV1',{})[`${x.subject.id}:${x.index}`];return `<article class="ur-card"><div class="ur-top"><span class="ur-icon">${x.subject.icon}</span><div><div class="ur-meta">${esc(x.subject.hi)} • इकाई ${x.index+1}</div><h3 class="ur-name">${esc(x.title)}</h3></div>${revised?'<span class="ur-done">✓ Revised</span>':''}</div><ul class="ur-points"><li>${esc(x.points[0])}</li><li>${esc(x.points[1])}</li></ul><div class="ur-recall"><b>🔁 Active Recall:</b> पहले बिना देखे इस topic के 2 मुख्य points बोलो/लिखो, फिर ऊपर के points से check करो।</div><div class="ur-meta">${x.stats.attempts?`Best/recorded score: ${x.stats.score}% • ${x.stats.attempts} attempt${x.stats.attempts>1?'s':''}`:'अभी practice record नहीं है'}${x.stats.due?' • 🎯 Priority':''}</div><div class="ur-actions"><a class="ur-btn primary" href="${x.href}">${x.subject.id==='gk'?'Topic खोलो':'Lesson खोलो'} →</a><button class="ur-btn soft" type="button" data-done="${x.subject.id}:${x.index}">${revised?'↩️ फिर से revised':'✓ मैंने revise किया'}</button></div></article>`}).join('')}</div>`:'<div class="ur-empty">इस filter में अभी कोई topic नहीं है। <b>All topics</b> चुनकर पूरा revision bank देखो।</div>';
+ document.querySelectorAll('[data-sub]').forEach(b=>b.addEventListener('click',()=>{state.subject=b.dataset.sub;render()}));document.getElementById('urMode').addEventListener('change',e=>{state.mode=e.target.value;render()});document.getElementById('urSearch').addEventListener('input',e=>{state.query=e.target.value;render()});document.querySelectorAll('[data-done]').forEach(b=>b.addEventListener('click',()=>{const d=readJSON('class6RevisionDoneV1',{}),k=b.dataset.done;if(d[k])delete d[k];else d[k]=Date.now();localStorage.setItem('class6RevisionDoneV1',JSON.stringify(d));render()}));}
+window.UnifiedRevision={subjects:SUBJECTS,render};window.openRevision=function(){const show=window.show;if(typeof show==='function')show('revisionView');render();window.scrollTo({top:0,behavior:'smooth'})};
+})();
