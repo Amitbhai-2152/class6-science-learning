@@ -70,11 +70,22 @@ This file is the project queue. When the user says `next`, continue with the fir
 - [x] Verify legacy/duplicate entry pages are retained only as intentional compatibility redirects
 - [x] Complete repository-level static smoke-check and close the development queue
 
+## Post-Phase-8 maintenance — Revision system
+- [x] Repair Revision subject navigation using stable direct HTML routes
+- [x] Provide 8 meaningful study cards per chapter across all six Revision subjects
+- [x] Add persistent chapter-completion tracking for Revision
+- [x] Connect Revision completion to XP and study streaks with duplicate-award protection
+- [x] Surface Revision progress, XP and streak in shared learner progress
+- [x] Remove obsolete Revision experiments that were superseded by the stable flow
+
 ### Phase 8 QA boundary
 The final QA pass is repository/static verification of the committed implementation. A live browser/device session is still the appropriate place for final human visual acceptance testing; this queue does not claim a browser session was executed by the assistant.
 
+### Maintenance QA boundary
+Revision maintenance above is verified from the committed GitHub source, route wiring, and progress integration. A live browser/device session is still the appropriate place for final human visual acceptance testing; the repository does not claim such a session was executed by the assistant.
+
 ## Queue status
-**Development queue closed after Phase 8.** Future work should be treated as a new feature/maintenance request rather than another `next` item.
+**Development queue closed after Phase 8; Revision maintenance items above are completed.** Future work should be treated as a new feature/maintenance request rather than assuming an unfinished queue item.
 
 ## Rule for `next`
 1. Take the first unchecked task in this queue.
