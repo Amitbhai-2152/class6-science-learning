@@ -129,8 +129,73 @@
     }, true);
   }
 
+  function normalizeStem(value) {
+    return String(value ?? '')
+      .replace(/[“”"'’‘`.,!?;:()[\]{}]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .toLocaleLowerCase();
+  }
+
+  function validateGeneratedPaper(paper, exam) {
+    if (!Array.isArray(paper) || paper.length !== cfg().questionCount) {
+      throw new Error(`T${exam.n} generated ${Array.isArray(paper) ? paper.length : 0} questions; expected ${cfg().questionCount}.`);
+    }
+    const requiredCounts = {
+      Science: 10,
+      Mathematics: 10,
+      English: 10,
+      Hindi: 10,
+      'GK + Reasoning': 10,
+      'Social Science': 10
+    };
+    const counts = Object.fromEntries(Object.keys(requiredCounts).map(k => [k, 0]));
+    const seen = new Set();
+    let reasoning = 0;
+    const scope = window.WEEKLY_EXAM_SYLLABUS?.[exam.n];
+    if (!scope) throw new Error(`T${exam.n} syllabus is unavailable for paper validation.`);
+    const scopeFor = (q) => {
+      if (q.subject === 'Science') return scope.science;
+      if (q.subject === 'Mathematics') return scope.maths;
+      if (q.subject === 'English') return scope.english;
+      if (q.subject === 'Hindi') return scope.hindi;
+      if (q.subject === 'Social Science') return scope.socialScience;
+      if (q.subject === 'GK + Reasoning') return q.topic === 'Reasoning' ? scope.reasoning : scope.gk;
+      return null;
+    };
+
+    paper.forEach((q, i) => {
+      const number = i + 1;
+      if (!q || !requiredCounts[q.subject]) throw new Error(`T${exam.n} question ${number} has an invalid subject.`);
+      counts[q.subject]++;
+      if (q.subject === 'GK + Reasoning' && q.topic === 'Reasoning') reasoning++;
+
+      const stem = normalizeStem(q.question);
+      if (!stem) throw new Error(`T${exam.n} question ${number} has an empty stem.`);
+      if (seen.has(stem)) throw new Error(`T${exam.n} contains a duplicate question stem at question ${number}.`);
+      seen.add(stem);
+
+      if (!Array.isArray(q.options) || q.options.length < 4) throw new Error(`T${exam.n} question ${number} must have at least 4 options.`);
+      const optionKeys = q.options.map(v => normalizeStem(v));
+      if (optionKeys.some(v => !v) || new Set(optionKeys).size !== optionKeys.length) throw new Error(`T${exam.n} question ${number} has duplicate/empty options.`);
+      if (!Number.isInteger(q.answer) || q.answer < 0 || q.answer >= q.options.length) throw new Error(`T${exam.n} question ${number} has an invalid answer index.`);
+
+      const allowed = scopeFor(q);
+      if (Array.isArray(allowed) && allowed.length && q.chapterId !== '' && q.chapterId !== undefined && q.chapterId !== null) {
+        const chapter = Number(q.chapterId);
+        if (!allowed.includes(chapter)) throw new Error(`T${exam.n} question ${number} escaped its declared syllabus scope.`);
+      }
+    });
+
+    Object.entries(requiredCounts).forEach(([subject, expected]) => {
+      if (counts[subject] !== expected) throw new Error(`T${exam.n} ${subject} count is ${counts[subject]}; expected ${expected}.`);
+    });
+    if (reasoning !== 5) throw new Error(`T${exam.n} reasoning count is ${reasoning}; expected 5.`);
+    return true;
+  }
+
   function hardenExamBuilder() {
-    if (typeof window.buildExam !== 'function' || window.__weeklyDeterministicBuilder) return;
+    if (typeof window.buildExam !== 'function' || window.__weeklyQualityBuilder) return;
     const original = window.buildExam;
     window.buildExam = function () {
       const s = state();
@@ -143,9 +208,13 @@
         seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
         return seed / 4294967296;
       };
-      try { return original(); } finally { Math.random = oldRandom; }
+      try {
+        const paper = original();
+        validateGeneratedPaper(paper, s.exam);
+        return paper;
+      } finally { Math.random = oldRandom; }
     };
-    window.__weeklyDeterministicBuilder = true;
+    window.__weeklyQualityBuilder = true;
   }
 
   function init() {
