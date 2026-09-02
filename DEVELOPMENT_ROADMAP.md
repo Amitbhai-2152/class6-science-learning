@@ -58,7 +58,7 @@ This file is the project queue. When the user says `next`, continue with the fir
 - [x] Add chapter tests and full Social Science CBT
 - [x] Add Hindi Social Science Tutor with chapter context
 - [x] Add Social Science progress, XP, mastery, revision and badges
-- [ ] Run Social Science mobile/accessibility/runtime QA
+- [x] Run Social Science mobile/accessibility/runtime QA
 
 ## Rule for `next`
 1. Take the first unchecked task in this queue.
