@@ -4,9 +4,8 @@ import path from 'node:path';
 const root = process.cwd();
 const IGNORE = new Set(['node_modules', '.git']);
 const QUESTION_START = /\{\s*(?:question|q)\s*:/g;
-
 const fail = (message) => { throw new Error(`[question-quality] ${message}`); };
-const warn = [];
+const warnings = [];
 const files = [];
 
 function walk(dir) {
@@ -18,22 +17,20 @@ function walk(dir) {
   }
 }
 
-function readQuoted(source, start) {
+function quoted(source, start) {
   const quote = source[start];
-  let out = '';
+  let value = '';
   for (let i = start + 1; i < source.length; i++) {
     const ch = source[i];
-    if (ch === '\\') { out += ch + (source[i + 1] ?? ''); i++; continue; }
-    if (ch === quote) return { value: out, end: i + 1 };
-    out += ch;
+    if (ch === '\\') { value += ch + (source[i + 1] ?? ''); i++; continue; }
+    if (ch === quote) return value;
+    value += ch;
   }
   return null;
 }
 
-function findBalancedObject(source, start) {
-  let depth = 0;
-  let quote = null;
-  let escaped = false;
+function balancedObject(source, start) {
+  let depth = 0, quote = null, escaped = false;
   for (let i = start; i < source.length; i++) {
     const ch = source[i];
     if (quote) {
@@ -52,20 +49,17 @@ function findBalancedObject(source, start) {
   return null;
 }
 
-function parseStringAfter(label, objectSource) {
-  const re = new RegExp(`${label}\\s*:\\s*(['"])");
+function fieldString(objectSource, label) {
+  const re = new RegExp(`${label}\\s*:\\s*(['"])`);
   const m = re.exec(objectSource);
-  if (!m) return null;
-  return readQuoted(objectSource, m.index + m[0].length - 1)?.value ?? null;
+  return m ? quoted(objectSource, m.index + m[0].length - 1) : null;
 }
 
-function parseArrayLiteral(objectSource) {
+function arrayBody(objectSource) {
   const m = /options\s*:\s*\[/.exec(objectSource);
   if (!m) return null;
   const start = m.index + m[0].length - 1;
-  let depth = 0;
-  let quote = null;
-  let escaped = false;
+  let depth = 0, quote = null, escaped = false;
   for (let i = start; i < objectSource.length; i++) {
     const ch = objectSource[i];
     if (quote) {
@@ -84,9 +78,9 @@ function parseArrayLiteral(objectSource) {
   return null;
 }
 
-function splitTopLevelArrayItems(text) {
-  const items = [];
-  let last = 0, depth = 0, quote = null, escaped = false;
+function splitTopLevel(text) {
+  const out = [];
+  let start = 0, depth = 0, quote = null, escaped = false;
   for (let i = 0; i < text.length; i++) {
     const ch = text[i];
     if (quote) {
@@ -98,76 +92,60 @@ function splitTopLevelArrayItems(text) {
     if (ch === '\'' || ch === '"' || ch === '`') { quote = ch; continue; }
     if (ch === '[' || ch === '{' || ch === '(') depth++;
     else if (ch === ']' || ch === '}' || ch === ')') depth--;
-    else if (ch === ',' && depth === 0) { items.push(text.slice(last, i).trim()); last = i + 1; }
+    else if (ch === ',' && depth === 0) { out.push(text.slice(start, i).trim()); start = i + 1; }
   }
-  const tail = text.slice(last).trim();
-  if (tail) items.push(tail);
-  return items;
+  const last = text.slice(start).trim();
+  if (last) out.push(last);
+  return out;
 }
 
-function decodeSimpleString(token) {
+function tokenValue(token) {
   const t = token.trim();
-  if (!/^['"`]/.test(t)) return t;
-  const parsed = readQuoted(t, 0);
-  return parsed?.value ?? t;
+  if (/^['"`]/.test(t)) return quoted(t, 0) ?? t;
+  return t;
 }
 
-function inspectObjectQuestions(relative, source) {
+function inspect(relative, source) {
   let count = 0;
-  let index = 0;
-  for (const m of source.matchAll(QUESTION_START)) {
-    const start = m.index;
-    const objectSource = findBalancedObject(source, start);
-    if (!objectSource) fail(`${relative}: unterminated question object near character ${start}.`);
-    index++;
+  for (const match of source.matchAll(QUESTION_START)) {
+    const objectSource = balancedObject(source, match.index);
+    if (!objectSource) fail(`${relative}: unterminated question object near character ${match.index}.`);
     count++;
+    const question = fieldString(objectSource, 'question') ?? fieldString(objectSource, 'q');
+    if (!question?.trim()) fail(`${relative}: question ${count} is empty.`);
 
-    const question = parseStringAfter('question', objectSource) ?? parseStringAfter('q', objectSource) ?? '';
-    if (!question.trim()) fail(`${relative}: question object ${index} has an empty question.`);
-
-    const optionsSource = parseArrayLiteral(objectSource);
-    if (optionsSource === null) {
-      warn.push(`${relative}: question ${index} has no options array.`);
+    const body = arrayBody(objectSource);
+    if (body === null) {
+      warnings.push(`${relative}: question ${count} is not an MCQ object with an options array.`);
       continue;
     }
-    const options = splitTopLevelArrayItems(optionsSource).map(decodeSimpleString).filter(Boolean);
-    if (options.length < 4) fail(`${relative}: question ${index} has ${options.length} options; class-test MCQ banks require at least 4.`);
-    const normalized = options.map(x => x.replace(/\s+/g, ' ').trim().toLowerCase());
-    if (new Set(normalized).size !== normalized.length) fail(`${relative}: question ${index} contains duplicate answer options.`);
+    const options = splitTopLevel(body).map(tokenValue).filter(Boolean);
+    if (options.length < 4) fail(`${relative}: question ${count} has ${options.length} options; MCQ items require at least 4.`);
+    const normalized = options.map(x => x.replace(/\s+/g, ' ').trim().toLocaleLowerCase());
+    if (new Set(normalized).size !== normalized.length) fail(`${relative}: question ${count} contains duplicate options.`);
 
     const answerMatch = /answer\s*:\s*(-?\d+)/.exec(objectSource);
-    if (!answerMatch) fail(`${relative}: question ${index} is missing numeric answer index.`);
+    if (!answerMatch) fail(`${relative}: question ${count} is missing a numeric answer index.`);
     const answer = Number(answerMatch[1]);
-    if (answer < 0 || answer >= options.length) fail(`${relative}: question ${index} answer index ${answer} is outside 0..${options.length - 1}.`);
+    if (answer < 0 || answer >= options.length) fail(`${relative}: question ${count} answer ${answer} is outside 0..${options.length - 1}.`);
 
-    if (!/explanation\s*:/.test(objectSource)) warn.push(`${relative}: question ${index} has no explicit explanation; review fallback will be used.`);
+    if (!/explanation\s*:/.test(objectSource)) warnings.push(`${relative}: question ${count} has no explicit explanation; review fallback will be used.`);
   }
   return count;
 }
 
-function inspectTupleBanks(relative, source) {
-  const tupleBank = /(?:REASONING_HI|GK_HI_TOPICS)\s*=|(?:REASONING|GK)[^=]*=/.test(source);
-  if (!tupleBank) return 0;
-  const nums = [...source.matchAll(/\[\s*(['"`])([\s\S]*?)\1\s*,\s*\[/g)];
-  return nums.length;
-}
-
 walk(root);
-let objectQuestions = 0;
-let htmlQuestionHits = 0;
+let totalQuestions = 0;
 for (const file of files) {
   const source = fs.readFileSync(file, 'utf8');
   const relative = path.relative(root, file).replaceAll(path.sep, '/');
-  objectQuestions += inspectObjectQuestions(relative, source);
-  if (/question|questions|quiz/i.test(source) && /options|answer/i.test(source)) htmlQuestionHits++;
-  inspectTupleBanks(relative, source);
+  totalQuestions += inspect(relative, source);
 }
 
-if (objectQuestions === 0) fail('No object-format question records were detected; audit configuration is likely broken.');
-
-console.log(`Question quality audit PASSED: ${objectQuestions} object-format questions inspected across ${files.length} JS/HTML files; ${warn.length} non-blocking explanation warnings; ${htmlQuestionHits} question-bearing HTML/JS files detected.`);
-if (warn.length) {
-  console.log('Warnings (non-blocking):');
-  for (const message of warn.slice(0, 25)) console.log(`- ${message}`);
-  if (warn.length > 25) console.log(`- ... ${warn.length - 25} more warnings`);
+if (totalQuestions < 60) fail(`Only ${totalQuestions} object-format questions were detected; expected a substantial multi-subject question corpus.`);
+console.log(`Question quality audit PASSED: ${totalQuestions} object-format questions inspected across ${files.length} JS/HTML files. Structural checks: non-empty stems, 4+ unique options, valid answer indexes. Explicit-explanation warnings: ${warnings.length}.`);
+if (warnings.length) {
+  console.log('Non-blocking warnings:');
+  for (const warning of warnings.slice(0, 25)) console.log(`- ${warning}`);
+  if (warnings.length > 25) console.log(`- ... ${warnings.length - 25} more warnings`);
 }
