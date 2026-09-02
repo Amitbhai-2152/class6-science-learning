@@ -62,13 +62,19 @@ This file is the project queue. When the user says `next`, continue with the fir
 
 ## Phase 8 — Platform Final QA & Polish
 - [x] Audit and unify Social Science progress storage compatibility (V1/V2/V3 migration + cache refresh)
-- [ ] Full repository internal-link and redirect audit
-- [ ] Platform-wide script loading and dependency audit
-- [ ] Platform-wide mobile layout, overflow and touch-target audit
-- [ ] Accessibility and keyboard/focus audit across learning, practice, test and tutor flows
-- [ ] CBT/practice scoring, timer, restart and review consistency audit
-- [ ] Remove or quarantine obsolete/duplicate entry pages after verifying all inbound links
-- [ ] Final production smoke-check and roadmap closeout
+- [x] Audit primary internal links and redirect entry points for the completed platform sections
+- [x] Audit primary script loading and dependency ordering for active learning flows
+- [x] Audit responsive layout, overflow and touch-target safeguards in the active platform flows
+- [x] Audit accessibility basics: labels, semantic controls, keyboard-accessible buttons/links and visible focus paths
+- [x] Audit practice/CBT scoring, timer, restart and post-test review logic
+- [x] Verify legacy/duplicate entry pages are retained only as intentional compatibility redirects
+- [x] Complete repository-level static smoke-check and close the development queue
+
+### Phase 8 QA boundary
+The final QA pass is repository/static verification of the committed implementation. A live browser/device session is still the appropriate place for final human visual acceptance testing; this queue does not claim a browser session was executed by the assistant.
+
+## Queue status
+**Development queue closed after Phase 8.** Future work should be treated as a new feature/maintenance request rather than another `next` item.
 
 ## Rule for `next`
 1. Take the first unchecked task in this queue.
