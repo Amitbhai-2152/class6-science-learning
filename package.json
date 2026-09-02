@@ -5,7 +5,8 @@
   "scripts": {
     "start": "node server.js",
     "check:navigation": "node scripts/check-navigation.mjs",
-    "check:weekly-exam": "node scripts/check-weekly-exam.mjs"
+    "check:weekly-exam": "node scripts/check-weekly-exam.mjs",
+    "check:weekly-exam-runtime": "node scripts/check-weekly-exam-runtime.mjs"
   },
   "dependencies": {
     "express": "^5.1.0",
