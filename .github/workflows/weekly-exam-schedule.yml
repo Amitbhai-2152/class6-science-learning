@@ -1,0 +1,41 @@
+name: Weekly Exam Schedule Check
+
+on:
+  push:
+    paths:
+      - 'tests/weekly-exam-plan.js'
+      - 'tests/weekly-exam.js'
+      - 'tests/index.html'
+      - 'tests/planner.html'
+      - 'scripts/check-weekly-exam.mjs'
+      - 'scripts/check-weekly-exam-runtime.mjs'
+      - 'package.json'
+      - '.github/workflows/weekly-exam-schedule.yml'
+  pull_request:
+    paths:
+      - 'tests/weekly-exam-plan.js'
+      - 'tests/weekly-exam.js'
+      - 'tests/index.html'
+      - 'tests/planner.html'
+      - 'scripts/check-weekly-exam.mjs'
+      - 'scripts/check-weekly-exam-runtime.mjs'
+      - 'package.json'
+      - '.github/workflows/weekly-exam-schedule.yml'
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Validate JavaScript syntax
+        run: node --check tests/weekly-exam-plan.js && node --check scripts/check-weekly-exam-runtime.mjs
+      - name: Run static weekly exam contract check
+        run: npm run check:weekly-exam
+      - name: Run executable weekly exam schedule test
+        run: npm run check:weekly-exam-runtime
