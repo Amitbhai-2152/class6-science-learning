@@ -35,6 +35,7 @@ const similarity = (a, b) => {
   for (const token of A) if (B.has(token)) common++;
   return common / (A.size + B.size - common);
 };
+const compact = (value) => String(value).replace(/\s+/g, ' ').trim();
 
 function addQuestion(source, index, question, options = [], answer = -1, explanation = '', { legacyTuple = false } = {}) {
   const stem = normalize(question);
@@ -42,7 +43,7 @@ function addQuestion(source, index, question, options = [], answer = -1, explana
   const key = `${source}#${index}`;
   const previous = seen.get(stem);
   if (previous) {
-    report.push(`[DUPLICATE] ${key} repeats ${previous.source}#${previous.index}: ${question}`);
+    report.push(`[DUPLICATE] ${key} repeats ${previous.source}#${previous.index}: ${compact(question)} | previous: ${compact(previous.question)}`);
   } else {
     seen.set(stem, { source, index, question });
   }
@@ -58,7 +59,6 @@ function addQuestion(source, index, question, options = [], answer = -1, explana
       if (normalizedOptions[i] && normalizedOptions[i] === correct) {
         report.push(`[DISTRACTOR] ${key} repeats the correct answer as an option.`);
       }
-      // Do not treat ordinary morphology or compound words as defective overlap.
       const correctTokens = tokens(correct);
       const distractorTokens = tokens(normalizedOptions[i]);
       if (correctTokens.size >= 2 && distractorTokens.size >= 2) {
@@ -127,7 +127,9 @@ const near = [];
 for (let i = 0; i < all.length; i++) {
   for (let j = i + 1; j < all.length; j++) {
     const score = similarity(all[i].question, all[j].question);
-    if (score >= 0.82) near.push(`[NEAR-DUPLICATE ${(score * 100).toFixed(0)}%] ${all[i].source}#${all[i].index} ↔ ${all[j].source}#${all[j].index}`);
+    if (score >= 0.82) {
+      near.push(`[NEAR-DUPLICATE ${(score * 100).toFixed(0)}%] ${all[i].source}#${all[i].index} ↔ ${all[j].source}#${all[j].index}: ${compact(all[i].question)} | ${compact(all[j].question)}`);
+    }
   }
 }
 report.push(...near);
