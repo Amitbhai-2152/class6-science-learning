@@ -120,21 +120,21 @@ This file is the project queue. When the user says `next`, continue with the fir
 - [x] Preserve test landing pages as the explicit place where candidates review rules before starting timed tests
 
 ## Post-Phase-8 maintenance — Executable weekly schedule verification
-- [x] Execute the production `tests/weekly-exam-plan.js` in a Node VM harness with a minimal browser shim
-- [x] Verify all 13 exam Sundays and all 13 preview Sundays from the running production schedule
-- [x] Verify 14-day spacing, stable Exam IDs and prep/preview/exam/closed state transitions
-- [x] Verify T1–T13 syllabus objects and exam configuration from the running production schedule
+- [x] Add an executable Node VM harness that loads the production `tests/weekly-exam-plan.js` with a minimal browser shim
+- [x] Add runtime assertions for all 13 exam Sundays, all 13 preview Sundays, 14-day spacing and stable Exam IDs
+- [x] Add runtime assertions for prep/preview/exam/closed state transitions and T1–T13 syllabus/config contracts
 - [x] Add `npm run check:weekly-exam-runtime` so the executable test is repeatable locally and in CI
 - [x] Add GitHub Actions workflow to execute the runtime schedule test on relevant changes and manual dispatch
+- [ ] Verify the newly added runtime test passes in a GitHub Actions run
 
 ### Phase 8 QA boundary
 The final QA pass is repository/static verification of the committed implementation. A live browser/device session is still the appropriate place for final human visual acceptance testing; this queue does not claim a browser session was executed by the assistant.
 
 ### Maintenance QA boundary
-Revision, platform-integrity, entry/exit navigation, Sunday examination planner, Sunday examination hardening, exact weekly syllabus enforcement, candidate test UX hardening, and executable weekly schedule verification are verified from the committed GitHub source, route wiring, schedule/syllabus contracts and feature integration. A live browser/device session is still the appropriate place for final human visual acceptance testing; the repository does not claim such a session was executed by the assistant. The executable weekly schedule test is designed to run independently of a browser in Node and is also wired into GitHub Actions.
+Revision, platform-integrity, entry/exit navigation, Sunday examination planner, Sunday examination hardening, exact weekly syllabus enforcement, candidate test UX hardening, and executable weekly schedule verification are verified from the committed GitHub source, route wiring, schedule/syllabus contracts and feature integration. A live browser/device session is still the appropriate place for final human visual acceptance testing; the repository does not claim such a session was executed by the assistant. The executable weekly schedule test is wired into GitHub Actions, but its CI result has not yet been independently confirmed here.
 
 ## Queue status
-**Current queue is complete through executable weekly schedule verification.** Future work should be treated as a new feature/maintenance request rather than assuming an unfinished queue item.
+**Current queue is pending the first GitHub Actions pass of executable weekly schedule verification.** Future work should be treated as a new feature/maintenance request after that verification is confirmed.
 
 ## Rule for `next`
 1. Take the first unchecked task in this queue.
