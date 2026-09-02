@@ -103,14 +103,22 @@ This file is the project queue. When the user says `next`, continue with the fir
 - [x] Make the weekly paper deterministic for the same Exam ID to prevent silent paper changes on refresh
 - [x] Add repository smoke-check coverage for the weekly exam files, schedule and integration contracts
 
+## Post-Phase-8 maintenance — Exact weekly syllabus enforcement
+- [x] Define exact T1–T13 syllabus coverage across Science, Mathematics, English, Hindi, GK, Reasoning and Social Science
+- [x] Drive the weekly paper from the declared syllabus instead of generic current/previous scope
+- [x] Enforce 10 questions per core subject and a strict 5 GK + 5 Reasoning split
+- [x] Add deterministic scoped question selection using each weekly Exam ID
+- [x] Surface the same exact syllabus on the All Tests banner and planner
+- [x] Extend the repository smoke-check to cover syllabus structure and scoped-paper contracts
+
 ### Phase 8 QA boundary
 The final QA pass is repository/static verification of the committed implementation. A live browser/device session is still the appropriate place for final human visual acceptance testing; this queue does not claim a browser session was executed by the assistant.
 
 ### Maintenance QA boundary
-Revision, platform-integrity, entry/exit navigation, Sunday examination planner, and Sunday examination hardening maintenance above is verified from the committed GitHub source, route wiring, navigation contracts and feature integration. A live browser/device session is still the appropriate place for final human visual acceptance testing; the repository does not claim such a session was executed by the assistant.
+Revision, platform-integrity, entry/exit navigation, Sunday examination planner, Sunday examination hardening, and exact weekly syllabus enforcement are verified from the committed GitHub source, route wiring, schedule/syllabus contracts and feature integration. A live browser/device session is still the appropriate place for final human visual acceptance testing; the repository does not claim such a session was executed by the assistant.
 
 ## Queue status
-**Current queue is complete through Sunday examination hardening.** Future work should be treated as a new feature/maintenance request rather than assuming an unfinished queue item.
+**Current queue is complete through exact weekly syllabus enforcement.** Future work should be treated as a new feature/maintenance request rather than assuming an unfinished queue item.
 
 ## Rule for `next`
 1. Take the first unchecked task in this queue.
