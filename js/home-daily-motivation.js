@@ -20,7 +20,7 @@ function addMotivationSizing(){
   if(document.getElementById('daily-motivation-size-fix'))return;
   const s=document.createElement('style');
   s.id='daily-motivation-size-fix';
-  s.textContent='#homeView .home-motivation{padding:18px 19px;min-height:84px;gap:16px}#homeView .home-motivation-icon{flex-basis:48px;width:48px;height:48px;font-size:24px}#homeView .home-motivation small{font-size:12px}#homeView .home-motivation b{font-size:16px;line-height:1.55}@media(max-width:650px){#homeView .home-motivation{padding:16px 14px;min-height:82px;gap:13px}#homeView .home-motivation-icon{flex-basis:44px;width:44px;height:44px;font-size:22px}#homeView .home-motivation b{font-size:15px}}';
+  s.textContent='#homeView .home-motivation{padding:19px 20px;min-height:90px;gap:17px}#homeView .home-motivation-icon{flex-basis:50px;width:50px;height:50px;border-radius:13px;font-size:25px}#homeView .home-motivation small{font-size:12px}#homeView .home-motivation b{font-size:17px;line-height:1.55}@media(max-width:650px){#homeView .home-motivation{padding:17px 14px;min-height:88px;gap:13px}#homeView .home-motivation-icon{flex-basis:46px;width:46px;height:46px;font-size:23px}#homeView .home-motivation b{font-size:16px}}';
   document.head.appendChild(s);
 }
 function syncCurrentSubjectProgress(){
