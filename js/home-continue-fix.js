@@ -23,18 +23,23 @@ function getState(){
   const c=window.CHAPTERS?.find(x=>Number(x.id)===chapter);
   if(c?.sections?.length)part=Math.min(part,c.sections.length);
   const pct=completed.length/(window.CHAPTERS?.length||12)*100;
-  return{chapter,part,c,pct,completed}
+  return{chapter,part,c,pct,completed};
+}
+function isNonScienceSubject(){
+  try{
+    const current=localStorage.getItem('class6CurrentSubject');
+    return !!current&&current!=='science';
+  }catch(_){return false}
 }
 function refresh(){
   const card=document.querySelector('.home-continue .home-card:first-child');
-  if(!card)return;
+  if(!card||isNonScienceSubject())return;
   const state=getState();
   const set=(id,text)=>{const el=document.getElementById(id);if(el)el.textContent=text};
   const bar=document.getElementById('continueBar');
   set('continueTitle',state.c?.title||'Science');
   set('continuePercent',clamp(state.pct)+'%');
   if(state.c){
-    const total=(state.c.sections?.length||0)+1;
     const label=state.part>=state.c.sections.length?'Chapter Challenge':`भाग ${Math.min(state.part+1,state.c.sections.length)}/${state.c.sections.length}`;
     set('continueMeta',`${state.c.title} • ${label}`);
     if(bar)bar.style.width=clamp(state.pct)+'%';
@@ -52,7 +57,7 @@ function refresh(){
     });
   }
 }
-window.HomeContinueFix={refresh};
+window.HomeContinueFix={refresh,getState};
 window.addEventListener('DOMContentLoaded',()=>setTimeout(refresh,0));
 window.addEventListener('load',()=>setTimeout(refresh,0));
 ['storage','science:xp','xp:earned'].forEach(ev=>window.addEventListener(ev,refresh));
