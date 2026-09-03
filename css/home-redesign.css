@@ -54,7 +54,7 @@
 #homeView .home-mini-stats div{padding:12px 8px;border-radius:13px;background:#f7f8fb;border:1px solid #e8ecf2}
 #homeView .home-mini-stats b{font-size:21px}
 #homeView .home-mini-stats span{font-size:10px;color:#6b7484}
-#homeView .home-motivation{display:flex;align-items:center;gap:15px;margin-top:16px;padding:18px 19px;border:1px solid #dfe6f3;border-radius:17px;background:linear-gradient(135deg,#f5f7ff,#effcf9);order:4;min-height:86px;box-shadow:0 7px 18px rgba(31,41,55,.045)}
+#homeView .home-motivation{display:flex;align-items:center;gap:15px;margin-top:16px;padding:18px 19px;border:1px solid #dfe6f3;border-radius:17px;background:linear-gradient(135deg,#f5f7ff,#effcf9);order:6;min-height:86px;box-shadow:0 7px 18px rgba(31,41,55,.045)}
 #homeView .home-motivation-icon{display:grid;place-items:center;flex:0 0 48px;width:48px;height:48px;border-radius:13px;background:#e9ecff;font-size:24px}
 #homeView .home-motivation small{display:block;color:var(--home2-muted);font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
 #homeView .home-motivation b{display:block;color:var(--home2-ink);font-size:16px;line-height:1.55;margin-top:4px}
