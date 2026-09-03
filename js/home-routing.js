@@ -14,7 +14,7 @@
     if(window.QuizEngine?.run && !window.QuizEngine.__candidateInstructions){
       const originalRun=window.QuizEngine.run;
       window.QuizEngine.run=function(questions,box,callback){
-        return ti.open({title:'Chapter Challenge शुरू करने से पहले',subtitle:'पहले instructions पढ़ो, फिर अपने answers carefully attempt करो।',items:['हर question को ध्यान से पढ़कर सबसे सही option चुनो.','इस challenge में हर सही उत्तर पर 1 mark मिलेगा; गलत/छोड़े हुए answer पर 0 mark.','Answer चुनने के बाद आगे बढ़ो और जरूरत हो तो questions दोबारा check करो.','Submit के बाद score और हर question का explanation देखना मत भूलना.'],startLabel:'Instructions पढ़ लीं — Challenge शुरू करें 🚀'},()=>originalRun.call(window.QuizEngine,questions,box,callback));
+        return ti.open({title:'Chapter Challenge शुरू करने से पहले',subtitle:'पहले instructions पढ़ो, फिर अपने answers carefully attempt करो।',items:['हर question को ध्यान से पढ़कर सबसे सही option चुनो.','इस challenge में हर सही उत्तर पर 1 mark मिलेगा; गलत/छोड़े हुए answer पर 0 mark.','Answer चुनने के बाद आगे बढ़ो और जरूरत हो तो questions दोबारा check करो.','Submit के बाद score और हर question का explanation देखना मत भूलो.'],startLabel:'Instructions पढ़ लीं — Challenge शुरू करें 🚀'},()=>originalRun.call(window.QuizEngine,questions,box,callback));
       };
       window.QuizEngine.__candidateInstructions=true;
     }
@@ -28,9 +28,17 @@
       window.ScienceCBT.__candidateInstructions=true;
     }
   }
+  function loadLevelBanner(){
+    if(document.querySelector('script[data-level-banner]'))return;
+    const script=document.createElement('script');
+    script.src='js/level-banner.js?v=1';
+    script.dataset.levelBanner='true';
+    document.head.appendChild(script);
+  }
   function route(){
     refreshTutorSafeStyle();
     installTestInstructionGuards();
+    setTimeout(loadLevelBanner,0);
     try{
       const params=new URLSearchParams(location.search);
       const view=params.get('view');
