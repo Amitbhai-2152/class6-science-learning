@@ -23,25 +23,17 @@ function toggle(){
   const next=(document.documentElement.classList.contains('dark')||document.body?.classList.contains('dark'))?'light':'dark';
   save(next);apply(next);
 }
-function bind(){
-  apply(read());
-  const btn=document.getElementById('themeBtn');
-  if(btn && !btn.dataset.themeBound){
-    btn.dataset.themeBound='1';
-    btn.type='button';
-    btn.addEventListener('click',toggle,{passive:true});
-  }
-}
-try{document.documentElement.dataset.theme=read()}catch(_){}
+// Apply as early as possible so there is no light-flash before the page is ready.
 apply(read());
-document.addEventListener('DOMContentLoaded',bind,{once:true});
-window.addEventListener('load',bind,{once:true});
-// Delegated fallback keeps the toggle working even if the Home view is re-rendered.
+// Use one delegated listener only. This also survives Home DOM re-renders.
 document.addEventListener('click',e=>{
   const btn=e.target?.closest?.('#themeBtn');
   if(!btn)return;
   e.preventDefault();
+  e.stopPropagation();
   toggle();
 },{capture:true});
+window.addEventListener('DOMContentLoaded',()=>apply(read()),{once:true});
+window.addEventListener('load',()=>apply(read()),{once:true});
 window.ThemeToggle={getTheme:read,apply,toggle};
 })();
