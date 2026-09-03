@@ -9,11 +9,14 @@
 <body>
 <header class="top"><div class="wrap"><a class="back" href="../index.html">← Home</a><div class="pill">ALL CLASSES</div><h1>कक्षा 6 के Subjects</h1><p>हर subject अपने dedicated learning space में खुलेगा।</p></div></header>
 <main class="content"><div class="grid">
-<a class="card" href="science/index.html"><span class="icon">🔬</span><h2>Science</h2><p>12 chapters • Visuals • Activities • Tutor • Practice • CBT</p><span class="go">Science खोलें →</span></a>
-<a class="card" href="maths/index.html"><span class="icon">➗</span><h2>Mathematics</h2><p>8 chapters • Step solutions • Hints • Practice • CBT • Tutor</p><span class="go">Maths खोलें →</span></a>
-<a class="card" href="english/index.html"><span class="icon">🇬🇧</span><h2>English Grammar &amp; Translation</h2><p>8 chapters • Reading • Vocabulary • Writing • Practice • AI Tutor</p><span class="go">English खोलें →</span></a>
-<a class="card" href="hindi/index.html"><span class="icon">अ</span><h2>Hindi</h2><p>8 chapters • Grammar • Reading • Writing • Practice</p><span class="go">Hindi खोलें →</span></a>
-<a class="card" href="gk/index.html"><span class="icon">🧠</span><h2>GK + Reasoning</h2><p>India • Geography • Science • History • World GK • Sports • Reasoning</p><span class="go">GK + Reasoning खोलें →</span></a>
-<a class="card" href="social-science/index.html"><span class="icon">🌏</span><h2>सामाजिक विज्ञान</h2><p>14 अध्याय • भूगोल • इतिहास • संस्कृति • नागरिक शास्त्र • अर्थव्यवस्था</p><span class="go">सामाजिक विज्ञान खोलें →</span></a>
+<a class="card" data-subject="science" href="science/index.html"><span class="icon">🔬</span><h2>Science</h2><p>12 chapters • Visuals • Activities • Tutor • Practice • CBT</p><span class="go">Science खोलें →</span></a>
+<a class="card" data-subject="maths" href="maths/index.html"><span class="icon">➗</span><h2>Mathematics</h2><p>8 chapters • Step solutions • Hints • Practice • CBT • Tutor</p><span class="go">Maths खोलें →</span></a>
+<a class="card" data-subject="english" href="english/index.html"><span class="icon">🇬🇧</span><h2>English Grammar &amp; Translation</h2><p>8 chapters • Reading • Vocabulary • Writing • Practice • AI Tutor</p><span class="go">English खोलें →</span></a>
+<a class="card" data-subject="hindi" href="hindi/index.html"><span class="icon">अ</span><h2>Hindi</h2><p>8 chapters • Grammar • Reading • Writing • Practice</p><span class="go">Hindi खोलें →</span></a>
+<a class="card" data-subject="gk" href="gk/index.html"><span class="icon">🧠</span><h2>GK + Reasoning</h2><p>India • Geography • Science • History • World GK • Sports • Reasoning</p><span class="go">GK + Reasoning खोलें →</span></a>
+<a class="card" data-subject="social" href="social-science/index.html"><span class="icon">🌏</span><h2>सामाजिक विज्ञान</h2><p>14 अध्याय • भूगोल • इतिहास • संस्कृति • नागरिक शास्त्र • अर्थव्यवस्था</p><span class="go">सामाजिक विज्ञान खोलें →</span></a>
 </div></main>
+<script>
+document.querySelectorAll('[data-subject]').forEach(link=>link.addEventListener('click',()=>{try{localStorage.setItem('class6CurrentSubject',link.dataset.subject)}catch(_){}}));
+</script>
 </body></html>
