@@ -36,18 +36,18 @@
     document.head.appendChild(script);
   }
   function installFastScienceExit(){
-    const params=new URLSearchParams(location.search);
-    if(params.get('view')!=='science' || !(Number(params.get('chapter'))>0))return;
+    const enteredFromScience=sessionStorage.getItem('class6ScienceChapterEntry')==='1';
+    if(!enteredFromScience)return;
+    sessionStorage.removeItem('class6ScienceChapterEntry');
     const exit=document.querySelector('#lessonView > a.btn');
     if(!exit || exit.dataset.fastScienceExit==='true')return;
-    const ref=document.referrer||'';
-    if(ref.includes('/subjects/science/index.html')){
-      exit.dataset.fastScienceExit='true';
-      exit.addEventListener('click',function(event){
+    exit.dataset.fastScienceExit='true';
+    exit.addEventListener('click',function(event){
+      if(history.length>1){
         event.preventDefault();
-        if(history.length>1)history.back();
-      });
-    }
+        history.back();
+      }
+    });
   }
   function route(){
     refreshTutorSafeStyle();
