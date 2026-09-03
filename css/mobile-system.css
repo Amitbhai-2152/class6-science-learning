@@ -1,0 +1,41 @@
+/* Shared mobile responsiveness foundation. Keep page structure and existing feature behavior unchanged. */
+html{overflow-x:hidden}body{min-width:0;overflow-x:hidden}img,svg,video,canvas{max-width:100%;height:auto}table{max-width:100%;border-collapse:collapse}pre,code{max-width:100%;overflow-x:auto;white-space:pre-wrap;overflow-wrap:anywhere}button,a,input,select,textarea{max-width:100%}
+@media(max-width:680px){
+  #lessonView,#progressView,#fullTestView,#cbtView{padding-inline:10px}
+  #lessonView>.btn,#progressView>.btn,#fullTestView>.btn,#cbtView>.btn{width:100%;margin-bottom:10px}
+  #lessonView .lesson-head{align-items:flex-start;flex-direction:column;padding:15px}
+  #lessonView .lesson-head h1{font-size:clamp(21px,7vw,28px);overflow-wrap:anywhere}
+  #lessonView .chapter-icon-large{align-self:flex-end;font-size:40px}
+  #lessonView .lesson-layout{gap:10px}
+  #lessonView .side{margin-top:0}
+  #lessonView .toc{padding-bottom:2px;scroll-snap-type:x proximity}
+  #lessonView .toc button{min-width:160px;scroll-snap-align:start}
+  #lessonView article.card{padding:15px;overflow-wrap:anywhere}
+  #lessonView .body-text{font-size:16px;line-height:1.8}
+  #lessonView .visual-row{justify-content:stretch}
+  #lessonView .visual-node{flex:1 1 120px;min-width:0}
+  #lessonView .arrow{flex:0 0 auto}
+  #lessonView .exam-link{grid-template-columns:1fr}
+  #lessonView .nav{gap:7px}
+  #lessonView .nav .btn{width:100%}
+  #progressView .lesson-head{padding:16px}
+  #progressView .lesson-head h1{font-size:clamp(22px,7vw,30px);overflow-wrap:anywhere}
+  #fullTestView .test-head{padding:14px;flex-direction:column;align-items:stretch;gap:10px}
+  #fullTestView .test-head h1{font-size:clamp(21px,7vw,29px);overflow-wrap:anywhere}
+  #fullTestView .test-timer{align-self:flex-start;font-size:22px}
+  #fullTestView .test-meta{flex-wrap:wrap;gap:8px}
+  #cbtView .card{padding:15px;overflow-wrap:anywhere}
+  .chat-wrap{left:8px;right:8px;width:auto;bottom:76px}
+  .chat{width:100%;max-width:none;max-height:calc(100dvh - 92px)}
+  .messages{max-height:42dvh}
+  .chat-input{position:sticky;bottom:0}
+  .modal{padding:12px}
+  .modal-card{max-height:calc(100dvh - 24px);overflow:auto;padding:20px}
+}
+@media(max-width:390px){
+  #lessonView,#progressView,#fullTestView,#cbtView{padding-inline:7px}
+  #lessonView article.card,#progressView .card,#fullTestView .card,#cbtView .card{padding:13px}
+  #lessonView .toc button{min-width:145px}
+  .btn{min-height:46px;padding-inline:12px}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
