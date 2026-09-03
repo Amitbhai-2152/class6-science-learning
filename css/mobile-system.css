@@ -31,11 +31,24 @@ html{overflow-x:hidden}body{min-width:0;overflow-x:hidden}img,svg,video,canvas{m
   .chat-input{position:sticky;bottom:0}
   .modal{padding:12px}
   .modal-card{max-height:calc(100dvh - 24px);overflow:auto;padding:20px}
+
+  /* Protect touch controls from narrow-screen crowding/overflow. */
+  .exam-actions{align-items:stretch}
+  .exam-actions>div{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .exam-actions .secondary,.exam-actions .primary{min-width:0;width:100%}
+  .start-row{align-items:stretch}
+  .start-row .primary{width:100%}
+  .actions{gap:8px}
+  .actions>*{min-width:0}
+  .quick-actions button{flex:0 0 auto;min-height:40px}
+  .chat-input input{min-width:0}
 }
 @media(max-width:390px){
   #lessonView,#progressView,#fullTestView,#cbtView{padding-inline:7px}
   #lessonView article.card,#progressView .card,#fullTestView .card,#cbtView .card{padding:13px}
   #lessonView .toc button{min-width:145px}
   .btn{min-height:46px;padding-inline:12px}
+  .exam-actions>div{grid-template-columns:1fr}
+  .exam-actions .secondary,.exam-actions .primary{width:100%}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
