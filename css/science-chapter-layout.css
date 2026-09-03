@@ -1,0 +1,49 @@
+/* Science chapter page layout: isolated responsive polish */
+#lessonView{max-width:1100px;margin:0 auto;padding:14px 12px 100px}
+#lessonView>.btn:first-child{display:inline-flex;align-items:center;justify-content:center;margin:0 0 10px;min-height:42px}
+#lessonView .lesson-layout{margin-top:0;align-items:start;gap:18px}
+#lessonView .lesson-layout>.side{margin:0;top:76px}
+#lessonView .lesson-layout>section{min-width:0;margin:0}
+#lessonView .lesson-head{margin-top:0;padding:20px 22px;align-items:center}
+#lessonView .progress{margin:10px 2px 0}
+#lessonView #lessonContent{margin-top:12px;padding:20px 22px 26px;overflow:visible}
+#lessonView #lessonContent h2{margin:4px 0 14px;line-height:1.3}
+#lessonView #lessonContent .body-text{margin:12px 0;max-width:78ch}
+#lessonView .visual{margin:14px 0;overflow:hidden}
+#lessonView .callout,#lessonView .activity,#lessonView .mistake{margin-top:12px}
+#lessonView .exam-link{margin-top:12px}
+#lessonView .nav{margin-top:16px}
+#lessonView .nav .btn{min-width:145px}
+
+@media(max-width:900px){
+  #lessonView{padding:10px 10px 96px}
+  #lessonView .lesson-layout{gap:10px}
+  #lessonView .lesson-layout>.side{position:static}
+  #lessonView .side .toc{display:flex;gap:7px;overflow-x:auto;overflow-y:hidden;padding:2px 2px 6px;scroll-snap-type:x proximity}
+  #lessonView .side .toc button{flex:0 0 min(230px,76vw);min-width:0;scroll-snap-align:start}
+  #lessonView .lesson-head{padding:17px 18px}
+  #lessonView #lessonContent{margin-top:10px;padding:18px 18px 24px}
+  #lessonView .nav .btn{width:100%;min-width:0}
+}
+
+@media(max-width:580px){
+  #lessonView{padding:8px 8px 92px}
+  #lessonView>.btn:first-child{width:100%;margin-bottom:8px}
+  #lessonView .lesson-head{padding:14px;gap:10px}
+  #lessonView .lesson-head h1{font-size:22px;line-height:1.3;margin:6px 0 4px;overflow-wrap:anywhere}
+  #lessonView .chapter-icon-large{font-size:38px;flex:0 0 auto}
+  #lessonView #lessonContent{padding:15px 14px 20px;border-radius:16px}
+  #lessonView #lessonContent h2{font-size:20px;margin:4px 0 11px}
+  #lessonView #lessonContent .body-text{font-size:16px;line-height:1.85}
+  #lessonView .visual{margin:12px 0;padding:10px}
+  #lessonView .visual-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;justify-content:stretch}
+  #lessonView .visual-node{width:100%;min-width:0;padding:9px}
+  #lessonView .arrow{font-size:0;display:none}
+  #lessonView .callout,#lessonView .activity,#lessonView .mistake{padding:10px;margin-top:9px}
+  #lessonView .exam-link{grid-template-columns:1fr;gap:8px;margin-top:10px}
+  #lessonView .exam-link>div{padding:10px}
+  #lessonView .nav{margin-top:14px;flex-direction:column;gap:8px;padding-bottom:8px}
+  #lessonView .nav .btn{min-height:46px}
+}
+
+@media(prefers-reduced-motion:reduce){#lessonView *{scroll-behavior:auto}}
