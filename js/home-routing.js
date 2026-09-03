@@ -35,18 +35,6 @@
     script.dataset.levelBannerV4='true';
     document.head.appendChild(script);
   }
-  function hardenScienceExit(){
-    const params=new URLSearchParams(location.search);
-    if(params.get('view')!=='science' || !(Number(params.get('chapter'))>0))return;
-    const exitButton=document.querySelector('#lessonView > .btn');
-    if(!exitButton || exitButton.dataset.scienceExitV2==='true')return;
-    exitButton.dataset.scienceExitV2='true';
-    exitButton.addEventListener('click',function(event){
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      location.replace('subjects/science/index.html');
-    },true);
-  }
   function route(){
     refreshTutorSafeStyle();
     installTestInstructionGuards();
@@ -58,8 +46,7 @@
       if(view==='science' && !chapter){location.replace('subjects/science/index.html');return;}
       if(view==='science' && chapter && typeof window.openChapter==='function'){
         window.openChapter(chapter,0);
-        window.goHome=function(){location.replace('subjects/science/index.html');};
-        setTimeout(hardenScienceExit,0);
+        window.goHome=function(){location.href='subjects/science/index.html';};
         return;
       }
       if(view==='science-practice' && window.FullScienceTest?.start){window.FullScienceTest.start(4);return;}
