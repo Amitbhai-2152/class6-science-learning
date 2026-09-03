@@ -29,10 +29,10 @@
     }
   }
   function loadLevelBanner(){
-    if(document.querySelector('script[data-level-banner-v3]'))return;
+    if(document.querySelector('script[data-level-banner-v4]'))return;
     const script=document.createElement('script');
-    script.src='js/level-banner-v3.js?v=1';
-    script.dataset.levelBannerV3='true';
+    script.src='js/level-banner-v4.js?v=1';
+    script.dataset.levelBannerV4='true';
     document.head.appendChild(script);
   }
   function route(){
