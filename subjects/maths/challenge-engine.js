@@ -1,3 +1,4 @@
+(function(){if(!window.XPSystem){const s=document.createElement('script');s.src='../../js/xp-system.js?v=2';document.head.appendChild(s)}})();
 (function(){
 'use strict';
 
@@ -58,6 +59,7 @@ function ChallengeEngine(){
   function renderResult(){
     const m=mount();if(!m)return;
     const score=scoreNow(), total=questions.length, pct=Math.round(score/total*100);saveBest(score);
+    window.XPSystem?.score?.('maths',`chapter-challenge:${chapter?.id||0}`,pct,'chapter-challenge');
     const grade=pct>=90?'🏆 Outstanding!':pct>=75?'🌟 बहुत अच्छा!':pct>=60?'👍 अच्छा प्रयास':'📚 थोड़ा और practice करो';
     m.innerHTML=`<div class="mc-result"><div class="mc-badge">RESULT</div><div class="mc-score-big">${score}<small>/${total}</small></div><h3>${grade}</h3><p>${pct}% • Best score: ${best}/${total}</p><div class="mc-result-grid"><div><b>✅ ${score}</b><span>Correct</span></div><div><b>❌ ${total-score}</b><span>Need review</span></div><div><b>🏆 ${best}</b><span>Best score</span></div></div><div class="mc-actions"><button class="mc-secondary" id="mcRetry">🔄 फिर से दें</button><button class="mc-primary" id="mcReview">🔎 पूरा Review</button></div></div>`;
     m.querySelector('#mcRetry').onclick=()=>start(chapter);
