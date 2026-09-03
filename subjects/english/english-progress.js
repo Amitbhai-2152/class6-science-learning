@@ -1,3 +1,4 @@
+(function(){if(!window.XPSystem){document.write('<script src="../../js/xp-system.js?v=2"><\/script>')}document.write('<script src="../../js/xp-unify-bridge-v2.js?v=1"><\/script>')})();
 (function(){'use strict';
 const KEY='class6EnglishProgressV1';
 const defaults=()=>({xp:0,attempts:0,best:0,totalQuestions:0,totalScore:0,categories:{},history:[],badges:[]});
