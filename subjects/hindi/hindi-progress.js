@@ -1,4 +1,4 @@
-(function(){if(!window.XPSystem){document.write('<script src="../../js/xp-system.js?v=1"><\/script>')}document.write('<script src="../../js/xp-unify-bridge.js?v=1"><\/script>')})();
+(function(){if(!window.XPSystem){document.write('<script src="../../js/xp-system.js?v=2"><\/script>')}document.write('<script src="../../js/xp-unify-bridge-v2.js?v=1"><\/script>')})();
 (function(){
 'use strict';
 const KEY='class6HindiProgressV2';
