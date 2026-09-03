@@ -22,6 +22,6 @@
 <script>
 const icons=['🌱','🍃','🍽️','💧','🧲','🔥','🔭','🌧️','🧂','📏','💡','🌍'];
 const chapters=window.CHAPTERS||[window.chapter01,window.chapter02,window.chapter03,window.chapter04,window.chapter05,window.chapter06,window.chapter07,window.chapter08,window.chapter09,window.chapter10,window.chapter11,window.chapter12].filter(Boolean);
-document.getElementById('chapters').innerHTML=chapters.map((c,i)=>`<a class="card" href="../../index.html?view=science&chapter=${c.id}"><span class="num">अध्याय ${c.id}</span><span class="icon">${icons[i]||'🔬'}</span><h2>${c.title}</h2><p>${c.goal||'Concept समझो और अभ्यास करो।'}</p><span class="go">अध्याय खोलें →</span></a>`).join('');
+document.getElementById('chapters').innerHTML=chapters.map((c,i)=>`<a class="card" href="../../index.html?view=science&chapter=${c.id}" onclick="sessionStorage.setItem('class6ScienceChapterEntry','1')"><span class="num">अध्याय ${c.id}</span><span class="icon">${icons[i]||'🔬'}</span><h2>${c.title}</h2><p>${c.goal||'Concept समझो और अभ्यास करो।'}</p><span class="go">अध्याय खोलें →</span></a>`).join('');
 </script>
 </body></html>
