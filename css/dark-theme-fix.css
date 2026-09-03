@@ -1,0 +1,55 @@
+html body.dark{background:#0b1220;color:#eef6ff}
+body.dark #homeView{background:radial-gradient(circle at 8% 0,rgba(99,102,241,.16),transparent 30%),radial-gradient(circle at 95% 12%,rgba(20,184,166,.10),transparent 25%),#0b1220}
+body.dark #homeView .home-nav{background:rgba(11,18,32,.92);border-bottom-color:#26354a;color:#eef6ff}
+body.dark #homeView .home-stat,body.dark #homeView .home-theme,body.dark #homeView .home-progress-btn,body.dark #homeView .home-xp-chip{color:#eef6ff;background:#111c2d;border-color:#2a3b52}
+body.dark #homeView .home-stat:hover,body.dark #homeView .home-theme:hover,body.dark #homeView .home-progress-btn:hover,body.dark #homeView .home-xp-chip:hover{background:#18263a;border-color:#3a506d}
+body.dark #homeView .home-head h2,body.dark #homeView .home-card h3,body.dark #homeView .home-label,body.dark #homeView .home-meta,body.dark #homeView .home-row,body.dark #homeView .home-section p{color:#eef6ff}
+body.dark #homeView .home-head p,body.dark #homeView .home-label{color:#9fb0c3}
+body.dark #homeView .home-card{background:linear-gradient(145deg,#122238,#0f1b2c);border-color:#2b3e56;box-shadow:0 14px 36px rgba(0,0,0,.24)}
+body.dark #homeView .home-card:first-child,body.dark #homeView .home-card:nth-child(2){background:linear-gradient(145deg,#122238,#0f1b2c)}
+body.dark #homeView .home-bar-row{border-bottom-color:#26364c}
+body.dark #homeView .home-mini-stats div{background:#15263b;border-color:#2b405a}
+body.dark #homeView .home-mini-stats span,body.dark #homeView .home-bar-top span,body.dark #homeView .home-bar-row small{color:#a9b9ca}
+body.dark #homeView .home-offer{background:#122238;border-color:#2b3e56;color:#eef6ff}
+body.dark #homeView .home-offer:hover{background:#172a42;border-color:#3b5572}
+body.dark #homeView .home-offer-copy small{color:#a9b9ca}
+body.dark #homeView .home-offer-icon{background:#202d52}
+body.dark #homeView .home-motivation{background:linear-gradient(135deg,#182343,#11302f);border-color:#344667}
+body.dark #homeView .home-motivation-icon{background:#26335d}
+body.dark #homeView .home-motivation small{color:#a9b9ca}
+body.dark #homeView .home-motivation b{color:#f3f7ff}
+body.dark #homeView .home-notice{background:#15263b;color:#dce7f3;border-color:#2b405a}
+body.dark .card{background:var(--card);color:var(--ink)}
+body.dark .tag{background:#193152;color:#c8ddff}
+body.dark .soft{background:#193152;color:#c8ddff}
+body.dark .chapter-card{background:var(--card);color:var(--ink)}
+body.dark .chapter-number,.dark .qnum{background:#193152;color:#c8ddff}
+body.dark .callout{background:#302914;color:#f6e7a8}
+body.dark .activity{background:#112f3b;color:#d4f4fa}
+body.dark .mistake{background:#321b25;color:#ffd5de}
+body.dark .exam-link>div{background:#122238}
+body.dark .option{background:#122238;color:var(--ink)}
+body.dark .quiz-top{background:#16304d;color:#c8ddff}
+body.dark .quiz-correct{background:#123427!important}
+body.dark .quiz-wrong{background:#3a1c26!important}
+body.dark .feedback.ok{background:#123427;color:#baf4d2}
+body.dark .feedback.bad{background:#3a1c26;color:#ffd2dc}
+body.dark .dash-card,body.dark .dash-row,body.dark .history-row{background:#122238;color:var(--ink)}
+body.dark .progress-live-card,body.dark .progress-live-level-box,body.dark .progress-live-sub,body.dark .progress-live-kpi,body.dark .progress-live-revision{background:#122238!important;border-color:#2b3e56!important;color:#eef6ff}
+body.dark .progress-live-sub p,body.dark .progress-live-row,body.dark .progress-live-level-box span,body.dark .progress-live-kpi span,body.dark .progress-live-revision span{color:#a9b9ca}
+body.dark .progress-live-meter{background:#26384e}
+body.dark .visual{background:linear-gradient(135deg,#13243a,#11302d);border-color:#2b3e56}
+body.dark .visual-node{background:#14263c;color:#eef6ff}
+body.dark .visual-tip{color:#a9b9ca}
+body.dark .chat{background:#122238;border-color:#2b3e56}
+body.dark .quick-actions{background:#122238}
+body.dark .quick-actions button{background:#163250;color:#c8ddff;border-color:#315d8c}
+body.dark .messages{background:#0d1b2d}
+body.dark .bot{background:#14263c;color:#eef6ff}
+body.dark .user{background:#133348;color:#e2f7ff;border-color:#24536b}
+body.dark .typing{background:#0d1b2d}
+body.dark .chat-input{background:#122238}
+body.dark .chat-input input{background:#0d1b2d;color:#eef6ff;border-color:#2b405a}
+body.dark .modal{background:#020813bb}
+body.dark .modal-card{background:#122238;color:#eef6ff}
+body.dark .unlock-icon{color:#fff}
