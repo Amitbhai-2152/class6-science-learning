@@ -26,10 +26,11 @@
       const user = await window.Class6CloudSync.getUser();
       if (!user) return { synced: false, reason: 'not_signed_in' };
 
-      const local = snapshot();
+      const scope = window.Class6CloudSync.prepareUser?.(user.id) || { changed: false };
+      const local = scope.changed ? { ids: [], total: 0 } : snapshot();
       const row = await window.Class6CloudSync.load();
       const cloud = row?.state?.badgeState || {};
-      const merged = merge(local, cloud);
+      const merged = scope.changed ? { ids: Array.isArray(cloud.ids) ? cloud.ids : [], total: Number(cloud.total) || 0 } : merge(local, cloud);
       const current = window.XPSystem?.read?.();
       if (!current || !window.XPSystem?.save) return { synced: false, reason: 'xp_system_unavailable' };
 
