@@ -10,7 +10,8 @@
     "check:challenge-review-quality": "node scripts/check-challenge-review-quality.mjs",
     "check:final-syllabus": "node scripts/check-final-syllabus-contract.mjs",
     "check:all-tests-validation": "node scripts/check-all-tests-validation.mjs",
-    "check:question-quality": "node scripts/check-question-quality.mjs"
+    "check:question-quality": "node scripts/check-question-quality.mjs",
+    "check:account-system": "node scripts/check-account-system.mjs"
   },
   "dependencies": {
     "express": "^5.1.0",
