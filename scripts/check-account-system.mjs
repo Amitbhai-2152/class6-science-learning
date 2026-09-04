@@ -1,0 +1,27 @@
+import { readFile } from 'node:fs/promises';
+import assert from 'node:assert/strict';
+
+const files = {
+  auth: await readFile('auth.html', 'utf8'),
+  config: await readFile('js/auth-config.js', 'utf8'),
+  authJs: await readFile('js/auth.js', 'utf8'),
+  cloud: await readFile('js/cloud-sync.js', 'utf8'),
+  schema: await readFile('supabase/schema.sql', 'utf8'),
+  index: await readFile('index.html', 'utf8'),
+};
+
+assert.match(files.auth, /id="loginForm"/);
+assert.match(files.auth, /id="signupForm"/);
+assert.match(files.auth, /js\/auth-config\.js\?v=1/);
+assert.match(files.auth, /js\/auth\.js\?v=1/);
+assert.match(files.authJs, /signUp\({ email, password \}\)/);
+assert.match(files.authJs, /signInWithPassword\({ email, password \}\)/);
+assert.match(files.authJs, /signOut\(\)/);
+assert.match(files.cloud, /from\('student_state'\)/);
+assert.match(files.cloud, /upsert\(/);
+assert.match(files.schema, /references auth\.users\(id\) on delete cascade/);
+assert.match(files.schema, /enable row level security/);
+assert.match(files.schema, /auth\.uid\(\) = user_id/);
+assert.match(files.index, /Account/);
+
+console.log('Account system static checks: PASS');
