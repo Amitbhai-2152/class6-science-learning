@@ -1,6 +1,17 @@
 (() => {
   const cfg = window.CLASS6_AUTH_CONFIG || {};
   const AVATARS = ['🧑‍🎓', '🦊', '🐼', '🐯', '🐸', '🦁', '🚀', '⭐'];
+  const LOCAL_PROGRESS_KEYS = [
+    'class6XPSystemV1',
+    'class6ScienceProgressV9',
+    'mathsExamHistory',
+    'class6EnglishProgressV1',
+    'class6HindiProgressV2',
+    'class6GKProgressV1',
+    'socialScienceProgressV3',
+    'class6RevisionProgressV1'
+  ];
+  const LOCAL_OWNER_KEYS = ['class6CloudOwnerV1', 'class6CloudOwnerV2'];
   let client = null;
 
   const $ = (selector) => document.querySelector(selector);
@@ -17,6 +28,12 @@
 
   function configured() {
     return Boolean(String(cfg.url || "").trim() && String(cfg.anonKey || "").trim());
+  }
+
+  function clearLocalAccountData() {
+    [...LOCAL_PROGRESS_KEYS, ...LOCAL_OWNER_KEYS].forEach((key) => {
+      try { localStorage.removeItem(key); } catch (_) {}
+    });
   }
 
   function localAvatar() {
@@ -221,8 +238,8 @@
       if (!supabase) return;
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-      setStatus("Logout successful.", "success");
-      await refreshSession();
+      clearLocalAccountData();
+      window.location.replace('index.html');
     } catch (error) {
       setStatus(String(error?.message || "Logout failed."), "error");
     }
