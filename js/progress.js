@@ -1,4 +1,4 @@
-(function(){if(!window.XPSystem){document.write('<script src="xp-system.js?v=2"><\/script>')}document.write('<script src="xp-unify-bridge-v2.js?v=1"><\/script>')})();
+(function(){if(!window.XPSystem){document.write('<script src="xp-system.js?v=2"><\/script>')}document.write('<script src="xp-unify-bridge-v2.js?v=2"><\/script>')})();
 const Progress={
  key:'class6ScienceProgressV9',data:null,
  load(){try{const d=JSON.parse(localStorage.getItem(this.key)||'null');if(d&&Array.isArray(d.completed)&&d.best&&typeof d.best==='object')return {...d,section:d.section&&typeof d.section==='object'?d.section:{},history:Array.isArray(d.history)?d.history:[],xp:Number(d.xp)||0,badges:Array.isArray(d.badges)?d.badges:[],streak:Number(d.streak)||0,lastActive:d.lastActive||null,review:d.review&&typeof d.review==='object'?d.review:{}}}catch(e){}return {completed:[],best:{},section:{},history:[],xp:0,badges:[],streak:0,lastActive:null,review:{}}},
@@ -20,5 +20,5 @@ const Progress={
  strongest(){const a=Object.entries(this.data.best).filter(([id])=>Number(id)>0);return a.sort((x,y)=>y[1]-x[1])[0]||null},
  weakest(){const a=Object.entries(this.data.best).filter(([id])=>Number(id)>0);return a.sort((x,y)=>x[1]-y[1])[0]||null},
  reset(){this.data={completed:[],best:{},section:{},history:[],xp:0,badges:[],streak:0,lastActive:null,review:{}};this.save();localStorage.removeItem('scienceCurrentChapter')},
- save(){localStorage.setItem(this.key,JSON.stringify(this.data))}
+ save(){localStorage.setItem(this.key,JSON.stringify(this.data)}
 };Progress.init();
