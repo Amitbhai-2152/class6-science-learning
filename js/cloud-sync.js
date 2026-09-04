@@ -1,6 +1,7 @@
 (() => {
   const cfg = window.CLASS6_AUTH_CONFIG || {};
   let clientPromise = null;
+  let saveQueue = Promise.resolve();
 
   function configured() {
     return Boolean(String(cfg.url || '').trim() && String(cfg.anonKey || '').trim());
@@ -40,19 +41,29 @@
   }
 
   async function save(state, schemaVersion = 1) {
-    const supabase = await getClient();
-    if (!supabase) return { synced: false, reason: 'not_configured' };
-    const user = await getUser();
-    if (!user) return { synced: false, reason: 'not_signed_in' };
+    const write = saveQueue.then(async () => {
+      const supabase = await getClient();
+      if (!supabase) return { synced: false, reason: 'not_configured' };
+      const user = await getUser();
+      if (!user) return { synced: false, reason: 'not_signed_in' };
 
-    const { error } = await supabase.from('student_state').upsert({
-      user_id: user.id,
-      state: state && typeof state === 'object' ? state : {},
-      schema_version: Number(schemaVersion) || 1
-    }, { onConflict: 'user_id' });
+      const incoming = state && typeof state === 'object' ? state : {};
+      const existing = await load();
+      const cloudState = existing?.state && typeof existing.state === 'object' ? existing.state : {};
+      const mergedState = Object.assign({}, cloudState, incoming);
 
-    if (error) throw error;
-    return { synced: true, userId: user.id };
+      const { error } = await supabase.from('student_state').upsert({
+        user_id: user.id,
+        state: mergedState,
+        schema_version: Number(schemaVersion) || Number(existing?.schema_version) || 1
+      }, { onConflict: 'user_id' });
+
+      if (error) throw error;
+      return { synced: true, userId: user.id };
+    });
+
+    saveQueue = write.catch(() => undefined);
+    return write;
   }
 
   window.Class6CloudSync = Object.freeze({
