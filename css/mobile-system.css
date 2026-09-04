@@ -1,3 +1,4 @@
+@import url("./site-mobile.css");
 /* Shared mobile responsiveness foundation. Keep page structure and existing feature behavior unchanged. */
 html{overflow-x:hidden}body{min-width:0;overflow-x:hidden}img,svg,video,canvas{max-width:100%;height:auto}table{max-width:100%;border-collapse:collapse}pre,code{max-width:100%;overflow-x:auto;white-space:pre-wrap;overflow-wrap:anywhere}button,a,input,select,textarea{max-width:100%}
 @media(max-width:680px){
