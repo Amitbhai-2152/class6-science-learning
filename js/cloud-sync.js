@@ -1,6 +1,6 @@
 (() => {
   const cfg = window.CLASS6_AUTH_CONFIG || {};
-  const OWNER_KEY = 'class6CloudOwnerV1';
+  const OWNER_KEY = 'class6CloudOwnerV2';
   const LOCAL_PROGRESS_KEYS = [
     'class6XPSystemV1',
     'class6ScienceProgressV9',
