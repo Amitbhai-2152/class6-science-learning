@@ -6,12 +6,16 @@
 #lessonView .lesson-layout>section{min-width:0;margin:0}
 #lessonView .lesson-head{margin-top:0;padding:20px 22px;align-items:center}
 #lessonView .progress{margin:10px 2px 0}
-#lessonView #lessonContent{margin-top:12px;padding:20px 22px 26px;overflow:visible}
+#lessonView #lessonContent{margin-top:12px;padding:20px 22px 26px;overflow:visible;min-width:0}
+#lessonView #lessonContent h2,#lessonView #lessonContent h3,#lessonView #lessonContent p,#lessonView #lessonContent li{overflow-wrap:anywhere;word-break:normal}
 #lessonView #lessonContent h2{margin:4px 0 14px;line-height:1.3}
 #lessonView #lessonContent .body-text{margin:12px 0;max-width:78ch}
-#lessonView .visual{margin:14px 0;overflow:hidden}
-#lessonView .callout,#lessonView .activity,#lessonView .mistake{margin-top:12px}
-#lessonView .exam-link{margin-top:12px}
+#lessonView .visual{margin:14px 0;overflow:hidden;min-width:0}
+#lessonView .visual-row{min-width:0;max-width:100%}
+#lessonView .visual-node{max-width:100%;overflow-wrap:anywhere}
+#lessonView .callout,#lessonView .activity,#lessonView .mistake{margin-top:12px;min-width:0;overflow-wrap:anywhere}
+#lessonView .exam-link{margin-top:12px;min-width:0}
+#lessonView .exam-link>*{min-width:0;overflow-wrap:anywhere}
 #lessonView .nav{margin-top:16px}
 #lessonView .nav .btn{min-width:145px}
 
@@ -19,34 +23,50 @@
 #lessonView .side .toc{max-height:70vh;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;padding-bottom:80px;scroll-padding-bottom:80px}
 
 @media(max-width:900px){
-  #lessonView{padding:10px 10px 96px}
-  #lessonView .lesson-layout{gap:10px}
-  #lessonView .lesson-layout>.side{position:static}
-  #lessonView .side .toc{display:flex;gap:7px;overflow-x:auto;overflow-y:hidden;padding:2px 2px 6px;scroll-snap-type:x proximity}
-  #lessonView .side .toc button{flex:0 0 min(230px,76vw);min-width:0;scroll-snap-align:start}
-  #lessonView .lesson-head{padding:17px 18px}
-  #lessonView #lessonContent{margin-top:10px;padding:18px 18px 24px}
+  #lessonView{padding:10px 10px 96px;width:100%;max-width:none}
+  #lessonView .lesson-layout{grid-template-columns:minmax(0,1fr);gap:10px}
+  #lessonView .lesson-layout>.side{position:static;width:100%;min-width:0}
+  #lessonView .side .toc{display:flex;gap:7px;max-height:none;overflow-x:auto;overflow-y:hidden;padding:2px 2px 8px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;touch-action:pan-x;overscroll-behavior-x:contain}
+  #lessonView .side .toc button{flex:0 0 min(230px,76vw);min-width:0;min-height:44px;scroll-snap-align:start;white-space:normal;overflow-wrap:anywhere}
+  #lessonView .lesson-head{padding:17px 18px;width:100%;min-width:0}
+  #lessonView #lessonContent{margin-top:10px;padding:18px 18px 24px;width:100%}
+  #lessonView .visual{max-width:100%}
+  #lessonView .nav{flex-wrap:wrap;min-width:0}
   #lessonView .nav .btn{width:100%;min-width:0}
 }
 
 @media(max-width:580px){
   #lessonView{padding:8px 8px 92px}
-  #lessonView>.btn:first-child{width:100%;margin-bottom:8px}
-  #lessonView .lesson-head{padding:14px;gap:10px}
+  #lessonView>.btn:first-child{width:100%;margin-bottom:8px;min-height:44px}
+  #lessonView .lesson-head{padding:14px;gap:10px;align-items:flex-start}
+  #lessonView .lesson-head>div{min-width:0;flex:1 1 auto}
   #lessonView .lesson-head h1{font-size:22px;line-height:1.3;margin:6px 0 4px;overflow-wrap:anywhere}
-  #lessonView .chapter-icon-large{font-size:38px;flex:0 0 auto}
+  #lessonView .chapter-icon-large{font-size:38px;flex:0 0 auto;line-height:1}
   #lessonView #lessonContent{padding:15px 14px 20px;border-radius:16px}
   #lessonView #lessonContent h2{font-size:20px;margin:4px 0 11px}
+  #lessonView #lessonContent h3{line-height:1.35}
   #lessonView #lessonContent .body-text{font-size:16px;line-height:1.85}
-  #lessonView .visual{margin:12px 0;padding:10px}
+  #lessonView #lessonContent img,#lessonView #lessonContent svg,#lessonView #lessonContent canvas,#lessonView #lessonContent video{max-width:100%;height:auto}
+  #lessonView .visual{margin:12px 0;padding:10px;overflow:auto;max-width:100%;-webkit-overflow-scrolling:touch}
   #lessonView .visual-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;justify-content:stretch}
   #lessonView .visual-node{width:100%;min-width:0;padding:9px}
-  #lessonView .arrow{font-size:0;display:none}
+  #lessonView .arrow{font-size:inherit;display:flex;align-items:center;justify-content:center;min-width:18px;line-height:1}
   #lessonView .callout,#lessonView .activity,#lessonView .mistake{padding:10px;margin-top:9px}
   #lessonView .exam-link{grid-template-columns:1fr;gap:8px;margin-top:10px}
   #lessonView .exam-link>div{padding:10px}
   #lessonView .nav{margin-top:14px;flex-direction:column;gap:8px;padding-bottom:8px}
   #lessonView .nav .btn{min-height:46px}
+}
+
+@media(max-width:380px){
+  #lessonView{padding-left:6px;padding-right:6px}
+  #lessonView .lesson-head{padding:12px}
+  #lessonView .lesson-head h1{font-size:20px}
+  #lessonView .chapter-icon-large{font-size:34px}
+  #lessonView #lessonContent{padding:14px 12px 18px}
+  #lessonView #lessonContent .body-text{font-size:15px;line-height:1.8}
+  #lessonView .visual-row{grid-template-columns:1fr}
+  #lessonView .visual-node{padding:8px}
 }
 
 @media(prefers-reduced-motion:reduce){#lessonView *{scroll-behavior:auto}}
