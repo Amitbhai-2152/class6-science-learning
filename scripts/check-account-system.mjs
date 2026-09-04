@@ -7,6 +7,8 @@ const files = {
   authJs: await readFile('js/auth.js', 'utf8'),
   cloud: await readFile('js/cloud-sync.js', 'utf8'),
   xpCloud: await readFile('js/xp-cloud-sync.js', 'utf8'),
+  streakCloud: await readFile('js/home-streak-cloud-sync.js', 'utf8'),
+  streak: await readFile('js/home-streak.js', 'utf8'),
   xp: await readFile('js/xp-system.js', 'utf8'),
   schema: await readFile('supabase/schema.sql', 'utf8'),
   index: await readFile('index.html', 'utf8'),
@@ -26,6 +28,10 @@ assert.match(files.xpCloud, /XP_KEY = 'class6XPSystemV1'/);
 assert.match(files.xpCloud, /Class6CloudSync\.load\(\)/);
 assert.match(files.xpCloud, /Class6CloudSync\.save\(merged, 1\)/);
 assert.match(files.xpCloud, /mergeStates/);
+assert.match(files.streakCloud, /streakState/);
+assert.match(files.streakCloud, /Class6CloudSync\.load\(\)/);
+assert.match(files.streakCloud, /Class6CloudSync\.save/);
+assert.match(files.streak, /streakState/);
 assert.match(files.xp, /class6XPSystemV1/);
 assert.match(files.schema, /references auth\.users\(id\) on delete cascade/);
 assert.match(files.schema, /enable row level security/);
@@ -33,6 +39,7 @@ assert.match(files.schema, /auth\.uid\(\) = user_id/);
 assert.match(files.index, /js\/auth-config\.js\?v=1/);
 assert.match(files.index, /js\/cloud-sync\.js\?v=1/);
 assert.match(files.index, /js\/xp-cloud-sync\.js\?v=1/);
+assert.match(files.index, /js\/home-streak-cloud-sync\.js\?v=1/);
 assert.match(files.index, /href="auth\.html"/);
 assert.match(files.package, /check:account-system/);
 
