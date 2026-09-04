@@ -77,9 +77,10 @@
       const user = await window.Class6CloudSync.getUser();
       if (!user) return { synced: false, reason: 'not_signed_in' };
 
-      const localState = clone(window.XPSystem.read());
+      const scope = window.Class6CloudSync.prepareUser?.(user.id) || { changed: false };
+      const localState = scope.changed ? null : clone(window.XPSystem.read());
       const row = await window.Class6CloudSync.load();
-      const merged = mergeStates(localState, row?.state || {});
+      const merged = scope.changed ? normalizeState(row?.state || {}) : mergeStates(localState, row?.state || {});
       window.XPSystem.save(merged);
 
       const result = await window.Class6CloudSync.save(merged, 1);
