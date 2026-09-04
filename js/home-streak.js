@@ -39,9 +39,21 @@ function refresh(){
   const home=document.getElementById('homeStreak');
   if(home)home.textContent=String(streak);
 }
+function watchDisplays(){
+  if(!window.MutationObserver||document.documentElement.dataset.streakWatch==='1')return;
+  const targets=['streakMini','homeStreak'].map(id=>document.getElementById(id)).filter(Boolean);
+  if(!targets.length)return;
+  document.documentElement.dataset.streakWatch='1';
+  const observer=new MutationObserver(()=>{
+    const expected=String(getStreak());
+    targets.forEach(el=>{if(el.textContent!==expected)el.textContent=expected});
+  });
+  targets.forEach(el=>observer.observe(el,{childList:true,characterData:true,subtree:true}));
+  refresh();
+}
 window.HomeStreak={refresh,getStreak};
-window.addEventListener('DOMContentLoaded',refresh);
-window.addEventListener('load',refresh);
+window.addEventListener('DOMContentLoaded',()=>{refresh();watchDisplays()},{once:true});
+window.addEventListener('load',()=>{refresh();watchDisplays()},{once:true});
 window.addEventListener('xp:earned',refresh);
 window.addEventListener('science:xp',refresh);
 window.addEventListener('storage',refresh);
