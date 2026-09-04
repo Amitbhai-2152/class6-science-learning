@@ -39,8 +39,13 @@ function getScienceProgressStreak(){
     return Math.max(diskStreak,memoryStreak);
   }catch(_){return 0}
 }
+function getCloudStreak(){
+  try{
+    return Math.max(0,Number(window.XPSystem?.read?.()?.streakState?.streak)||0);
+  }catch(_){return 0}
+}
 function getStreak(){
-  return Math.max(getEventStreak(),getScienceProgressStreak());
+  return Math.max(getEventStreak(),getScienceProgressStreak(),getCloudStreak());
 }
 function refresh(){
   const streak=getStreak();
@@ -66,5 +71,6 @@ window.addEventListener('DOMContentLoaded',()=>{refresh();watchDisplays()},{once
 window.addEventListener('load',()=>{refresh();watchDisplays()},{once:true});
 window.addEventListener('xp:earned',refresh);
 window.addEventListener('science:xp',refresh);
+window.addEventListener('class6:streak-cloud-synced',refresh);
 window.addEventListener('storage',refresh);
 })();
