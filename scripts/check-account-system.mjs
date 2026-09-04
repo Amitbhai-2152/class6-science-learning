@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 
 const files = {
   auth: await readFile('auth.html', 'utf8'),
+  authCss: await readFile('css/auth.css', 'utf8'),
   config: await readFile('js/auth-config.js', 'utf8'),
   authJs: await readFile('js/auth.js', 'utf8'),
   homeAccount: await readFile('js/home-account.js', 'utf8'),
@@ -23,10 +24,21 @@ assert.match(files.auth, /id="loginForm"/);
 assert.match(files.auth, /id="signupForm"/);
 assert.match(files.auth, /id="profileAvatar"/);
 assert.match(files.auth, /id="avatarOptions"/);
+assert.match(files.auth, /data-auth-tab="login"/);
+assert.match(files.auth, /data-auth-tab="signup"/);
+assert.match(files.auth, /data-password-toggle="loginPassword"/);
+assert.match(files.auth, /data-password-toggle="signupPassword"/);
+assert.match(files.auth, /css\/auth\.css\?v=3/);
+assert.match(files.auth, /js\/auth\.js\?v=3/);
 assert.match(files.authJs, /updateUser\(\{ data: \{ avatar \} \}\)/);
+assert.match(files.authJs, /setupAuthTabs/);
+assert.match(files.authJs, /setupPasswordToggles/);
 assert.match(files.authJs, /AVATARS = \[/);
 assert.match(files.authJs, /signInWithPassword\(\{ email, password \}\)/);
 assert.match(files.authJs, /signOut\(\)/);
+assert.match(files.authCss, /@keyframes authRise/);
+assert.match(files.authCss, /@keyframes authFloat/);
+assert.match(files.authCss, /prefers-reduced-motion/);
 assert.match(files.homeAccount, /homeAvatar/);
 assert.match(files.homeAccount, /user_metadata/);
 assert.match(files.cloud, /from\('student_state'\)/);
