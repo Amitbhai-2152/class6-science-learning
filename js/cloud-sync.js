@@ -1,10 +1,19 @@
 (() => {
   const cfg = window.CLASS6_AUTH_CONFIG || {};
   const OWNER_KEY = 'class6CloudOwnerV1';
+  const LOCAL_PROGRESS_KEYS = [
+    'class6XPSystemV1',
+    'class6ScienceProgressV9',
+    'mathsExamHistory',
+    'class6EnglishProgressV1',
+    'class6HindiProgressV2',
+    'class6GKProgressV1',
+    'socialScienceProgressV3',
+    'class6RevisionProgressV1'
+  ];
   let clientPromise = null;
   let saveQueue = Promise.resolve();
   let sessionUserId = null;
-  let sessionFresh = false;
 
   function configured() {
     return Boolean(String(cfg.url || '').trim() && String(cfg.anonKey || '').trim());
@@ -27,21 +36,31 @@
     return data?.user || null;
   }
 
+  function clearLocalProgress() {
+    LOCAL_PROGRESS_KEYS.forEach((key) => {
+      try { localStorage.removeItem(key); } catch (_) {}
+    });
+  }
+
   function prepareUser(userId) {
     const nextUserId = String(userId || '').trim();
     if (!nextUserId) return { changed: false, previousUserId: null, userId: null };
+
     if (sessionUserId === nextUserId) {
-      return { changed: sessionFresh, previousUserId: nextUserId, userId: nextUserId };
+      return { changed: false, previousUserId: nextUserId, userId: nextUserId };
     }
 
     let previousUserId = null;
     try { previousUserId = String(localStorage.getItem(OWNER_KEY) || '').trim() || null; } catch (_) {}
-    sessionFresh = previousUserId !== nextUserId;
+    const changed = previousUserId !== nextUserId;
     sessionUserId = nextUserId;
-    if (sessionFresh) {
+
+    if (changed) {
+      clearLocalProgress();
       try { localStorage.setItem(OWNER_KEY, nextUserId); } catch (_) {}
     }
-    return { changed: sessionFresh, previousUserId, userId: nextUserId };
+
+    return { changed, previousUserId, userId: nextUserId };
   }
 
   async function load() {
