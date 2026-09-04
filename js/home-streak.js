@@ -22,11 +22,21 @@ function getEventStreak(){
   }
   return streak;
 }
+function readPersistedScience(){
+  try{
+    const raw=localStorage.getItem('class6ScienceProgressV9');
+    const p=raw?JSON.parse(raw):null;
+    return p&&typeof p==='object'?p:null;
+  }catch(_){return null}
+}
 function getScienceProgressStreak(){
   try{
-    const p=window.Progress?.data;
-    if(!p?.lastActive||dayKey(p.lastActive)!==dayKey(new Date()))return 0;
-    return Math.max(0,Number(p.streak)||0);
+    const persisted=readPersistedScience();
+    const today=dayKey(new Date());
+    const diskStreak=persisted?.lastActive&&dayKey(persisted.lastActive)===today?Math.max(0,Number(persisted.streak)||0):0;
+    const memory=window.Progress?.data;
+    const memoryStreak=memory?.lastActive&&dayKey(memory.lastActive)===today?Math.max(0,Number(memory.streak)||0):0;
+    return Math.max(diskStreak,memoryStreak);
   }catch(_){return 0}
 }
 function getStreak(){
