@@ -1,0 +1,47 @@
+/* GK + Reasoning mobile responsiveness: content-first, no changes to learning logic. */
+*{box-sizing:border-box}
+html{overflow-x:hidden}
+body{width:100%;overflow-x:hidden}
+.top,.wrap,.main{max-width:100%;min-width:0}
+.wrap{overflow-wrap:anywhere}
+.top h1,.top p,h1,h2,h3,p,span,b,small,a,label{overflow-wrap:anywhere}
+.main{padding-left:clamp(10px,4vw,16px);padding-right:clamp(10px,4vw,16px)}
+.card,.hero,.topic,.lesson,.q,.action,.instructions,.result,.note,.skill,.ex{min-width:0;max-width:100%}
+.nav,.chapter-nav{max-width:100%;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.nav a,.chapter-nav a{flex:0 0 auto;min-height:42px;display:inline-flex;align-items:center}
+.actions{min-width:0}
+.action{min-width:0}
+.q{overflow:hidden}
+.option,.opt{width:100%;min-width:0;line-height:1.55;touch-action:manipulation}
+.option input,.opt input{vertical-align:top;margin-top:3px}
+.submit,.btn{min-height:46px;touch-action:manipulation}
+img,svg,canvas,video,iframe{max-width:100%;height:auto}
+@media(max-width:700px){
+  .top{padding:20px 13px 25px}
+  .top h1{font-size:clamp(26px,8vw,40px);line-height:1.18}
+  .top p{font-size:14px;line-height:1.6}
+  .main{padding-top:15px;padding-bottom:50px}
+  .card{border-radius:16px}
+  .hero{padding:15px}
+  .actions{grid-template-columns:1fr}
+  .topics{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr 1fr}
+  .flow{grid-template-columns:1fr}
+  .lesson h2{font-size:18px;line-height:1.4}
+  .lesson p,.ex,.skill{line-height:1.7}
+  .q{padding:12px}
+  .option,.opt{padding:10px;min-height:44px}
+  .toolbar{overflow-x:auto;flex-wrap:nowrap;padding-bottom:3px}
+  .toolbar .mode{flex:0 0 auto;min-height:42px;white-space:nowrap}
+  .bar{gap:8px;flex-wrap:wrap}
+  .bar>*{min-width:0}
+}
+@media(max-width:420px){
+  .top{padding-left:11px;padding-right:11px}
+  .main{padding-left:9px;padding-right:9px}
+  .card,.hero,.topic,.lesson,.q,.instructions,.result,.note,.skill,.ex{padding:12px}
+  .stats{grid-template-columns:1fr}
+  .top h1{font-size:25px}
+  .q b{font-size:14px}
+}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
