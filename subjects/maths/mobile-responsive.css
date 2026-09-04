@@ -1,0 +1,50 @@
+/* Maths mobile responsiveness: scoped to Maths pages only. */
+html{overflow-x:hidden}
+body{min-width:0;overflow-x:hidden}
+.wrap,.content,.main{width:min(1120px,100%);min-width:0}
+img,svg,canvas,video{max-width:100%;height:auto}
+button,a{max-width:100%}
+
+@media(max-width:850px){
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .learning-flow{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+@media(max-width:560px){
+  .top{padding:18px 12px 24px}
+  .top h1{font-size:clamp(26px,8vw,34px);line-height:1.2;overflow-wrap:anywhere}
+  .top p{font-size:14px;line-height:1.6;overflow-wrap:anywhere}
+  .content,.main{padding-left:10px;padding-right:10px}
+  .hero,.chapter-intro,.card{padding:14px;border-radius:16px}
+  .actions{display:grid;grid-template-columns:1fr;gap:8px}
+  .actions .action{width:100%;min-height:44px}
+  .grid,.tests,.learning-flow,.knowledge-grid,.mc-result-grid{grid-template-columns:1fr}
+  .chapter-nav{gap:7px;padding:2px 2px 9px;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .chapter-nav::-webkit-scrollbar{display:none}
+  .chapter-nav a{flex:0 0 auto;min-height:42px;display:inline-flex;align-items:center}
+  .section-card{padding:14px;overflow-wrap:anywhere}
+  .section-card h3,.challenge-head h2,.mc-hero h3,.mc-review-head h3,.mc-result h3{overflow-wrap:anywhere;line-height:1.35}
+  .body{font-size:15.5px;line-height:1.8;overflow-wrap:anywhere;word-break:normal}
+  .knowledge{overflow-wrap:anywhere;word-break:normal}
+  .mc-hero,.mc-question{padding:14px;overflow:hidden}
+  .mc-stats{display:grid;grid-template-columns:1fr 1fr}
+  .mc-stats span{min-width:0;overflow-wrap:anywhere}
+  .mc-option{min-height:46px;align-items:flex-start;overflow-wrap:anywhere}
+  .mc-option span{flex:0 0 30px}
+  .mc-feedback,.mc-explain,.mc-review-card,.mc-review-head,.tutor-note{overflow-wrap:anywhere}
+  .mc-actions{display:grid;grid-template-columns:1fr;gap:8px}
+  .mc-actions .mc-primary,.mc-actions .mc-secondary{width:100%;min-height:46px}
+  .tutor-note{align-items:stretch}
+  .tutor-btn{width:100%;min-height:46px}
+}
+
+@media(max-width:380px){
+  .content,.main{padding-left:8px;padding-right:8px}
+  .card,.hero,.chapter-intro{padding:12px}
+  .section-card{padding:12px}
+  .body{font-size:15px;line-height:1.78}
+  .mc-stats{grid-template-columns:1fr}
+  .mc-score-big{font-size:48px}
+}
+
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
