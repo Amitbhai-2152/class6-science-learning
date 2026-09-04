@@ -16,7 +16,7 @@
 #lessonView .nav .btn{min-width:145px}
 
 /* Keep the desktop navigator inside a bounded scroll area and leave enough end-space to fully reveal the last chapter. */
-#lessonView .side .toc{max-height:70vh;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;padding-bottom:18px;scroll-padding-bottom:18px}
+#lessonView .side .toc{max-height:70vh;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;padding-bottom:80px;scroll-padding-bottom:80px}
 
 @media(max-width:900px){
   #lessonView{padding:10px 10px 96px}
