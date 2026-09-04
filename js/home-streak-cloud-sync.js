@@ -68,10 +68,11 @@
       const user = await window.Class6CloudSync.getUser();
       if (!user) return { synced: false, reason: 'not_signed_in' };
 
-      const localState = localSnapshot();
+      const scope = window.Class6CloudSync.prepareUser?.(user.id) || { changed: false };
+      const localState = scope.changed ? {} : localSnapshot();
       const row = await window.Class6CloudSync.load();
       const cloud = row?.state?.streakState || {};
-      const merged = merge(localState, cloud);
+      const merged = scope.changed ? normalize(cloud) : merge(localState, cloud);
 
       const current = window.XPSystem?.read?.();
       if (current && window.XPSystem?.save) {
