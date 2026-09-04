@@ -1,5 +1,6 @@
 (() => {
   const cfg = window.CLASS6_AUTH_CONFIG || {};
+  const OWNER_KEY = 'class6CloudOwnerV1';
   let clientPromise = null;
   let saveQueue = Promise.resolve();
 
@@ -22,6 +23,18 @@
     const { data, error } = await supabase.auth.getUser();
     if (error) throw error;
     return data?.user || null;
+  }
+
+  function prepareUser(userId) {
+    const nextUserId = String(userId || '').trim();
+    if (!nextUserId) return { changed: false, previousUserId: null, userId: null };
+    let previousUserId = null;
+    try { previousUserId = String(localStorage.getItem(OWNER_KEY) || '').trim() || null; } catch (_) {}
+    const changed = previousUserId !== nextUserId;
+    if (changed) {
+      try { localStorage.setItem(OWNER_KEY, nextUserId); } catch (_) {}
+    }
+    return { changed, previousUserId, userId: nextUserId };
   }
 
   async function load() {
@@ -70,6 +83,7 @@
     configured,
     getClient,
     getUser,
+    prepareUser,
     load,
     save
   });
