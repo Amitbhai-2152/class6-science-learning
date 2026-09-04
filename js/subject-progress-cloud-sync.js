@@ -117,10 +117,11 @@
       const user = await window.Class6CloudSync.getUser();
       if (!user) return { synced: false, reason: 'not_signed_in' };
 
-      const localState = readLocal();
+      const scope = window.Class6CloudSync.prepareUser?.(user.id) || { changed: false };
+      const localState = scope.changed ? {} : readLocal();
       const row = await window.Class6CloudSync.load();
       const cloudState = row?.state?.subjectProgress?.science || {};
-      const merged = mergeStates(localState, cloudState);
+      const merged = scope.changed ? normalize(cloudState) : mergeStates(localState, cloudState);
       localStorage.setItem(SCIENCE_KEY, JSON.stringify(merged));
 
       const current = window.XPSystem?.read?.();
