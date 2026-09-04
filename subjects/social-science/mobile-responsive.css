@@ -1,0 +1,46 @@
+/* Social Science mobile layer: preserves existing learning logic and improves narrow-screen layout. */
+*{box-sizing:border-box}
+html{overflow-x:hidden}
+body{width:100%;min-width:0;overflow-x:hidden}
+.wrap,.main{min-width:0;max-width:100%}
+h1,h2,h3,p,span,b,a,label,small{overflow-wrap:anywhere}
+img,svg,canvas,video,iframe{max-width:100%;height:auto}
+button,a,input,select,textarea{max-width:100%;touch-action:manipulation}
+.card,.hero,.lesson,.box,.question,.q,.option,.choice,.sst-progress-box{min-width:0;max-width:100%}
+.toc,.filters,.toolbar,.quick{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.toc a,.filter,.toolbar .button,.quick button{flex:0 0 auto;min-height:42px}
+@media(max-width:720px){
+  .main{padding-left:clamp(10px,4vw,15px);padding-right:clamp(10px,4vw,15px);padding-bottom:52px}
+  .top{padding-left:clamp(12px,4vw,18px);padding-right:clamp(12px,4vw,18px)}
+  .hero,.card{border-radius:16px}
+  .tools{grid-template-columns:1fr!important}
+  .grid{grid-template-columns:1fr!important}
+  .tutor-banner{align-items:stretch!important;flex-direction:column!important}
+  .tutor-banner a{width:100%;text-align:center}
+  .chapter-link{min-width:0}
+  .chapter-link>div:last-child{min-width:0}
+  .actions{display:grid!important;grid-template-columns:1fr;min-width:0}
+  .actions .btn,.actions a{width:100%;text-align:center}
+  .qtop,.qhead{align-items:flex-start;flex-wrap:wrap}
+  .question h2,.q h2{font-size:16px;line-height:1.55}
+  .option{width:100%;min-height:44px;padding:10px;line-height:1.55}
+  .progress-head{align-items:flex-start;flex-wrap:wrap}
+  .setup{grid-template-columns:1fr!important}
+  .composer{grid-template-columns:1fr!important}
+  .send{min-height:45px}
+  .msg{max-width:95%!important}
+  .messages{max-height:52dvh}
+  .sst-progress-grid{grid-template-columns:1fr 1fr!important}
+}
+@media(max-width:430px){
+  .main{padding-left:9px;padding-right:9px}
+  .hero,.card,.lesson,.box,.question,.q,.choice,.sst-progress-box{padding:12px}
+  .chapter-link{gap:9px}
+  .num{min-width:34px!important;width:34px!important;height:34px!important}
+  .top h1{font-size:clamp(24px,8vw,32px)!important}
+  .toc{max-height:300px!important;grid-template-columns:1fr!important}
+  .sst-progress-grid{grid-template-columns:1fr!important}
+  .quick{flex-wrap:nowrap!important}
+  .quick button{white-space:nowrap}
+}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
