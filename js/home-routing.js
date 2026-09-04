@@ -68,6 +68,5 @@
       if(view==='science-cbt' && window.ScienceCBT?.open){window.ScienceCBT.open();return;}
     }catch(_){/* keep homepage usable if routing fails */}
   }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',route,{once:true});
-  else route();
+  route();
 })();
