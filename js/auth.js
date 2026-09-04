@@ -1,5 +1,6 @@
 (() => {
   const cfg = window.CLASS6_AUTH_CONFIG || {};
+  const AVATARS = ['🧑‍🎓', '🦊', '🐼', '🐯', '🐸', '🦁', '🚀', '⭐'];
   let client = null;
 
   const $ = (selector) => document.querySelector(selector);
@@ -14,6 +15,62 @@
 
   function configured() {
     return Boolean(String(cfg.url || "").trim() && String(cfg.anonKey || "").trim());
+  }
+
+  function localAvatar() {
+    try {
+      const value = String(localStorage.getItem('class6Avatar') || '').trim();
+      return AVATARS.includes(value) ? value : AVATARS[0];
+    } catch (_) {
+      return AVATARS[0];
+    }
+  }
+
+  function setLocalAvatar(value) {
+    if (!AVATARS.includes(value)) return;
+    try { localStorage.setItem('class6Avatar', value); } catch (_) {}
+  }
+
+  function renderAvatar(value) {
+    const avatar = AVATARS.includes(value) ? value : localAvatar();
+    const current = $("#profileAvatar");
+    if (current) current.textContent = avatar;
+    document.querySelectorAll('[data-avatar]').forEach((button) => {
+      const selected = button.dataset.avatar === avatar;
+      button.classList.toggle('selected', selected);
+      button.setAttribute('aria-pressed', selected ? 'true' : 'false');
+    });
+  }
+
+  function renderAvatarPicker() {
+    const wrap = $("#avatarOptions");
+    if (!wrap) return;
+    wrap.innerHTML = AVATARS.map((avatar) => `<button type="button" class="avatar-option" data-avatar="${avatar}" aria-label="Avatar ${avatar}" aria-pressed="false">${avatar}</button>`).join('');
+    wrap.addEventListener('click', async (event) => {
+      const button = event.target.closest('[data-avatar]');
+      if (!button) return;
+      const avatar = button.dataset.avatar;
+      setLocalAvatar(avatar);
+      renderAvatar(avatar);
+      try {
+        const supabase = await loadClient();
+        if (supabase) {
+          const { data } = await supabase.auth.getSession();
+          if (data?.session?.user) {
+            const { error } = await supabase.auth.updateUser({ data: { avatar } });
+            if (error) throw error;
+            setStatus('Avatar save हो गया है।', 'success');
+          } else {
+            setStatus('Avatar local guest profile में save हो गया है। Login के बाद account से जुड़ जाएगा।', 'success');
+          }
+        } else {
+          setStatus('Avatar local guest profile में save हो गया है।', 'success');
+        }
+      } catch (error) {
+        setStatus(String(error?.message || 'Avatar save नहीं हो पाया।'), 'error');
+      }
+    });
+    renderAvatar(localAvatar());
   }
 
   async function loadClient() {
@@ -35,10 +92,13 @@
     const account = $("#accountState");
     const guest = $("#guestLink");
     const logout = $("#logoutBtn");
+    const profileEmail = $("#profileEmail");
     if (!supabase) {
       if (account) account.textContent = "Guest mode — account sync अभी configured नहीं है।";
       if (guest) guest.hidden = false;
       if (logout) logout.hidden = true;
+      if (profileEmail) profileEmail.textContent = 'Guest / not signed in';
+      renderAvatar(localAvatar());
       return null;
     }
     const { data, error } = await supabase.auth.getSession();
@@ -46,13 +106,19 @@
     const session = data.session;
     if (session?.user) {
       const email = session.user.email || "Student account";
+      const avatar = AVATARS.includes(session.user.user_metadata?.avatar) ? session.user.user_metadata.avatar : localAvatar();
+      setLocalAvatar(avatar);
+      renderAvatar(avatar);
+      if (profileEmail) profileEmail.textContent = email;
       if (account) account.textContent = `Signed in as ${email}`;
       if (guest) guest.hidden = true;
       if (logout) logout.hidden = false;
     } else {
       if (account) account.textContent = "Not signed in — continue as guest or create an account.";
+      if (profileEmail) profileEmail.textContent = 'Guest / not signed in';
       if (guest) guest.hidden = false;
       if (logout) logout.hidden = true;
+      renderAvatar(localAvatar());
     }
     return session;
   }
@@ -73,7 +139,7 @@
         return;
       }
       setBusy(form, true);
-      const { data, error } = await supabase.auth.signUp({ email, password });
+      const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { avatar: localAvatar() } } });
       if (error) throw error;
       if (data.session) {
         setStatus("Account बन गया और आप signed in हैं।", "success");
@@ -128,28 +194,15 @@
     }
   }
 
-  window.Class6Auth = Object.freeze({
-    configured,
-    getClient: loadClient,
-    getSession: refreshSession,
-    signOut: logout
-  });
+  window.Class6Auth = Object.freeze({ configured, getClient: loadClient, getSession: refreshSession, signOut: logout, avatars: AVATARS.slice() });
 
   document.addEventListener("DOMContentLoaded", async () => {
+    renderAvatarPicker();
     $("#signupForm")?.addEventListener("submit", signUp);
     $("#loginForm")?.addEventListener("submit", signIn);
     $("#logoutBtn")?.addEventListener("click", logout);
-    $("#guestLink")?.addEventListener("click", () => {
-      window.location.href = "index.html";
-    });
-
-    if (!configured()) {
-      setStatus("Login UI तैयार है। अगला setup step: Supabase project URL और anon key जोड़ना।", "info");
-    }
-    try {
-      await refreshSession();
-    } catch (error) {
-      setStatus(String(error?.message || "Account status load नहीं हो पाया।"), "error");
-    }
+    $("#guestLink")?.addEventListener("click", () => { window.location.href = "index.html"; });
+    if (!configured()) setStatus("Login UI तैयार है। अगला setup step: Supabase project URL और anon key जोड़ना।", "info");
+    try { await refreshSession(); } catch (error) { setStatus(String(error?.message || "Account status load नहीं हो पाया।"), "error"); }
   });
 })();
