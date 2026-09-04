@@ -34,6 +34,48 @@
     }
   }
 
+  function setupMobileNav() {
+    const nav = document.querySelector('.home-nav');
+    const actions = document.querySelector('.home-actions');
+    if (!nav || !actions || document.getElementById('homeMenuBtn')) return;
+
+    const button = document.createElement('button');
+    button.id = 'homeMenuBtn';
+    button.className = 'home-menu-btn';
+    button.type = 'button';
+    button.setAttribute('aria-label', 'Open navigation menu');
+    button.setAttribute('aria-expanded', 'false');
+    button.innerHTML = '<span></span><span></span><span></span>';
+
+    const close = () => {
+      nav.classList.remove('home-menu-open');
+      button.setAttribute('aria-expanded', 'false');
+    };
+
+    button.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const open = nav.classList.toggle('home-menu-open');
+      button.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+
+    actions.addEventListener('click', (event) => {
+      if (event.target.closest('a, button')) close();
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!nav.contains(event.target)) close();
+    });
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 600) close();
+    });
+
+    nav.insertBefore(button, actions);
+  }
+
   window.Class6HomeAccount = Object.freeze({ refresh, avatars: AVATARS.slice() });
-  document.addEventListener('DOMContentLoaded', () => refresh(), { once: true });
+  document.addEventListener('DOMContentLoaded', () => {
+    refresh();
+    setupMobileNav();
+  }, { once: true });
 })();
