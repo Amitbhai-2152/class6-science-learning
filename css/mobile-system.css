@@ -1,6 +1,11 @@
 @import url("./site-mobile.css");
 /* Shared mobile responsiveness foundation. Keep page structure and existing feature behavior unchanged. */
 html{overflow-x:hidden}body{min-width:0;overflow-x:hidden}img,svg,video,canvas{max-width:100%;height:auto}table{max-width:100%;border-collapse:collapse}pre,code{max-width:100%;overflow-x:auto;white-space:pre-wrap;overflow-wrap:anywhere}button,a,input,select,textarea{max-width:100%}
+/* Quiz radio inputs must stay compact; the site-mobile foundation intentionally makes text inputs full-width. */
+.option input[type="radio"]{width:18px;min-width:18px;max-width:18px;height:18px;flex:0 0 18px;margin:2px 0 0;appearance:none;border:2px solid #94a3b8;border-radius:50%;background:#fff;box-shadow:none;padding:0}
+.option input[type="radio"]:checked{border-color:#2563eb;background:radial-gradient(circle at center,#2563eb 0 42%,transparent 45%)}
+.option{align-items:flex-start;gap:10px}
+.option>span{min-width:0;flex:1;line-height:1.5}
 @media(max-width:680px){
   #lessonView,#progressView,#fullTestView,#cbtView{padding-inline:10px}
   #lessonView>.btn,#progressView>.btn,#fullTestView>.btn,#cbtView>.btn{width:100%;margin-bottom:10px}
