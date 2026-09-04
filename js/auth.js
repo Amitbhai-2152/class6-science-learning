@@ -11,6 +11,8 @@
     if (!el) return;
     el.textContent = message;
     el.dataset.kind = kind;
+    el.classList.remove('status-pop');
+    requestAnimationFrame(() => el.classList.add('status-pop'));
   }
 
   function configured() {
@@ -34,7 +36,11 @@
   function renderAvatar(value) {
     const avatar = AVATARS.includes(value) ? value : localAvatar();
     const current = $("#profileAvatar");
-    if (current) current.textContent = avatar;
+    if (current) {
+      current.textContent = avatar;
+      current.classList.remove('avatar-pop');
+      requestAnimationFrame(() => current.classList.add('avatar-pop'));
+    }
     document.querySelectorAll('[data-avatar]').forEach((button) => {
       const selected = button.dataset.avatar === avatar;
       button.classList.toggle('selected', selected);
@@ -44,7 +50,8 @@
 
   function renderAvatarPicker() {
     const wrap = $("#avatarOptions");
-    if (!wrap) return;
+    if (!wrap || wrap.dataset.ready === '1') return;
+    wrap.dataset.ready = '1';
     wrap.innerHTML = AVATARS.map((avatar) => `<button type="button" class="avatar-option" data-avatar="${avatar}" aria-label="Avatar ${avatar}" aria-pressed="false">${avatar}</button>`).join('');
     wrap.addEventListener('click', async (event) => {
       const button = event.target.closest('[data-avatar]');
@@ -61,16 +68,46 @@
             if (error) throw error;
             setStatus('Avatar save हो गया है।', 'success');
           } else {
-            setStatus('Avatar local guest profile में save हो गया है। Login के बाद account से जुड़ जाएगा।', 'success');
+            setStatus('Avatar guest profile में save हो गया है। Login के बाद account से जुड़ जाएगा।', 'success');
           }
         } else {
-          setStatus('Avatar local guest profile में save हो गया है।', 'success');
+          setStatus('Avatar guest profile में save हो गया है।', 'success');
         }
       } catch (error) {
         setStatus(String(error?.message || 'Avatar save नहीं हो पाया।'), 'error');
       }
     });
     renderAvatar(localAvatar());
+  }
+
+  function setupAuthTabs() {
+    const tabs = [...document.querySelectorAll('[data-auth-tab]')];
+    const panels = [...document.querySelectorAll('[data-auth-panel]')];
+    if (!tabs.length) return;
+    const activate = (name, focus = false) => {
+      tabs.forEach((tab) => {
+        const active = tab.dataset.authTab === name;
+        tab.classList.toggle('active', active);
+        tab.setAttribute('aria-selected', active ? 'true' : 'false');
+        if (active && focus) tab.focus();
+      });
+      panels.forEach((panel) => panel.classList.toggle('active', panel.dataset.authPanel === name));
+    };
+    tabs.forEach((tab) => tab.addEventListener('click', () => activate(tab.dataset.authTab)));
+    activate('login');
+  }
+
+  function setupPasswordToggles() {
+    document.querySelectorAll('[data-password-toggle]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const input = document.getElementById(button.dataset.passwordToggle);
+        if (!input) return;
+        const showing = input.type === 'text';
+        input.type = showing ? 'password' : 'text';
+        button.textContent = showing ? 'Show' : 'Hide';
+        button.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+      });
+    });
   }
 
   async function loadClient() {
@@ -141,11 +178,8 @@
       setBusy(form, true);
       const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { avatar: localAvatar() } } });
       if (error) throw error;
-      if (data.session) {
-        setStatus("Account बन गया और आप signed in हैं।", "success");
-      } else {
-        setStatus("Account बन गया। Email confirmation required हो सकती है; अपने inbox को check करें।", "success");
-      }
+      if (data.session) setStatus("Account बन गया और आप signed in हैं।", "success");
+      else setStatus("Account बन गया। Email confirmation required हो सकती है; inbox check करें।", "success");
       await refreshSession();
     } catch (error) {
       setStatus(String(error?.message || "Signup failed."), "error");
@@ -198,6 +232,8 @@
 
   document.addEventListener("DOMContentLoaded", async () => {
     renderAvatarPicker();
+    setupAuthTabs();
+    setupPasswordToggles();
     $("#signupForm")?.addEventListener("submit", signUp);
     $("#loginForm")?.addEventListener("submit", signIn);
     $("#logoutBtn")?.addEventListener("click", logout);
