@@ -1,4 +1,11 @@
-(function(){if(!window.XPSystem){document.write('<script src="xp-system.js?v=2"><\/script>')}document.write('<script src="xp-unify-bridge-v2.js?v=2"><\/script>')})();
+(function(){
+  const bridgeSrc='js/xp-unify-bridge-v2.js?v=2';
+  if(!document.querySelector(`script[src="${bridgeSrc}"]`)){
+    const script=document.createElement('script');
+    script.src=bridgeSrc;
+    document.head.appendChild(script);
+  }
+})();
 const Progress={
  key:'class6ScienceProgressV9',data:null,
  load(){try{const d=JSON.parse(localStorage.getItem(this.key)||'null');if(d&&Array.isArray(d.completed)&&d.best&&typeof d.best==='object')return {...d,section:d.section&&typeof d.section==='object'?d.section:{},history:Array.isArray(d.history)?d.history:[],xp:Number(d.xp)||0,badges:Array.isArray(d.badges)?d.badges:[],streak:Number(d.streak)||0,lastActive:d.lastActive||null,review:d.review&&typeof d.review==='object'?d.review:{}}}catch(e){}return {completed:[],best:{},section:{},history:[],xp:0,badges:[],streak:0,lastActive:null,review:{}}},
