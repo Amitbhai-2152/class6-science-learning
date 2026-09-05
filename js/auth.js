@@ -195,8 +195,12 @@
       setBusy(form, true);
       const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { avatar: localAvatar() } } });
       if (error) throw error;
-      if (data.session) setStatus("Account बन गया और आप signed in हैं।", "success");
-      else setStatus("Account बन गया। Email confirmation required हो सकती है; inbox check करें।", "success");
+      if (data.session) {
+        setStatus("Account बन गया और आप signed in हैं।", "success");
+        window.location.replace('index.html');
+        return;
+      }
+      setStatus("Account बन गया। Email confirmation required हो सकती है; inbox check करें।", "success");
       await refreshSession();
     } catch (error) {
       setStatus(String(error?.message || "Signup failed."), "error");
@@ -223,8 +227,7 @@
       setBusy(form, true);
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
-      setStatus("Login successful. आपका account पहचान लिया गया है।", "success");
-      await refreshSession();
+      window.location.replace('index.html');
     } catch (error) {
       setStatus(String(error?.message || "Login failed."), "error");
     } finally {
@@ -239,7 +242,7 @@
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       clearLocalAccountData();
-      window.location.replace('index.html');
+      window.location.replace('auth.html');
     } catch (error) {
       setStatus(String(error?.message || "Logout failed."), "error");
     }
