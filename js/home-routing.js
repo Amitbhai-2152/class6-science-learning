@@ -1,5 +1,15 @@
 (function(){
   'use strict';
+
+  function enforceLogin(){
+    if(!window.Class6CloudSync?.getUser)return;
+    window.Class6CloudSync.getUser().then(function(user){
+      if(!user) window.location.replace('auth.html?next=index.html');
+    }).catch(function(){
+      window.location.replace('auth.html?next=index.html');
+    });
+  }
+
   function refreshTutorSafeStyle(){
     if(document.querySelector('link[data-tutor-safe-v2]'))return;
     const link=document.createElement('link');
@@ -50,6 +60,7 @@
     });
   }
   function route(){
+    enforceLogin();
     refreshTutorSafeStyle();
     installTestInstructionGuards();
     setTimeout(loadLevelBanner,0);
