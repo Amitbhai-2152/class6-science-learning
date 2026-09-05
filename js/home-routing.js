@@ -1,8 +1,12 @@
 (function(){
   'use strict';
 
+  var authGateAttempts=0;
   function enforceLogin(){
-    if(!window.Class6CloudSync?.getUser)return;
+    if(!window.Class6CloudSync?.getUser){
+      if(authGateAttempts++<100)setTimeout(enforceLogin,50);
+      return;
+    }
     window.Class6CloudSync.getUser().then(function(user){
       if(!user) window.location.replace('auth.html?next=index.html');
     }).catch(function(){
