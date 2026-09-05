@@ -7,6 +7,7 @@ const files = {
   config: await readFile('js/auth-config.js', 'utf8'),
   authJs: await readFile('js/auth.js', 'utf8'),
   homeAccount: await readFile('js/home-account.js', 'utf8'),
+  homeRouting: await readFile('js/home-routing.js', 'utf8'),
   cloud: await readFile('js/cloud-sync.js', 'utf8'),
   xpCloud: await readFile('js/xp-cloud-sync.js', 'utf8'),
   badgeCloud: await readFile('js/badge-cloud-sync.js', 'utf8'),
@@ -30,6 +31,7 @@ assert.match(files.auth, /data-password-toggle="loginPassword"/);
 assert.match(files.auth, /data-password-toggle="signupPassword"/);
 assert.match(files.auth, /css\/auth\.css\?v=4/);
 assert.match(files.auth, /js\/auth\.js\?v=5/);
+assert.doesNotMatch(files.auth, /id="guestLink"/);
 assert.match(files.authJs, /updateUser\(\{ data: \{ avatar \} \}\)/);
 assert.match(files.authJs, /clearLocalAccountData/);
 assert.match(files.authJs, /LOCAL_PROGRESS_KEYS/);
@@ -48,6 +50,10 @@ assert.match(files.homeAccount, /user_metadata/);
 assert.match(files.homeAccount, /let button = document\.getElementById\('homeMenuBtn'\)/);
 assert.match(files.homeAccount, /button\.dataset\.bound = '1'/);
 assert.match(files.homeAccount, /home-menu-open/);
+assert.match(files.homeRouting, /function enforceLogin\(\)/);
+assert.match(files.homeRouting, /Class6CloudSync\?\.getUser/);
+assert.match(files.homeRouting, /auth\.html\?next=index\.html/);
+assert.match(files.homeRouting, /enforceLogin\(\)/);
 assert.match(files.cloud, /OWNER_KEY = 'class6CloudOwnerV2'/);
 assert.match(files.cloud, /let sessionUserId = null/);
 assert.match(files.cloud, /function clearLocalProgress\(\)/);
