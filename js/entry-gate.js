@@ -3,6 +3,7 @@
 
   const SUPABASE_CDN = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
   const AUTH_PATH = 'auth.html';
+  document.documentElement.classList.add('auth-gate-pending');
 
   async function getSession() {
     try {
@@ -24,11 +25,10 @@
   async function enforce() {
     const session = await getSession();
     if (!session) {
-      const target = `${AUTH_PATH}?next=index.html`;
-      if (location.pathname.endsWith('/index.html') || location.pathname.endsWith('/')) {
-        location.replace(target);
-      }
+      location.replace(AUTH_PATH + '?next=index.html');
+      return;
     }
+    document.documentElement.classList.remove('auth-gate-pending');
   }
 
   enforce();
