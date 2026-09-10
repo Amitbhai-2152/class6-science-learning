@@ -64,16 +64,17 @@
     });
   }
   function route(){
-    enforceLogin();
-    refreshTutorSafeStyle();
-    installTestInstructionGuards();
-    setTimeout(loadLevelBanner,0);
     try{
       const params=new URLSearchParams(location.search);
       const view=params.get('view');
       const chapter=Number(params.get('chapter'))||0;
+      const directScienceChapter=view==='science' && chapter>0;
+      if(!directScienceChapter) enforceLogin();
+      refreshTutorSafeStyle();
+      installTestInstructionGuards();
+      setTimeout(loadLevelBanner,0);
       if(view==='science' && !chapter){location.replace('subjects/science/index.html');return;}
-      if(view==='science' && chapter && typeof window.openChapter==='function'){
+      if(directScienceChapter && typeof window.openChapter==='function'){
         window.openChapter(chapter,0);
         window.goHome=function(){location.href='subjects/science/index.html';};
         installFastScienceExit();
