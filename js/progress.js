@@ -25,4 +25,6 @@ const Progress={
  weakest(){const a=Object.entries(this.data.best).filter(([id])=>Number(id)>0);return a.sort((x,y)=>x[1]-y[1])[0]||null},
  reset(){this.data={completed:[],best:{},section:{},history:[],xp:0,badges:[],streak:0,lastActive:null,review:{}};this.save();localStorage.removeItem('scienceCurrentChapter')},
  save(){localStorage.setItem(this.key,JSON.stringify(this.data))}
-};Progress.init();window.addEventListener('load',()=>window.XPUnifyV2?.install?.(),{once:true});})();
+};
+window.Progress=Progress;
+Progress.init();window.addEventListener('load',()=>window.XPUnifyV2?.install?.(),{once:true});})();
