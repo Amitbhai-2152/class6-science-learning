@@ -63,17 +63,40 @@
       }
     });
   }
-  function routeDirectScienceChapter(chapter,attempt){
-    if(typeof window.openChapter==='function' && Array.isArray(window.CHAPTERS) && window.CHAPTERS.length>=chapter){
-      try{
-        window.openChapter(chapter,0);
-        window.goHome=function(){location.href='subjects/science/index.html';};
-        installFastScienceExit();
-        return true;
-      }catch(_){/* retry after the application finishes booting */}
+  function activateScienceChapter(chapter,attempt){
+    if(!Array.isArray(window.CHAPTERS) || chapter<1 || chapter>window.CHAPTERS.length){
+      if(attempt<160)setTimeout(()=>activateScienceChapter(chapter,attempt+1),25);
+      return false;
     }
-    if(attempt<160)setTimeout(()=>routeDirectScienceChapter(chapter,attempt+1),25);
-    return false;
+    const lesson=document.getElementById('lessonView');
+    const home=document.getElementById('homeView');
+    if(!lesson || !home){
+      if(attempt<160)setTimeout(()=>activateScienceChapter(chapter,attempt+1),25);
+      return false;
+    }
+    try{
+      home.classList.add('hidden');
+      lesson.classList.remove('hidden');
+      window.currentChapter=chapter;
+      window._part=0;
+      try{ localStorage.setItem('scienceCurrentChapter',String(chapter)); }catch(_){ }
+      if(window.Progress?.setSection)window.Progress.setSection(chapter,0);
+      if(typeof window.renderChapter==='function'){
+        window.renderChapter();
+      }else{
+        const c=window.CHAPTERS[chapter-1];
+        document.getElementById('chapterTag').textContent=`अध्याय ${c.id}`;
+        document.getElementById('chapterTitle').textContent=c.title;
+        document.getElementById('chapterGoal').textContent=c.goal;
+        document.getElementById('chapterIcon').textContent=c.icon;
+      }
+      window.goHome=function(){location.href='subjects/science/index.html';};
+      installFastScienceExit();
+      return true;
+    }catch(_){
+      if(attempt<160)setTimeout(()=>activateScienceChapter(chapter,attempt+1),25);
+      return false;
+    }
   }
   function route(){
     try{
@@ -87,7 +110,7 @@
       setTimeout(loadLevelBanner,0);
       if(view==='science' && !chapter){location.replace('subjects/science/index.html');return;}
       if(directScienceChapter){
-        routeDirectScienceChapter(chapter,0);
+        activateScienceChapter(chapter,0);
         return;
       }
       if(view==='science-practice' && window.FullScienceTest?.start){window.FullScienceTest.start(4);return;}
