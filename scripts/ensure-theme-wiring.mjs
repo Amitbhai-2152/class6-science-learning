@@ -16,14 +16,21 @@ function walk(dir){
 
 function wire(file){
   const original=fs.readFileSync(file,'utf8');
-  if(/theme-toggle\.js(?:\?[^"']*)?["']/i.test(original)) return;
+  let updated=original;
   const relDir=path.relative(path.dirname(file),root).replaceAll(path.sep,'/');
   const prefix=relDir?relDir.split('/').filter(Boolean).map(()=> '..').join('/')+'/':'';
   const src=`${prefix}js/theme-toggle.js?v=3`;
-  const tag=`<script src="${src}"></script>`;
-  const updated=original.includes('</head>')
-    ? original.replace('</head>',`${tag}</head>`)
-    : `${tag}${original}`;
+  const themeTag=`<script src="${src}"></script>`;
+  const themeRe=/<script\s+src="([^"]*\/?js\/theme-toggle\.js)(?:\?[^" ]*)?"\s*><\/script>/i;
+  if(themeRe.test(updated)) updated=updated.replace(themeRe,themeTag);
+  else if(updated.includes('</head>')) updated=updated.replace('</head>',`${themeTag}</head>`);
+  else updated=`${themeTag}${updated}`;
+
+  // Home previously linked the stylesheet as v1; normalize it so cached light-only
+  // CSS cannot mask the newer contrast fixes.
+  const darkCssRe=/(<link\s+rel="stylesheet"\s+href=")([^"]*\/?css\/dark-theme-fix\.css)(?:\?[^" ]*)?(")/i;
+  if(darkCssRe.test(updated)) updated=updated.replace(darkCssRe,'$1$2?v=2$3');
+
   if(updated!==original){
     fs.writeFileSync(file,updated);
     changed++;
