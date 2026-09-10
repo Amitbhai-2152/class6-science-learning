@@ -63,6 +63,60 @@
       }
     });
   }
+  function safeEscape(value){
+    if(typeof window.escapeHtml==='function')return window.escapeHtml(value==null?'':value);
+    return String(value==null?'':value).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+  }
+  function fallbackSciencePart(){
+    const chapters=Array.isArray(window.CHAPTERS)?window.CHAPTERS:[];
+    const c=chapters[(Number(window.currentChapter)||1)-1];
+    const box=document.getElementById('lessonContent');
+    if(!c||!box)return false;
+    const sections=Array.isArray(c.sections)?c.sections:[];
+    if(!sections.length){
+      box.innerHTML='<div class="section-kicker">अध्याय</div><h2>इस अध्याय की सामग्री अभी उपलब्ध नहीं है।</h2>';
+      return true;
+    }
+    window._part=Math.max(0,Math.min(Number(window._part)||0,sections.length));
+    const progress=document.getElementById('lessonProgress');
+    if(progress)progress.style.width=((window._part+1)/(sections.length+1)*100)+'%';
+    if(window._part>=sections.length){
+      box.innerHTML='<div class="section-kicker">FINAL CHECK</div><h2>🧠 Chapter Challenge</h2><p class="muted">अध्याय की पढ़ाई पूरी हो गई। Challenge खोलने के लिए नीचे से वापस/आगे navigation इस्तेमाल करें।</p><div class="nav"><button class="btn soft" onclick="prevPart()">← पीछे</button><button class="btn primary" onclick="goHome()">🏠 Home</button></div>';
+      return true;
+    }
+    const s=sections[window._part]||{};
+    const visualItems=Array.isArray(s.visual)?s.visual:[];
+    const visualText=Array.isArray(s.visualText)?s.visualText:[];
+    let visual='';
+    if(visualItems.length){
+      visual=`<div class="visual"><div class="visual-label">👆 Visual concept map</div><div class="visual-row">${visualItems.map((item,i)=>`<button class="visual-node" onclick="speakConcept(${JSON.stringify(visualText[i]||item)})" title="सुनने के लिए दबाएँ"><div class="big">${safeEscape(item)}</div><b>${safeEscape(visualText[i]||'')}</b></button>${i<visualItems.length-1?'<div class="arrow">→</div>':''}`).join('')}</div><small class="visual-tip">किसी visual card पर tap करके उसका label सुनें।</small></div>`;
+    }
+    let html=`<div class="section-kicker">अध्याय ${safeEscape(c.id)} • भाग ${window._part+1}/${sections.length}</div><h2>${safeEscape(s.title||'अध्याय का भाग')}</h2>${visual}<p class="body-text">${safeEscape(s.body||'')}</p>`;
+    if(s.remember)html+=`<div class="callout"><b>💡 याद रखो:</b> ${safeEscape(s.remember)}</div>`;
+    if(s.activity)html+=`<div class="activity"><b>🧪 Activity:</b> ${safeEscape(s.activity)}<br><button class="btn soft activity-btn" onclick="completeActivity()">✓ मैंने activity की</button></div>`;
+    if(s.mistake)html+=`<div class="mistake"><b>⚠️ Common Mistake:</b> ${safeEscape(s.mistake)}</div>`;
+    if(s.think)html+=`<div class="callout" style="border-color:#2563eb;background:#eff6ff"><b>🤔 सोचो:</b> ${safeEscape(s.think)}</div>`;
+    html+=`<div class="exam-link"><div><b>📝 Exam Link</b><br><span class="muted">इस concept से कारण, अंतर, परिभाषा या application question बन सकता है।</span></div><div><b>🔁 Active Recall</b><br><span class="muted">पेज बंद करके अपने शब्दों में concept समझाओ।</span></div></div><div class="nav"><button class="btn soft" onclick="prevPart()" ${window._part===0?'disabled':''}>← पीछे</button><button class="btn primary" onclick="nextPart()">${window._part===sections.length-1?'🧠 Challenge':'आगे →'}</button></div>`;
+    box.innerHTML=html;
+    return true;
+  }
+  function installScienceRenderGuard(){
+    if(typeof window.renderPart!=='function' || window.renderPart.__scienceRenderGuard)return;
+    const original=window.renderPart;
+    const guarded=function(){
+      try{
+        const result=original.apply(this,arguments);
+        const box=document.getElementById('lessonContent');
+        if(box && !box.innerHTML.trim())fallbackSciencePart();
+        return result;
+      }catch(error){
+        return fallbackSciencePart();
+      }
+    };
+    guarded.__scienceRenderGuard=true;
+    guarded.__scienceRenderOriginal=original;
+    window.renderPart=guarded;
+  }
   function activateScienceChapter(chapter,attempt){
     if(!Array.isArray(window.CHAPTERS) || chapter<1 || chapter>window.CHAPTERS.length){
       if(attempt<160)setTimeout(()=>activateScienceChapter(chapter,attempt+1),25);
@@ -81,6 +135,7 @@
       window._part=0;
       try{ localStorage.setItem('scienceCurrentChapter',String(chapter)); }catch(_){ }
       if(window.Progress?.setSection)window.Progress.setSection(chapter,0);
+      installScienceRenderGuard();
       if(typeof window.renderChapter==='function'){
         window.renderChapter();
       }else{
@@ -89,6 +144,7 @@
         document.getElementById('chapterTitle').textContent=c.title;
         document.getElementById('chapterGoal').textContent=c.goal;
         document.getElementById('chapterIcon').textContent=c.icon;
+        fallbackSciencePart();
       }
       window.goHome=function(){location.href='subjects/science/index.html';};
       installFastScienceExit();
