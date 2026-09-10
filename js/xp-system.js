@@ -2,6 +2,7 @@
 'use strict';
 
 const KEY='class6XPSystemV1';
+const STATE_VERSION=2;
 const SUBJECTS=['science','maths','english','hindi','gk','social','revision'];
 const DAILY_CAP=200;
 const ACTIVITY_SOURCE='xp-system-v2';
@@ -15,10 +16,27 @@ const BADGES=[
 const clamp=(n,min=0,max=100)=>Math.max(min,Math.min(max,Number(n)||0));
 const dayKey=(value)=>{const d=value instanceof Date?value:new Date(value);if(Number.isNaN(d.getTime()))return null;return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
 const today=()=>dayKey(new Date());
-const defaults=()=>({version:1,total:0,subjects:{science:0,maths:0,english:0,hindi:0,gk:0,social:0,revision:0},events:[],daily:{date:today(),earned:0},activeDays:[],legacySeeded:false});
-function read(){try{const x=JSON.parse(localStorage.getItem(KEY)||'null');if(x&&x.version===1)return Object.assign(defaults(),x,{subjects:Object.assign(defaults().subjects,x.subjects||{}),events:Array.isArray(x.events)?x.events:[],daily:x.daily&&typeof x.daily==='object'?x.daily:defaults().daily,activeDays:Array.isArray(x.activeDays)?[...new Set(x.activeDays.map(dayKey).filter(Boolean))].sort().slice(-400):[]});}catch(_){}return defaults()}
+const defaults=()=>({version:STATE_VERSION,total:0,subjects:{science:0,maths:0,english:0,hindi:0,gk:0,social:0,revision:0},events:[],daily:{date:today(),earned:0},activeDays:[],activitySource:ACTIVITY_SOURCE,legacySeeded:false});
+function normalizeState(input){
+  const x=input&&typeof input==='object'?input:{};
+  const base=defaults();
+  const subjects=Object.assign({},base.subjects,x.subjects||{});
+  Object.keys(subjects).forEach(s=>{subjects[s]=Math.max(0,Math.round(Number(subjects[s])||0))});
+  const events=Array.isArray(x.events)?x.events.filter(Boolean).slice(0,500):[];
+  const eventDays=events.map(e=>dayKey(e?.at)).filter(Boolean);
+  const activeDays=[...new Set([...(Array.isArray(x.activeDays)?x.activeDays:[]).map(dayKey).filter(Boolean),...eventDays])].sort().slice(-400);
+  return Object.assign({},base,x,{version:STATE_VERSION,subjects,events,activeDays,activitySource:ACTIVITY_SOURCE,total:Object.values(subjects).reduce((sum,v)=>sum+v,0),daily:x.daily&&typeof x.daily==='object'?Object.assign({},base.daily,x.daily):base.daily});
+}
+function migrateState(input){
+  const x=input&&typeof input==='object'?input:null;
+  if(!x)return defaults();
+  if(Number(x.version)===STATE_VERSION)return normalizeState(x);
+  if(Number(x.version)===1)return normalizeState(x);
+  return defaults();
+}
+function read(){try{return migrateState(JSON.parse(localStorage.getItem(KEY)||'null'))}catch(_){return defaults()}}
 let state=read();
-function save(){state.activeDays=[...new Set((Array.isArray(state.activeDays)?state.activeDays:[]).map(dayKey).filter(Boolean))].sort().slice(-400);localStorage.setItem(KEY,JSON.stringify(state));return state}
+function save(){state=normalizeState(state);localStorage.setItem(KEY,JSON.stringify(state));return state}
 function resetDaily(){const d=today();if(state.daily?.date!==d)state.daily={date:d,earned:0}}
 function recordActivity(){const d=today();if(!state.activeDays.includes(d))state.activeDays.push(d);state.activeDays.sort();state.activeDays=state.activeDays.slice(-400);resetDaily()}
 function eventActivityDays(){return state.events.map(e=>dayKey(e?.at)).filter(Boolean)}
@@ -40,9 +58,9 @@ function showUnifiedBadgePopup(b){if(!b)return;let modal=document.getElementById
 function award(subject,action,content,points,meta={}){subject=SUBJECTS.includes(subject)?subject:null;if(!subject)return{awarded:0,total:state.total,subjectTotal:0,reason:'invalid-subject'};const key=`${subject}|${action}|${String(content||'')}`;if(state.events.some(e=>e.key===key&&meta.once!==false))return{awarded:0,total:state.total,subjectTotal:state.subjects[subject],reason:'duplicate'};let base=Math.max(0,Math.round(Number(points)||0));if(meta.diminishing!==false)base=Math.round(base*multiplier(subject,content));resetDaily();recordActivity();const remaining=Math.max(0,DAILY_CAP-(Number(state.daily.earned)||0));const value=Math.min(base,remaining);if(value<=0){save();return{awarded:0,total:state.total,subjectTotal:state.subjects[subject],reason:'daily-cap'}}const beforeBadges=badgeSnapshot(state.total);state.subjects[subject]+=value;state.total+=value;state.daily.earned+=value;state.events.unshift({id:`xp_${Date.now()}_${Math.random().toString(36).slice(2,8)}`,key,subject,action,content:String(content||''),points:value,at:new Date().toISOString()});state.events=state.events.slice(0,500);save();const afterBadges=badgeSnapshot(state.total);const unlocked=afterBadges.filter(a=>!beforeBadges.some(b=>b.id===a.id));window.dispatchEvent(new CustomEvent('xp:earned',{detail:{subject,action,points:value,total:state.total,subjectTotal:state.subjects[subject],dailyEarned:state.daily.earned,activeDays:activityDays().length,badges:afterBadges,unlockedBadges:unlocked}}));unlocked.forEach(b=>window.dispatchEvent(new CustomEvent('xp:badge-unlocked',{detail:b})));renderBadgeUI();return{awarded:value,total:state.total,subjectTotal:state.subjects[subject],reason:'awarded',unlockedBadges:unlocked}}
 function score(subject,content,pct,kind='attempt'){return award(subject,kind,content,attemptXP(pct),{diminishing:true,once:false})}
 function level(xp=state.total){let level=1,need=100;while(xp>=need){xp-=need;level++;need=100+((level-1)*50)}return{level,xpIntoLevel:xp,nextLevelXP:need,title:level>=10?'Master':level>=7?'Achiever':level>=5?'Scholar':level>=3?'Explorer':'Learner'}}
-function snapshot(){const badges=badgeSnapshot();return{total:state.total,subjects:Object.assign({},state.subjects),daily:Object.assign({},state.daily),activeDays:activityDays(),events:state.events.length,level:level(),badges,nextBadge:nextBadge(),activitySource:ACTIVITY_SOURCE}}
+function snapshot(){const badges=badgeSnapshot();return{version:STATE_VERSION,total:state.total,subjects:Object.assign({},state.subjects),daily:Object.assign({},state.daily),activeDays:activityDays(),events:state.events.length,level:level(),badges,nextBadge:nextBadge(),activitySource:ACTIVITY_SOURCE}}
 function recordLearningDay(reason='learning'){recordActivity();save();const detail={date:today(),activeDays:activityDays(),streak:currentStreak(),reason,source:ACTIVITY_SOURCE};window.dispatchEvent(new CustomEvent('xp:activity',{detail}));return detail}
-window.XPSystem={KEY,DAILY_CAP,BADGES,ACTIVITY_SOURCE,read:()=>state,save,seedLegacy,reconcileLegacy,award,score,attemptXP,level,badges:()=>badgeSnapshot(),nextBadge:()=>nextBadge(),snapshot,recordLearningDay,recordActivity,activityDays,currentStreak};
+window.XPSystem={KEY,STATE_VERSION,DAILY_CAP,BADGES,ACTIVITY_SOURCE,read:()=>state,save,normalizeState,migrateState,seedLegacy,reconcileLegacy,award,score,attemptXP,level,badges:()=>badgeSnapshot(),nextBadge:()=>nextBadge(),snapshot,recordLearningDay,recordActivity,activityDays,currentStreak};
 window.addEventListener('xp:badge-unlocked',e=>showUnifiedBadgePopup(e.detail));
 window.addEventListener('DOMContentLoaded',()=>{injectBadgeUI();renderBadgeUI()});
 })();
