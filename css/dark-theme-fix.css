@@ -79,3 +79,19 @@ body.dark .global-theme-toggle{position:fixed;top:14px;right:14px;z-index:9999;w
 body:not(.dark) .global-theme-toggle{position:fixed;top:14px;right:14px;z-index:9999;width:42px;height:42px;border:1px solid #d7dee8;border-radius:50%;background:#fff;color:#18202a;box-shadow:0 8px 22px rgba(20,30,60,.16);font-size:18px;display:grid;place-items:center;cursor:pointer;line-height:1}
 .global-theme-toggle:hover{transform:translateY(-1px)}
 @media(max-width:560px){.global-theme-toggle{top:10px;right:10px;width:39px;height:39px}}
+
+/* Keep intentionally light/white surfaces readable instead of forcing their text white. */
+body.dark .hint{background:#17263a!important;color:#e4edf6!important;border-color:#30455f!important}
+body.dark .hint p,body.dark .hint li,body.dark .hint strong,body.dark .hint b,body.dark .hint span{color:#e4edf6!important}
+body.dark .hero:not(#homeView .home-hero){background:#122238!important;color:#eef6ff!important}
+body.dark .hero:not(#homeView .home-hero) p{color:#d9e4ef!important}
+body.dark .hero:not(#homeView .home-hero) h1,body.dark .hero:not(#homeView .home-hero) h2,body.dark .hero:not(#homeView .home-hero) h3{color:#eef6ff!important}
+body.dark .white,.body-dark .white,body.dark .white-bg,body.dark .bg-white{background:#122238!important;color:#eef6ff!important}
+body.dark .white p,body.dark .white li,body.dark .white strong,body.dark .white b,body.dark .white span,body.dark .white h1,body.dark .white h2,body.dark .white h3,
+body.dark .white-bg p,body.dark .white-bg li,body.dark .white-bg strong,body.dark .white-bg b,body.dark .white-bg span,body.dark .white-bg h1,body.dark .white-bg h2,body.dark .white-bg h3,
+body.dark .bg-white p,body.dark .bg-white li,body.dark .bg-white strong,body.dark .bg-white b,body.dark .bg-white span,body.dark .bg-white h1,body.dark .bg-white h2,body.dark .bg-white h3{color:#eef6ff!important}
+
+/* Inline white/light surfaces must keep dark readable text. */
+body.dark [style*="#fff"],body.dark [style*="#FFF"],body.dark [style*="#ffffff"],body.dark [style*="#FFFFFF"],body.dark [style*="background:white"],body.dark [style*="background: white"]{color:#18202a!important}
+body.dark [style*="#fff"] p,body.dark [style*="#fff"] li,body.dark [style*="#fff"] strong,body.dark [style*="#fff"] b,body.dark [style*="#fff"] span,body.dark [style*="#fff"] h1,body.dark [style*="#fff"] h2,body.dark [style*="#fff"] h3{color:#18202a!important}
+body.dark [style*="#ffffff"] p,body.dark [style*="#ffffff"] li,body.dark [style*="#ffffff"] strong,body.dark [style*="#ffffff"] b,body.dark [style*="#ffffff"] span,body.dark [style*="#ffffff"] h1,body.dark [style*="#ffffff"] h2,body.dark [style*="#ffffff"] h3{color:#18202a!important}
