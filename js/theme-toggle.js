@@ -1,15 +1,39 @@
 (function(){
 'use strict';
 const KEY='class6ThemeV2';
+const SCRIPT_SRC=document.currentScript?.src||'';
 function read(){
   try{const saved=localStorage.getItem(KEY)||localStorage.getItem('class6ThemeV1');if(saved==='dark'||saved==='light')return saved}catch(_){}
   return 'light';
 }
+function ensureStyles(){
+  try{
+    if(document.querySelector('link[href*="dark-theme-fix.css"]'))return;
+    if(!SCRIPT_SRC)return;
+    const href=new URL('../css/dark-theme-fix.css?v=2',SCRIPT_SRC).href;
+    const link=document.createElement('link');
+    link.rel='stylesheet';
+    link.href=href;
+    link.setAttribute('data-global-theme-style','true');
+    (document.head||document.documentElement).appendChild(link);
+  }catch(_){}
+}
+function ensureButton(){
+  if(!document.body||document.getElementById('themeBtn')||document.querySelector('.global-theme-toggle'))return;
+  const btn=document.createElement('button');
+  btn.type='button';
+  btn.className='global-theme-toggle';
+  btn.setAttribute('aria-label','थीम बदलें');
+  btn.setAttribute('title','Dark mode बदलें');
+  btn.textContent='🌙';
+  document.body.appendChild(btn);
+}
 function apply(theme){
+  ensureStyles();
   const dark=theme==='dark';
   document.documentElement.classList.toggle('dark',dark);
   if(document.body)document.body.classList.toggle('dark',dark);
-  const btn=document.getElementById('themeBtn');
+  const btn=document.getElementById('themeBtn')||document.querySelector('.global-theme-toggle');
   if(btn){
     btn.textContent=dark?'☀️':'🌙';
     btn.setAttribute('aria-label',dark?'Light mode करें':'Dark mode करें');
@@ -23,17 +47,16 @@ function toggle(){
   const next=(document.documentElement.classList.contains('dark')||document.body?.classList.contains('dark'))?'light':'dark';
   save(next);apply(next);
 }
-// Apply as early as possible so there is no light-flash before the page is ready.
+ensureStyles();
 apply(read());
-// Use one delegated listener only. This also survives Home DOM re-renders.
 document.addEventListener('click',e=>{
-  const btn=e.target?.closest?.('#themeBtn');
+  const btn=e.target?.closest?.('#themeBtn,.global-theme-toggle');
   if(!btn)return;
   e.preventDefault();
   e.stopPropagation();
   toggle();
 },{capture:true});
-window.addEventListener('DOMContentLoaded',()=>apply(read()),{once:true});
-window.addEventListener('load',()=>apply(read()),{once:true});
+window.addEventListener('DOMContentLoaded',()=>{apply(read());ensureButton();},{once:true});
+window.addEventListener('load',()=>{apply(read());ensureButton();},{once:true});
 window.ThemeToggle={getTheme:read,apply,toggle};
 })();

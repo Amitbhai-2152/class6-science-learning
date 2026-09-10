@@ -1,0 +1,39 @@
+name: Global Theme Wiring
+
+on:
+  push:
+    paths:
+      - 'js/theme-toggle.js'
+      - 'css/dark-theme-fix.css'
+      - 'scripts/ensure-theme-wiring.mjs'
+      - '.github/workflows/theme-wiring.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  wire:
+    runs-on: ubuntu-latest
+    env:
+      TZ: Asia/Kolkata
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Wire theme toggle into every HTML page
+        run: node scripts/ensure-theme-wiring.mjs
+      - name: Commit generated HTML wiring
+        run: |
+          if git diff --quiet -- '*.html'; then
+            echo "No HTML wiring changes required."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- '*.html'
+          git commit -m "fix(theme): wire global dark mode across pages"
+          git push

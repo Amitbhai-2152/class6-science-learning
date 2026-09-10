@@ -1,10 +1,11 @@
-html body.dark{background:#0b1220;color:#eef6ff}
+html body.dark{background:#0b1220;color:#eef6ff;color-scheme:dark}
 body.dark #homeView{background:radial-gradient(circle at 8% 0,rgba(99,102,241,.16),transparent 30%),radial-gradient(circle at 95% 12%,rgba(20,184,166,.10),transparent 25%),#0b1220}
 body.dark #homeView .home-nav{background:rgba(11,18,32,.92);border-bottom-color:#26354a;color:#eef6ff}
 body.dark #homeView .home-stat,body.dark #homeView .home-theme,body.dark #homeView .home-progress-btn,body.dark #homeView .home-xp-chip{color:#eef6ff;background:#111c2d;border-color:#2a3b52}
 body.dark #homeView .home-stat:hover,body.dark #homeView .home-theme:hover,body.dark #homeView .home-progress-btn:hover,body.dark #homeView .home-xp-chip:hover{background:#18263a;border-color:#3a506d}
 body.dark #homeView .home-head h2,body.dark #homeView .home-card h3,body.dark #homeView .home-label,body.dark #homeView .home-meta,body.dark #homeView .home-row,body.dark #homeView .home-section p{color:#eef6ff}
-body.dark #homeView .home-head p,body.dark #homeView .home-label{color:#9fb0c3}
+body.dark #homeView .home-head p{color:#9fb0c3}
+body.dark #homeView .home-label{color:#b8c6d6}
 body.dark #homeView .home-card{background:linear-gradient(145deg,#122238,#0f1b2c);border-color:#2b3e56;box-shadow:0 14px 36px rgba(0,0,0,.24)}
 body.dark #homeView .home-card:first-child,body.dark #homeView .home-card:nth-child(2){background:linear-gradient(145deg,#122238,#0f1b2c)}
 body.dark #homeView .home-bar-row{border-bottom-color:#26364c}
@@ -19,22 +20,22 @@ body.dark #homeView .home-motivation-icon{background:#26335d}
 body.dark #homeView .home-motivation small{color:#a9b9ca}
 body.dark #homeView .home-motivation b{color:#f3f7ff}
 body.dark #homeView .home-notice{background:#15263b;color:#dce7f3;border-color:#2b405a}
-body.dark .card{background:var(--card);color:var(--ink)}
+body.dark .card{background:var(--card,#122238);color:var(--ink,#eef6ff)}
 body.dark .tag{background:#193152;color:#c8ddff}
 body.dark .soft{background:#193152;color:#c8ddff}
-body.dark .chapter-card{background:var(--card);color:var(--ink)}
-body.dark .chapter-number,.dark .qnum{background:#193152;color:#c8ddff}
+body.dark .chapter-card{background:var(--card,#122238);color:var(--ink,#eef6ff)}
+body.dark .chapter-number,body.dark .qnum{background:#193152;color:#c8ddff}
 body.dark .callout{background:#302914;color:#f6e7a8}
 body.dark .activity{background:#112f3b;color:#d4f4fa}
 body.dark .mistake{background:#321b25;color:#ffd5de}
 body.dark .exam-link>div{background:#122238}
-body.dark .option{background:#122238;color:var(--ink)}
+body.dark .option{background:#122238;color:var(--ink,#eef6ff)}
 body.dark .quiz-top{background:#16304d;color:#c8ddff}
 body.dark .quiz-correct{background:#123427!important}
 body.dark .quiz-wrong{background:#3a1c26!important}
 body.dark .feedback.ok{background:#123427;color:#baf4d2}
 body.dark .feedback.bad{background:#3a1c26;color:#ffd2dc}
-body.dark .dash-card,body.dark .dash-row,body.dark .history-row{background:#122238;color:var(--ink)}
+body.dark .dash-card,body.dark .dash-row,body.dark .history-row{background:#122238;color:var(--ink,#eef6ff)}
 body.dark .progress-live-card,body.dark .progress-live-level-box,body.dark .progress-live-sub,body.dark .progress-live-kpi,body.dark .progress-live-revision{background:#122238!important;border-color:#2b3e56!important;color:#eef6ff}
 body.dark .progress-live-sub p,body.dark .progress-live-row,body.dark .progress-live-level-box span,body.dark .progress-live-kpi span,body.dark .progress-live-revision span{color:#a9b9ca}
 body.dark .progress-live-meter{background:#26384e}
@@ -53,3 +54,28 @@ body.dark .chat-input input{background:#0d1b2d;color:#eef6ff;border-color:#2b405
 body.dark .modal{background:#020813bb}
 body.dark .modal-card{background:#122238;color:#eef6ff}
 body.dark .unlock-icon{color:#fff}
+
+/* Global readability for standalone subject/activity pages. */
+body.dark h1,body.dark h2,body.dark h3,body.dark h4,body.dark h5,body.dark h6{color:#eef6ff}
+body.dark p,body.dark li,body.dark dt,body.dark dd,body.dark label,body.dark summary,body.dark figcaption{color:#d9e4ef}
+body.dark strong,body.dark b{color:#f2f7ff}
+body.dark small{color:#a9b9ca}
+body.dark a{color:#9ecbff}
+body.dark a:hover{color:#c5e1ff}
+body.dark [class*="muted"],body.dark [class*="subtitle"],body.dark [class*="description"],body.dark [class*="meta"],body.dark [class*="helper"],body.dark [class*="hint"]{color:#a9b9ca!important}
+body.dark input,body.dark textarea,body.dark select{background:#0f1b2d!important;color:#eef6ff!important;border-color:#31445d!important}
+body.dark input::placeholder,body.dark textarea::placeholder{color:#8192a5!important}
+body.dark table{background:#122238;color:#eef6ff;border-color:#2b405a}
+body.dark th{background:#17304d;color:#eef6ff;border-color:#2b405a}
+body.dark td{background:#122238;color:#d9e4ef;border-color:#2b405a}
+body.dark .note,body.dark .instructions{background:#17263a!important;color:#d9e4ef!important;border-color:#30455f!important}
+body.dark .result{background:#1b2140!important;color:#eef6ff!important}
+body.dark .ex{background:#302914!important;color:#f6e7a8!important;border-color:#6d5a1d!important}
+body.dark .q,body.dark .lesson,body.dark .topic,body.dark .action{background:#122238;color:#eef6ff;border-color:#2b405a}
+body.dark .q b,body.dark .lesson h2,body.dark .topic h3,body.dark .action b{color:#f2f7ff}
+body.dark .opt,body.dark .option{background:#14263c;color:#e9f2fb;border-color:#30465f}
+body.dark .btn,body.dark button{border-color:#30465f}
+body.dark .global-theme-toggle{position:fixed;top:14px;right:14px;z-index:9999;width:42px;height:42px;border:1px solid #3a506d;border-radius:50%;background:#122238;color:#eef6ff;box-shadow:0 8px 22px rgba(0,0,0,.28);font-size:18px;display:grid;place-items:center;cursor:pointer;line-height:1}
+body:not(.dark) .global-theme-toggle{position:fixed;top:14px;right:14px;z-index:9999;width:42px;height:42px;border:1px solid #d7dee8;border-radius:50%;background:#fff;color:#18202a;box-shadow:0 8px 22px rgba(20,30,60,.16);font-size:18px;display:grid;place-items:center;cursor:pointer;line-height:1}
+.global-theme-toggle:hover{transform:translateY(-1px)}
+@media(max-width:560px){.global-theme-toggle{top:10px;right:10px;width:39px;height:39px}}
