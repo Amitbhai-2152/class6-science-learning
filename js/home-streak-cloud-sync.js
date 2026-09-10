@@ -1,7 +1,6 @@
 (() => {
   'use strict';
 
-  const SCIENCE_KEY = 'class6ScienceProgressV9';
   let started = false;
 
   const dayKey = (value) => {
@@ -10,54 +9,39 @@
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   };
 
-  function readScience() {
-    try {
-      const raw = localStorage.getItem(SCIENCE_KEY);
-      const value = raw ? JSON.parse(raw) : null;
-      return value && typeof value === 'object' ? value : {};
-    } catch (_) {
-      return {};
-    }
-  }
-
-  function localSnapshot() {
-    const science = readScience();
-    const today = dayKey(new Date());
-    const scienceActive = science.lastActive && dayKey(science.lastActive) === today;
-    const xpState = window.XPSystem?.read?.() || {};
-    const events = Array.isArray(xpState.events) ? xpState.events : [];
-    const days = [...new Set(events.map((event) => dayKey(event?.at)).filter(Boolean))].sort();
-    const persisted = xpState.streakState || {};
-    return {
-      streak: Math.max(
-        scienceActive ? Number(science.streak) || 0 : 0,
-        Number(persisted.streak) || 0,
-        Number(window.HomeStreak?.getStreak?.() || 0)
-      ),
-      lastActive: persisted.lastActive || (scienceActive ? dayKey(science.lastActive) : (days.at(-1) || null)),
-      activeDays: [...new Set([...(Array.isArray(persisted.activeDays) ? persisted.activeDays : []), ...days])].sort()
-    };
-  }
-
   function normalize(input) {
     const x = input && typeof input === 'object' ? input : {};
     const days = Array.isArray(x.activeDays) ? [...new Set(x.activeDays.map(dayKey).filter(Boolean))].sort() : [];
-    return {
-      streak: Math.max(0, Number(x.streak) || 0),
-      lastActive: dayKey(x.lastActive) || null,
-      activeDays: days.slice(-400)
-    };
+    return { activeDays: days.slice(-400) };
+  }
+
+  function activityFromLocal() {
+    try {
+      const xp = window.XPSystem?.read?.() || {};
+      const days = new Set(Array.isArray(xp.activeDays) ? xp.activeDays.map(dayKey).filter(Boolean) : []);
+      if (Array.isArray(xp.events)) xp.events.forEach(event => { const d = dayKey(event?.at); if (d) days.add(d); });
+      return { activeDays: [...days].sort().slice(-400) };
+    } catch (_) {
+      return { activeDays: [] };
+    }
   }
 
   function merge(local, cloud) {
     const a = normalize(local);
     const b = normalize(cloud);
-    const activeDays = [...new Set([...(a.activeDays || []), ...(b.activeDays || [])])].sort().slice(-400);
-    return {
-      streak: Math.max(a.streak, b.streak),
-      lastActive: [a.lastActive, b.lastActive].filter(Boolean).sort().at(-1) || null,
-      activeDays
-    };
+    return { activeDays: [...new Set([...(a.activeDays || []), ...(b.activeDays || [])])].sort().slice(-400) };
+  }
+
+  function calculateStreak(activeDays) {
+    const days = new Set(normalize({ activeDays }).activeDays);
+    let cursor = new Date();
+    let streak = 0;
+    while (days.has(dayKey(cursor))) {
+      streak++;
+      cursor.setDate(cursor.getDate() - 1);
+    }
+    const lastActive = [...days].at(-1) || null;
+    return { streak, lastActive };
   }
 
   async function sync() {
@@ -69,31 +53,33 @@
       if (!user) return { synced: false, reason: 'not_signed_in' };
 
       const scope = window.Class6CloudSync.prepareUser?.(user.id) || { changed: false };
-      const localState = scope.changed ? {} : localSnapshot();
+      const local = scope.changed ? { activeDays: [] } : activityFromLocal();
       const row = await window.Class6CloudSync.load();
       const cloud = row?.state?.streakState || {};
-      const merged = scope.changed ? normalize(cloud) : merge(localState, cloud);
+      const mergedDays = merge(local, cloud);
+      const derived = calculateStreak(mergedDays.activeDays);
+      const merged = { activeDays: mergedDays.activeDays, streak: derived.streak, lastActive: derived.lastActive };
 
       const current = window.XPSystem?.read?.();
       if (current && window.XPSystem?.save) {
-        window.XPSystem.save(Object.assign({}, current, { streakState: merged }));
+        window.XPSystem.save(Object.assign({}, current, { activeDays: merged.activeDays, streakState: merged }));
         const result = await window.Class6CloudSync.save(window.XPSystem.read(), 1);
         window.dispatchEvent(new CustomEvent('class6:streak-cloud-synced', {
-          detail: { userId: user.id, streak: merged.streak, lastActive: merged.lastActive, synced: result?.synced === true }
+          detail: { userId: user.id, streak: merged.streak, lastActive: merged.lastActive, activeDays: merged.activeDays, synced: result?.synced === true }
         }));
       } else {
         await window.Class6CloudSync.save({ streakState: merged }, 1);
       }
 
       window.HomeStreak?.refresh?.();
-      return { synced: true, streak: merged.streak };
+      return { synced: true, streak: merged.streak, activeDays: merged.activeDays };
     } catch (error) {
       console.error('Class 6 streak cloud sync failed:', error);
       return { synced: false, reason: 'sync_error', error: String(error?.message || error) };
     }
   }
 
-  window.Class6StreakCloudSync = Object.freeze({ sync, merge, localSnapshot });
+  window.Class6StreakCloudSync = Object.freeze({ sync, merge, calculateStreak, activityFromLocal });
 
   document.addEventListener('DOMContentLoaded', () => {
     window.setTimeout(() => sync(), 0);
