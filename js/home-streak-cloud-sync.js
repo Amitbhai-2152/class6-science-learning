@@ -2,34 +2,58 @@
   'use strict';
 
   let started = false;
+  const MAX_ACTIVITY_DAYS = 400;
 
   const dayKey = (value) => {
-    const d = value instanceof Date ? value : new Date(value);
+    const d = value instanceof Date ? new Date(value.getTime()) : new Date(value);
     if (Number.isNaN(d.getTime())) return null;
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   };
 
   function normalize(input) {
     const x = input && typeof input === 'object' ? input : {};
-    const days = Array.isArray(x.activeDays) ? [...new Set(x.activeDays.map(dayKey).filter(Boolean))].sort() : [];
-    return { activeDays: days.slice(-400) };
+    const days = Array.isArray(x.activeDays)
+      ? [...new Set(x.activeDays.map(dayKey).filter(Boolean))].sort()
+      : [];
+    return { activeDays: days.slice(-MAX_ACTIVITY_DAYS) };
   }
 
   function activityFromLocal() {
     try {
       const xp = window.XPSystem?.read?.() || {};
-      const days = new Set(Array.isArray(xp.activeDays) ? xp.activeDays.map(dayKey).filter(Boolean) : []);
-      if (Array.isArray(xp.events)) xp.events.forEach(event => { const d = dayKey(event?.at); if (d) days.add(d); });
-      return { activeDays: [...days].sort().slice(-400) };
+      const days = new Set();
+      if (Array.isArray(xp.activeDays)) xp.activeDays.forEach((value) => {
+        const d = dayKey(value);
+        if (d) days.add(d);
+      });
+      if (Array.isArray(xp.events)) xp.events.forEach((event) => {
+        const d = dayKey(event?.at);
+        if (d) days.add(d);
+      });
+      return normalize({ activeDays: [...days] });
     } catch (_) {
       return { activeDays: [] };
     }
   }
 
+  function activityFromCloud(state) {
+    const source = state && typeof state === 'object' ? state : {};
+    const streakState = source.streakState && typeof source.streakState === 'object' ? source.streakState : {};
+    const days = [
+      ...(Array.isArray(source.activeDays) ? source.activeDays : []),
+      ...(Array.isArray(streakState.activeDays) ? streakState.activeDays : [])
+    ];
+    return normalize({ activeDays: days });
+  }
+
   function merge(local, cloud) {
     const a = normalize(local);
     const b = normalize(cloud);
-    return { activeDays: [...new Set([...(a.activeDays || []), ...(b.activeDays || [])])].sort().slice(-400) };
+    return {
+      activeDays: [...new Set([...(a.activeDays || []), ...(b.activeDays || [])])]
+        .sort()
+        .slice(-MAX_ACTIVITY_DAYS)
+    };
   }
 
   function calculateStreak(activeDays) {
@@ -55,20 +79,37 @@
       const scope = window.Class6CloudSync.prepareUser?.(user.id) || { changed: false };
       const local = scope.changed ? { activeDays: [] } : activityFromLocal();
       const row = await window.Class6CloudSync.load();
-      const cloud = row?.state?.streakState || {};
+      const sourceCloud = row?.state && typeof row.state === 'object' ? row.state : {};
+      const cloud = activityFromCloud(sourceCloud);
       const mergedDays = merge(local, cloud);
       const derived = calculateStreak(mergedDays.activeDays);
-      const merged = { activeDays: mergedDays.activeDays, streak: derived.streak, lastActive: derived.lastActive };
+      const merged = {
+        activeDays: mergedDays.activeDays,
+        streak: derived.streak,
+        lastActive: derived.lastActive
+      };
 
       const current = window.XPSystem?.read?.();
       if (current && window.XPSystem?.save) {
-        window.XPSystem.save(Object.assign({}, current, { activeDays: merged.activeDays, streakState: merged }));
+        window.XPSystem.save(Object.assign({}, current, {
+          activeDays: merged.activeDays,
+          streakState: merged
+        }));
         const result = await window.Class6CloudSync.save(window.XPSystem.read(), 1);
         window.dispatchEvent(new CustomEvent('class6:streak-cloud-synced', {
-          detail: { userId: user.id, streak: merged.streak, lastActive: merged.lastActive, activeDays: merged.activeDays, synced: result?.synced === true }
+          detail: {
+            userId: user.id,
+            streak: merged.streak,
+            lastActive: merged.lastActive,
+            activeDays: merged.activeDays,
+            synced: result?.synced === true
+          }
         }));
       } else {
-        await window.Class6CloudSync.save({ streakState: merged }, 1);
+        await window.Class6CloudSync.save({
+          activeDays: merged.activeDays,
+          streakState: merged
+        }, 1);
       }
 
       window.HomeStreak?.refresh?.();
@@ -79,7 +120,13 @@
     }
   }
 
-  window.Class6StreakCloudSync = Object.freeze({ sync, merge, calculateStreak, activityFromLocal });
+  window.Class6StreakCloudSync = Object.freeze({
+    sync,
+    merge,
+    calculateStreak,
+    activityFromLocal,
+    activityFromCloud
+  });
 
   document.addEventListener('DOMContentLoaded', () => {
     window.setTimeout(() => sync(), 0);
