@@ -28,14 +28,19 @@ This file is the project queue. When the user says `next`, continue with the fir
 - [x] Audit and repair weak/duplicate question concepts, explanations and distractors across the complete Class 6 corpus
 - [x] Make T12 and T13 final-exam syllabus coverage explicit chapter/topic contracts instead of relying only on all-material semantics
 
+## Post-Phase-8 maintenance — GK content depth upgrade
+- [x] Expand the seven Hindi GK topic tracks from compact 10-lesson sets to 15 lessons each with deeper explanations, context and examples
+- [x] Activate the new depth layer without replacing the existing GK question/progress architecture
+- [x] Synchronize the GK section overview with the expanded lesson counts and question-bank size
+
 ### Phase 8 QA boundary
 The final QA pass is repository/static verification of the committed implementation. A live browser/device session is still the appropriate place for final human visual acceptance testing; this queue does not claim a browser session was executed by the assistant.
 
 ### Maintenance QA boundary
-Revision, platform-integrity, entry/exit navigation, Sunday examination planner, Sunday examination hardening, exact weekly syllabus enforcement, candidate test UX hardening, executable weekly schedule verification, the structural question-quality hardening layer, the difficulty-blueprint hardening, the cognitive-blueprint hardening, question-corpus quality audit/repair, explicit T12/T13 final-syllabus contracts, and Progress Engine v2 are verified from committed GitHub source, route wiring, schedule/syllabus contracts, runtime assertions, existing CI execution evidence, and live user acceptance of the repaired Science learning flow. The corrected question-quality CI run #8 passed the structural audit, the difficulty hardening CI run #14 passed the schedule/paper-generation/syllabus/difficulty checks, the cognitive hardening CI run #15 passed the complete weekly examination verification including the cognitive blueprint, the challenge-review quality CI run #35 passed the complete weekly examination verification plus 144 Science challenge review explanations and production resolver wiring, final-syllabus CI run #42 passed the explicit T12/T13 contract and generated-paper scope checks, and Progress Engine runtime CI run #2 passed the progress/XP/streak regression suite.
+Revision, platform-integrity, entry/exit navigation, Sunday examination planner, Sunday examination hardening, exact weekly syllabus enforcement, candidate test UX hardening, executable weekly schedule verification, the structural question-quality hardening layer, the difficulty-blueprint hardening, the cognitive-blueprint hardening, question-corpus quality audit/repair, explicit T12/T13 final-syllabus contracts, Progress Engine v2, Science Easy-Language Aid, and the GK content-depth upgrade are verified from committed GitHub source, route wiring, schedule/syllabus contracts, runtime assertions, existing CI execution evidence, and live user acceptance of the repaired Science learning flow. The corrected question-quality CI run #8 passed the structural audit, the difficulty hardening CI run #14 passed the schedule/paper-generation/syllabus/difficulty checks, the cognitive hardening CI run #15 passed the complete weekly examination verification including the cognitive blueprint, the challenge-review quality CI run #35 passed the complete weekly examination verification plus 144 Science challenge review explanations and production resolver wiring, final-syllabus CI run #42 passed the explicit T12/T13 contract and generated-paper scope checks, and Progress Engine runtime CI run #2 passed the progress/XP/streak regression suite.
 
 ## Queue status
-**Progress Engine v2 maintenance is complete.** The implementation, migration/versioning, runtime regression coverage, subject wiring verification, Science direct-chapter routing fixes, and final user acceptance of the repaired Science learning flow are complete.
+**GK content-depth maintenance is complete.** The seven Hindi GK topics now have an additional five lessons each, the new depth layer is wired into the existing topic renderer, and the GK overview reflects the expanded lesson coverage.
 
 ## Rule for `next`
 1. Take the first unchecked task in this queue.
