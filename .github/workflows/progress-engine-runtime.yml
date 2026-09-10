@@ -1,0 +1,45 @@
+name: Progress Engine Runtime Check
+
+on:
+  push:
+    paths:
+      - 'js/xp-system.js'
+      - 'js/home-streak-v2.js'
+      - 'js/progress.js'
+      - 'js/xp-unify-bridge-v2.js'
+      - 'js/home-streak-cloud-sync.js'
+      - 'js/xp-cloud-sync.js'
+      - 'js/subject-progress-cloud-sync.js'
+      - 'scripts/check-progress-engine-runtime.mjs'
+      - 'package.json'
+      - '.github/workflows/progress-engine-runtime.yml'
+  pull_request:
+    paths:
+      - 'js/xp-system.js'
+      - 'js/home-streak-v2.js'
+      - 'js/progress.js'
+      - 'js/xp-unify-bridge-v2.js'
+      - 'js/home-streak-cloud-sync.js'
+      - 'js/xp-cloud-sync.js'
+      - 'js/subject-progress-cloud-sync.js'
+      - 'scripts/check-progress-engine-runtime.mjs'
+      - 'package.json'
+      - '.github/workflows/progress-engine-runtime.yml'
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    env:
+      TZ: Asia/Kolkata
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Validate progress engine JavaScript syntax
+        run: node --check js/xp-system.js && node --check js/home-streak-v2.js && node --check js/progress.js && node --check js/xp-unify-bridge-v2.js && node --check js/home-streak-cloud-sync.js && node --check js/xp-cloud-sync.js && node --check js/subject-progress-cloud-sync.js && node --check scripts/check-progress-engine-runtime.mjs
+      - name: Run progress engine runtime regression check
+        run: npm run check:progress-engine-runtime
