@@ -95,3 +95,14 @@ body.dark .bg-white p,body.dark .bg-white li,body.dark .bg-white strong,body.dar
 body.dark [style*="#fff"],body.dark [style*="#FFF"],body.dark [style*="#ffffff"],body.dark [style*="#FFFFFF"],body.dark [style*="background:white"],body.dark [style*="background: white"]{color:#18202a!important}
 body.dark [style*="#fff"] p,body.dark [style*="#fff"] li,body.dark [style*="#fff"] strong,body.dark [style*="#fff"] b,body.dark [style*="#fff"] span,body.dark [style*="#fff"] h1,body.dark [style*="#fff"] h2,body.dark [style*="#fff"] h3{color:#18202a!important}
 body.dark [style*="#ffffff"] p,body.dark [style*="#ffffff"] li,body.dark [style*="#ffffff"] strong,body.dark [style*="#ffffff"] b,body.dark [style*="#ffffff"] span,body.dark [style*="#ffffff"] h1,body.dark [style*="#ffffff"] h2,body.dark [style*="#ffffff"] h3{color:#18202a!important}
+
+/* Pages may define --card/--bg as light values; dark mode must override those variables at the component boundary. */
+body.dark .card,body.dark .section-card{background:#122238!important;color:#eef6ff!important;border-color:#2b405a!important}
+body.dark .card p,body.dark .section-card p{color:#d9e4ef!important}
+body.dark .card h1,body.dark .card h2,body.dark .card h3,body.dark .section-card h1,body.dark .section-card h2,body.dark .section-card h3{color:#eef6ff!important}
+body.dark .flow div{background:#14263c!important;color:#eef6ff!important;border-color:#2b405a!important}
+body.dark .flow div b{color:#f2f7ff!important}
+body.dark .flow div small{color:#a9b9ca!important}
+body.dark .example{background:#302914!important;color:#f6e7a8!important;border-left-color:#d89b16!important}
+body.dark .example b{color:#ffe79a!important}
+body.dark .chapter-nav a{background:#17304d!important;color:#c8ddff!important;border-color:#31506f!important}
