@@ -45,8 +45,10 @@ assert(has('subjects/hindi/practice.html', 'HindiProgress.recordPractice'), 'Hin
 assert(has('subjects/social-science/practice-v2.html', 'S.practice(Number(mode),score,set.length)'), 'Social Science chapter practice does not update mastery.');
 assert(has('subjects/maths/maths-exam.js', "localStorage.setItem(key,JSON.stringify(h.slice(0,20)))"), 'Maths exam does not persist attempt history for the unified bridge.');
 
-assert(has('index.html', '<script src="js/progress.js"></script>'), 'Science main route lost legacy progress initialization.');
-assert(has('index.html', '<script src="js/xp-system.js?v=4"></script>'), 'Science main route lost canonical XPSystem.');
+const index = read('index.html');
+assert(/<script src="js\/progress\.js(?:\?v=\d+)?"><\/script>/.test(index), 'Science main route lost legacy progress initialization.');
+assert(/<script src="js\/xp-system\.js(?:\?v=\d+)?"><\/script>/.test(index), 'Science main route lost canonical XPSystem.');
 assert(has('index.html', '<script src="js/xp-unify-bridge-v2.js?v=2"></script>'), 'Science main route lost unified XP bridge.');
+assert(has('js/progress.js', 'window.Progress=Progress;'), 'Science progress API is not exposed on window for the app runtime.');
 
 console.log('Subject progress wiring check PASSED: GK, English, Hindi, Social Science, Maths and Science learning/test routes are connected to their progress APIs and the unified XP bridge where required.');
