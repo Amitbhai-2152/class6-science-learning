@@ -7,7 +7,7 @@ This file is the project queue. When the user says `next`, continue with the fir
 - [x] Establish a single learning-activity date source for streak calculations
 - [x] Migrate XP and progress consumers without losing existing user state
 - [x] Harden streak persistence and cloud merging around activity dates
-- [ ] Add runtime regression checks for progress/XP/streak invariants
+- [x] Add runtime regression checks for progress/XP/streak invariants
 - [ ] Add migration/versioning for the new progress state
 - [ ] Verify the migrated system across the main learning flows and leave final visual acceptance for a live browser/device session
 
@@ -32,10 +32,10 @@ This file is the project queue. When the user says `next`, continue with the fir
 The final QA pass is repository/static verification of the committed implementation. A live browser/device session is still the appropriate place for final human visual acceptance testing; this queue does not claim a browser session was executed by the assistant.
 
 ### Maintenance QA boundary
-Revision, platform-integrity, entry/exit navigation, Sunday examination planner, Sunday examination hardening, exact weekly syllabus enforcement, candidate test UX hardening, executable weekly schedule verification, the structural question-quality hardening layer, the difficulty-blueprint hardening, the cognitive-blueprint hardening, question-corpus quality audit/repair, and explicit T12/T13 final-syllabus contracts are verified from committed GitHub source, route wiring, schedule/syllabus contracts, runtime assertions and CI execution. A live browser/device session is still the appropriate place for final human visual acceptance testing; the repository does not claim such a session was executed by the assistant. The corrected question-quality CI run #8 passed the structural audit, the difficulty hardening CI run #14 passed the schedule/paper-generation/syllabus/difficulty checks, the cognitive hardening CI run #15 passed the complete weekly examination verification including the cognitive blueprint, the challenge-review quality CI run #35 passed the complete weekly examination verification plus 144 Science challenge review explanations and production resolver wiring, and final-syllabus CI run #42 passed the explicit T12/T13 contract and generated-paper scope checks.
+Revision, platform-integrity, entry/exit navigation, Sunday examination planner, Sunday examination hardening, exact weekly syllabus enforcement, candidate test UX hardening, executable weekly schedule verification, the structural question-quality hardening layer, the difficulty-blueprint hardening, the cognitive-blueprint hardening, question-corpus quality audit/repair, and explicit T12/T13 final-syllabus contracts are verified from committed GitHub source, route wiring, schedule/syllabus contracts, runtime assertions and CI execution. A live browser/device session is still the appropriate place for final human visual acceptance testing; the repository does not claim such a session was executed by the assistant. The corrected question-quality CI run #8 passed the structural audit, the difficulty hardening CI run #14 passed the schedule/paper-generation/syllabus/difficulty checks, the cognitive hardening CI run #15 passed the complete weekly examination verification including the cognitive blueprint, the challenge-review quality CI run #35 passed the complete weekly examination verification plus 144 Science challenge review explanations and production resolver wiring, final-syllabus CI run #42 passed the explicit T12/T13 contract and generated-paper scope checks, and Progress Engine runtime CI run #2 passed the progress/XP/streak regression suite.
 
 ## Queue status
-**Progress Engine v2 maintenance is now the active queue.** The audit, canonical activity-date source, XP/progress consumer migration, and streak cloud hardening tasks are verified; three verification/migration tasks remain.
+**Progress Engine v2 maintenance is now the active queue.** The audit, canonical activity-date source, XP/progress consumer migration, streak cloud hardening, and runtime regression checks are verified; two migration/verification tasks remain.
 
 ## Rule for `next`
 1. Take the first unchecked task in this queue.
