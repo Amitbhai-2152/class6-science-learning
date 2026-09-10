@@ -11,6 +11,7 @@ on:
       - 'js/xp-cloud-sync.js'
       - 'js/subject-progress-cloud-sync.js'
       - 'scripts/check-progress-engine-runtime.mjs'
+      - 'scripts/check-progress-state-migration.mjs'
       - 'package.json'
       - '.github/workflows/progress-engine-runtime.yml'
   pull_request:
@@ -23,6 +24,7 @@ on:
       - 'js/xp-cloud-sync.js'
       - 'js/subject-progress-cloud-sync.js'
       - 'scripts/check-progress-engine-runtime.mjs'
+      - 'scripts/check-progress-state-migration.mjs'
       - 'package.json'
       - '.github/workflows/progress-engine-runtime.yml'
   workflow_dispatch:
@@ -40,6 +42,8 @@ jobs:
         with:
           node-version: 22
       - name: Validate progress engine JavaScript syntax
-        run: node --check js/xp-system.js && node --check js/home-streak-v2.js && node --check js/progress.js && node --check js/xp-unify-bridge-v2.js && node --check js/home-streak-cloud-sync.js && node --check js/xp-cloud-sync.js && node --check js/subject-progress-cloud-sync.js && node --check scripts/check-progress-engine-runtime.mjs
+        run: node --check js/xp-system.js && node --check js/home-streak-v2.js && node --check js/progress.js && node --check js/xp-unify-bridge-v2.js && node --check js/home-streak-cloud-sync.js && node --check js/xp-cloud-sync.js && node --check js/subject-progress-cloud-sync.js && node --check scripts/check-progress-engine-runtime.mjs && node --check scripts/check-progress-state-migration.mjs
       - name: Run progress engine runtime regression check
         run: npm run check:progress-engine-runtime
+      - name: Run progress state migration check
+        run: npm run check:progress-state-migration
