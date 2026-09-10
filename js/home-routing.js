@@ -64,7 +64,7 @@
     });
   }
   function routeDirectScienceChapter(chapter,attempt){
-    if(typeof window.openChapter==='function' && Array.isArray(window.CHAPTERS) && window.CHAPTERS.length>=chapter && window.Progress?.data){
+    if(typeof window.openChapter==='function' && Array.isArray(window.CHAPTERS) && window.CHAPTERS.length>=chapter){
       try{
         window.openChapter(chapter,0);
         window.goHome=function(){location.href='subjects/science/index.html';};
