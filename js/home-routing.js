@@ -64,7 +64,7 @@
     });
   }
   function routeDirectScienceChapter(chapter,attempt){
-    if(typeof window.openChapter==='function'){
+    if(typeof window.openChapter==='function' && Array.isArray(window.CHAPTERS) && window.CHAPTERS.length>=chapter && window.Progress?.data){
       try{
         window.openChapter(chapter,0);
         window.goHome=function(){location.href='subjects/science/index.html';};
@@ -72,7 +72,7 @@
         return true;
       }catch(_){/* retry after the application finishes booting */}
     }
-    if(attempt<40)setTimeout(()=>routeDirectScienceChapter(chapter,attempt+1),25);
+    if(attempt<160)setTimeout(()=>routeDirectScienceChapter(chapter,attempt+1),25);
     return false;
   }
   function route(){
@@ -94,5 +94,10 @@
       if(view==='science-cbt' && window.ScienceCBT?.open){window.ScienceCBT.open();return;}
     }catch(_){/* keep homepage usable if routing fails */}
   }
-  route();
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',route,{once:true});
+  }else{
+    route();
+  }
 })();
