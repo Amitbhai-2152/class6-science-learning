@@ -10,8 +10,14 @@ on:
       - 'js/home-streak-cloud-sync.js'
       - 'js/xp-cloud-sync.js'
       - 'js/subject-progress-cloud-sync.js'
+      - 'subjects/gk/**'
+      - 'subjects/english/**'
+      - 'subjects/hindi/**'
+      - 'subjects/social-science/**'
+      - 'subjects/maths/**'
       - 'scripts/check-progress-engine-runtime.mjs'
       - 'scripts/check-progress-state-migration.mjs'
+      - 'scripts/check-subject-progress-wiring.mjs'
       - 'package.json'
       - '.github/workflows/progress-engine-runtime.yml'
   pull_request:
@@ -23,8 +29,14 @@ on:
       - 'js/home-streak-cloud-sync.js'
       - 'js/xp-cloud-sync.js'
       - 'js/subject-progress-cloud-sync.js'
+      - 'subjects/gk/**'
+      - 'subjects/english/**'
+      - 'subjects/hindi/**'
+      - 'subjects/social-science/**'
+      - 'subjects/maths/**'
       - 'scripts/check-progress-engine-runtime.mjs'
       - 'scripts/check-progress-state-migration.mjs'
+      - 'scripts/check-subject-progress-wiring.mjs'
       - 'package.json'
       - '.github/workflows/progress-engine-runtime.yml'
   workflow_dispatch:
@@ -42,8 +54,10 @@ jobs:
         with:
           node-version: 22
       - name: Validate progress engine JavaScript syntax
-        run: node --check js/xp-system.js && node --check js/home-streak-v2.js && node --check js/progress.js && node --check js/xp-unify-bridge-v2.js && node --check js/home-streak-cloud-sync.js && node --check js/xp-cloud-sync.js && node --check js/subject-progress-cloud-sync.js && node --check scripts/check-progress-engine-runtime.mjs && node --check scripts/check-progress-state-migration.mjs
+        run: node --check js/xp-system.js && node --check js/home-streak-v2.js && node --check js/progress.js && node --check js/xp-unify-bridge-v2.js && node --check js/home-streak-cloud-sync.js && node --check js/xp-cloud-sync.js && node --check js/subject-progress-cloud-sync.js && node --check scripts/check-progress-engine-runtime.mjs && node --check scripts/check-progress-state-migration.mjs && node --check scripts/check-subject-progress-wiring.mjs && node --check subjects/gk/gk-progress-hi.js && node --check subjects/gk/hi-progress-engine.js && node --check subjects/gk/gk-progress-hi.js && node --check subjects/english/english-progress.js && node --check subjects/hindi/hindi-progress.js && node --check subjects/social-science/social-science-progress.js && node --check subjects/maths/maths-exam.js
       - name: Run progress engine runtime regression check
         run: npm run check:progress-engine-runtime
       - name: Run progress state migration check
         run: npm run check:progress-state-migration
+      - name: Run subject progress wiring audit
+        run: npm run check:subject-progress-wiring
