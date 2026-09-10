@@ -8,6 +8,7 @@
     "check:weekly-exam": "node scripts/check-weekly-exam.mjs",
     "check:weekly-exam-runtime": "node scripts/check-weekly-exam-runtime.mjs",
     "check:progress-engine-runtime": "node scripts/check-progress-engine-runtime.mjs",
+    "check:progress-state-migration": "node scripts/check-progress-state-migration.mjs",
     "check:challenge-review-quality": "node scripts/check-challenge-review-quality.mjs",
     "check:final-syllabus": "node scripts/check-final-syllabus-contract.mjs",
     "check:all-tests-validation": "node scripts/check-all-tests-validation.mjs",
