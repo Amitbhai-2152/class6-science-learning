@@ -1,5 +1,6 @@
 (function(){
 'use strict';
+
 function dayKey(value){
   const d=value instanceof Date?value:new Date(value);
   if(Number.isNaN(d.getTime()))return null;
@@ -11,10 +12,19 @@ function getEvents(){
     return Array.isArray(state?.events)?state.events:[];
   }catch(_){return[]}
 }
-function getEventStreak(){
-  const days=new Set(getEvents().map(e=>dayKey(e?.at)).filter(Boolean));
+function getActivityDays(){
+  const days=new Set();
+  getEvents().forEach(e=>{const d=dayKey(e?.at);if(d)days.add(d)});
+  try{
+    const xpDays=window.XPSystem?.read?.()?.activeDays;
+    if(Array.isArray(xpDays))xpDays.forEach(d=>{const key=dayKey(d);if(key)days.add(key)});
+  }catch(_){ }
+  return days;
+}
+function getCalendarStreak(){
+  const days=getActivityDays();
+  if(!days.size)return 0;
   let cursor=new Date();
-  if(!days.has(dayKey(cursor)))return 0;
   let streak=0;
   while(days.has(dayKey(cursor))){
     streak++;
@@ -22,30 +32,24 @@ function getEventStreak(){
   }
   return streak;
 }
-function readPersistedScience(){
-  try{
-    const raw=localStorage.getItem('class6ScienceProgressV9');
-    const p=raw?JSON.parse(raw):null;
-    return p&&typeof p==='object'?p:null;
-  }catch(_){return null}
-}
 function getScienceProgressStreak(){
   try{
-    const persisted=readPersistedScience();
+    const persisted=localStorage.getItem('class6ScienceProgressV9');
+    const p=persisted?JSON.parse(persisted):null;
+    const last=p?.lastActive;
     const today=dayKey(new Date());
-    const diskStreak=persisted?.lastActive&&dayKey(persisted.lastActive)===today?Math.max(0,Number(persisted.streak)||0):0;
-    const memory=window.Progress?.data;
-    const memoryStreak=memory?.lastActive&&dayKey(memory.lastActive)===today?Math.max(0,Number(memory.streak)||0):0;
-    return Math.max(diskStreak,memoryStreak);
+    if(!last||dayKey(last)!==today)return 0;
+    return Math.max(0,Number(p.streak)||0);
   }catch(_){return 0}
 }
 function getCloudStreak(){
   try{
-    return Math.max(0,Number(window.XPSystem?.read?.()?.streakState?.streak)||0);
+    const state=window.XPSystem?.read?.()||{};
+    return Math.max(0,Number(state.streakState?.streak)||0);
   }catch(_){return 0}
 }
 function getStreak(){
-  return Math.max(getEventStreak(),getScienceProgressStreak(),getCloudStreak());
+  return Math.max(getCalendarStreak(),getScienceProgressStreak(),getCloudStreak());
 }
 function refresh(){
   const streak=getStreak();
@@ -66,10 +70,11 @@ function watchDisplays(){
   targets.forEach(el=>observer.observe(el,{childList:true,characterData:true,subtree:true}));
   refresh();
 }
-window.HomeStreak={refresh,getStreak};
+window.HomeStreak={refresh,getStreak,getActivityDays};
 window.addEventListener('DOMContentLoaded',()=>{refresh();watchDisplays()},{once:true});
 window.addEventListener('load',()=>{refresh();watchDisplays()},{once:true});
 window.addEventListener('xp:earned',refresh);
+window.addEventListener('xp:activity',refresh);
 window.addEventListener('science:xp',refresh);
 window.addEventListener('class6:streak-cloud-synced',refresh);
 window.addEventListener('storage',refresh);
