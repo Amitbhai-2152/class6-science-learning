@@ -43,9 +43,13 @@ on:
       - '.github/workflows/progress-engine-runtime.yml'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     env:
       TZ: Asia/Kolkata
     steps:
