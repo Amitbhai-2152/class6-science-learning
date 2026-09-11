@@ -13,11 +13,12 @@ const cloud = read('js/cloud-sync.js');
 const xpCloud = read('js/xp-cloud-sync.js');
 const bridge = read('js/xp-unify-bridge-v2.js');
 
-// Canonical engine must load before the Science compatibility wrapper.
-const xpIndex = index.indexOf('js/xp-system.js?v=');
-const progressIndex = index.indexOf('js/progress.js?v=');
-assert(xpIndex >= 0 && progressIndex >= 0 && xpIndex < progressIndex, 'index.html must load canonical XPSystem before Science Progress.');
+// The compatibility wrapper must bootstrap cleanly without document.write and
+// reconcile again once the canonical engine has loaded later in the page.
+assert(index.includes('js/progress.js?v='), 'Science Progress cache-busting is missing.');
+assert(index.includes('js/xp-system.js?v='), 'Canonical XPSystem cache-busting is missing.');
 assert(!progress.includes("document.write('<script src=\"xp-system.js"), 'Science Progress must not use a document.write XPSystem fallback in production.');
+assert(progress.includes("document.addEventListener('DOMContentLoaded',()=>{try{Progress.syncCanonicalView()}catch(_){}},{once:true})"), 'Science Progress must reconcile after the canonical XP engine bootstraps.');
 assert(!progress.includes('this.data.xp+='), 'Legacy Science Progress must not directly mutate canonical XP totals.');
 assert(!progress.includes('this.data.streak++'), 'Legacy Science Progress must not directly mutate canonical streaks.');
 assert(progress.includes("canonicalAward(action,content,points,meta={})"), 'Science Progress canonical award boundary was removed.');
@@ -62,6 +63,6 @@ assert(!xpCloud.includes('class6ChapterCompletionsV1'), 'XP cloud sync must not 
 
 // Unified bridge is a compatibility adapter only.
 assert(bridge.includes('x.score(') && bridge.includes('x.award('), 'Unified XP bridge must remain a thin canonical adapter.');
-assert(!bridge.includes('localStorage.setItem(\'class6XPSystemV1\''), 'XP bridge must not persist canonical XP state directly.');
+assert(!bridge.includes("localStorage.setItem('class6XPSystemV1'"), 'XP bridge must not persist canonical XP state directly.');
 
-console.log('PHASE 10 PRODUCTION CLEANUP PASSED: canonical load order, removal of document.write fallback, cache-busting, legacy compatibility ownership, user-scope cleanup boundaries and canonical XP bridge isolation verified.');
+console.log('PHASE 10 PRODUCTION CLEANUP PASSED: document.write fallback removed, post-bootstrap reconciliation retained, cache-busting verified, legacy compatibility ownership constrained, user-scope cleanup boundaries preserved and canonical XP bridge isolation verified.');
