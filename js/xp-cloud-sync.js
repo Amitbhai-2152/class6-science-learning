@@ -28,9 +28,10 @@
   }
   function migrateState(input){const x=input&&typeof input==='object'?input:{};if(Number(x.version)===STATE_VERSION||Number(x.version)===1||!Number.isFinite(Number(x.version)))return normalizeState(x);return normalizeState({})}
   function mergeStates(localState,cloudState){
-    const local=migrateState(localState),remote=migrateState(cloudState),merged=clone(local);Object.keys(merged.subjects).forEach(subject=>{merged.subjects[subject]=Math.max(local.subjects[subject]||0,remote.subjects[subject]||0)});
-    const seen=new Set(),combined=[];[...(local.events||[]),...(remote.events||[])].forEach(event=>{const key=String(event?.key||`${event?.subject||''}|${event?.action||''}|${event?.content||''}|${event?.at||''}`);if(seen.has(key))return;seen.add(key);combined.push(event)});combined.sort((a,b)=>String(b?.at||'').localeCompare(String(a?.at||'')));
-    merged.events=combined.slice(0,500);merged.activeDays=[...new Set([...(local.activeDays||[]),...(remote.activeDays||[]),...merged.events.map(e=>dayKey(e?.at)).filter(Boolean)])].sort().slice(-MAX_ACTIVITY_DAYS);
+    const local=migrateState(localState),remote=migrateState(cloudState),merged=clone(remote);
+    Object.keys(merged.subjects).forEach(subject=>{merged.subjects[subject]=Math.max(local.subjects[subject]||0,remote.subjects[subject]||0)});
+    const seen=new Set(),combined=[];[...(remote.events||[]),...(local.events||[])].forEach(event=>{const key=String(event?.key||`${event?.subject||''}|${event?.action||''}|${event?.content||''}|${event?.at||''}`);if(seen.has(key))return;seen.add(key);combined.push(event)});combined.sort((a,b)=>String(b?.at||'').localeCompare(String(a?.at||'')));
+    merged.events=combined.slice(0,500);merged.activeDays=[...new Set([...(remote.activeDays||[]),...(local.activeDays||[]),...merged.events.map(e=>dayKey(e?.at)).filter(Boolean)])].sort().slice(-MAX_ACTIVITY_DAYS);
     const ld=local.daily||{},rd=remote.daily||{};merged.daily=String(ld.date||'')===String(rd.date||'')?{date:String(ld.date||rd.date||''),earned:Math.max(Number(ld.earned)||0,Number(rd.earned)||0)}:(String(ld.date||'')>String(rd.date||'')?ld:rd);
     merged.version=STATE_VERSION;merged.activitySource=ACTIVITY_SOURCE;merged.legacySeeded=Boolean(local.legacySeeded||remote.legacySeeded);return merged;
   }
@@ -56,6 +57,9 @@
         if(!window.XPSystem?.read||!window.XPSystem?.save)return{synced:false,reason:'xp_system_unavailable'};
         const user=await getUserWithRetries();if(!user){scheduleRetry(2500);return{synced:false,reason:'not_signed_in'}}
         const scope=window.Class6CloudSync.prepareUser?.(user.id)||{changed:false};
+        // A user switch invalidates every browser-local cache, including any
+        // pending marker left by the previous account. Never merge old-user data.
+        if(scope.changed){clearDirty()}
         const row=await window.Class6CloudSync.load();
         const before=clone(window.XPSystem.read());
         const cloud=migrateState(row?.state||{});
@@ -65,9 +69,8 @@
         const pendingLocal=Boolean(dirtyMarker?.dirty)&&(!dirtyMarker.userId||dirtyMarker.userId===String(user.id).trim());
         const dirtySeq=dirtyMarker?.seq||0;
         const localIsCurrent=!scope.changed&&localRevision>0&&localRevision===cloudRevision;
-        // Revision drift normally means this browser has stale cached state.
-        // A persistent dirty marker proves XP/activity was created locally after
-        // the last successful sync, so those changes must be merged before cloud wins.
+        // Hydration is cloud-first for a clean or stale browser cache. Only an
+        // explicitly pending local mutation is allowed to merge back into cloud.
         const merged=scope.changed?cloud:(pendingLocal?mergeStates(before,cloud):(!row||!cloudRevision||localIsCurrent?mergeStates(before,cloud):cloud));
         const changed=JSON.stringify(normalizeState(before))!==JSON.stringify(normalizeState(merged));
         window.XPSystem.save(merged);
