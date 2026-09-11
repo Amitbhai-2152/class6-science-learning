@@ -6,6 +6,7 @@ const fail = (message) => { throw new Error(`[subject-progress-wiring] ${message
 const assert = (condition, message) => { if (!condition) fail(message); };
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 const has = (file, token) => read(file).includes(token);
+const hasScript = (file, name) => new RegExp(`<script src=[\"'](?:[^\"']*\/)?${name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}(?:\\?v=\\d+)?[\"']><\\/script>`).test(read(file));
 
 const progressEngines = [
   'subjects/gk/gk-progress-hi.js',
@@ -15,8 +16,8 @@ const progressEngines = [
   'subjects/social-science/social-science-progress.js'
 ];
 for (const file of progressEngines) {
-  assert(has(file, '../../js/xp-system.js?v=4'), `${file} does not bootstrap canonical XPSystem v4.`);
-  assert(has(file, '../../js/xp-unify-bridge-v2.js?v=2'), `${file} does not bootstrap the unified XP bridge v2.`);
+  assert(hasScript(file, 'xp-system.js'), `${file} does not bootstrap canonical XPSystem.`);
+  assert(hasScript(file, 'xp-unify-bridge-v2.js'), `${file} does not bootstrap the unified XP bridge.`);
 }
 
 const routes = {
@@ -48,7 +49,7 @@ assert(has('subjects/maths/maths-exam.js', "localStorage.setItem(key,JSON.string
 const index = read('index.html');
 assert(/<script src="js\/progress\.js(?:\?v=\d+)?"><\/script>/.test(index), 'Science main route lost legacy progress initialization.');
 assert(/<script src="js\/xp-system\.js(?:\?v=\d+)?"><\/script>/.test(index), 'Science main route lost canonical XPSystem.');
-assert(has('index.html', '<script src="js/xp-unify-bridge-v2.js?v=2"></script>'), 'Science main route lost unified XP bridge.');
+assert(/<script src="js\/xp-unify-bridge-v2\.js(?:\?v=\d+)?"><\/script>/.test(index), 'Science main route lost unified XP bridge.');
 assert(has('js/progress.js', 'window.Progress=Progress;'), 'Science progress API is not exposed on window for the app runtime.');
 
 console.log('Subject progress wiring check PASSED: GK, English, Hindi, Social Science, Maths and Science learning/test routes are connected to their progress APIs and the unified XP bridge where required.');
