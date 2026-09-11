@@ -208,8 +208,10 @@
   });
 
   window.Class6CloudSync?.getClient?.().then((client) => {
-    client?.auth?.onAuthStateChange?.(() => {
-      markAwaitingCloud();
+    client?.auth?.onAuthStateChange?.((event) => {
+      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'USER_UPDATED') {
+        markAwaitingCloud();
+      }
       sync();
     });
   }).catch(() => {});
