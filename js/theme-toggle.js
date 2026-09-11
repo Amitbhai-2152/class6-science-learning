@@ -60,3 +60,17 @@ window.addEventListener('DOMContentLoaded',()=>{apply(read());ensureButton();},{
 window.addEventListener('load',()=>{apply(read());ensureButton();},{once:true});
 window.ThemeToggle={getTheme:read,apply,toggle};
 })();
+
+// Universal chapter-completion bridge: pages that already load theme-toggle.js
+// automatically get the shared completion module and cross-subject completion hooks.
+(function(){
+  try{
+    if(document.querySelector('script[data-universal-chapter-completion-bridge]'))return;
+    const src=new URL('./chapter-completion-bridge.js?v=4',SCRIPT_SRC||location.href).href;
+    const s=document.createElement('script');
+    s.src=src;
+    s.async=false;
+    s.setAttribute('data-universal-chapter-completion-bridge','true');
+    (document.head||document.documentElement).appendChild(s);
+  }catch(_){}
+})();
