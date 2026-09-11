@@ -5,5 +5,4 @@ Allow: /
 Disallow: /auth.html
 Disallow: /auth/
 
-# Sitemap URL is intentionally omitted here because the production host/domain is deployment-specific.
-# Submit /sitemap.xml directly in Google Search Console after confirming the live site URL.
+Sitemap: https://amitbhai-2152.github.io/class6-science-learning/sitemap.xml
