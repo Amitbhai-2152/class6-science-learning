@@ -7,6 +7,12 @@
   // Each update needs a unique id, date, title and message.
   const UPDATES = [
     {
+      id: '2026-09-11-science-chapter-1',
+      date: '11 Sep 2026',
+      title: '📢 जरूरी सूचना: Science Chapter 1 पढ़ें',
+      message: 'सभी students आज Science का Chapter 1 जरूर पढ़ें और उसका अभ्यास पूरा करें। इसे pending छोड़ने पर अतिरिक्त study work दिया जा सकता है—इसलिए समय पर पूरा करें।'
+    },
+    {
       id: '2026-09-11-progress',
       date: '11 Sep 2026',
       title: '📊 Progress System Improved',
