@@ -14,7 +14,7 @@
 <section class="card tutor-note"><div><strong>🤖 Maths Tutor</strong><div style="color:var(--muted);font-size:12px;margin-top:3px">किसी भी Maths question का concept, hint, example या पूरा solution पूछो।</div></div><button class="tutor-btn" type="button" onclick="MathsTutor.open()">Tutor खोलें</button></section>
 </main>
 <script src="chapters/chapter-01.js"></script><script src="chapters/chapter-02.js"></script><script src="chapters/chapter-03.js"></script><script src="chapters/chapter-04.js"></script><script src="chapters/chapter-05.js"></script><script src="chapters/chapter-06.js"></script><script src="chapters/chapter-07.js"></script><script src="chapters/chapter-08.js"></script>
-<script src="../../js/ai-config.js?v=10"></script><script src="../../js/ai-tutor-client.js?v=10"></script><script src="maths-tutor.js?v=10"></script><script src="../../js/ai-tutor-bridge.js?v=10"></script><script src="challenge-engine.js?v=3"></script>
+<script src="../../js/ai-config.js?v=10"></script><script src="../../js/ai-tutor-client.js?v=10"></script><script src="maths-tutor.js?v=10"></script><script src="../../js/ai-tutor-bridge.js?v=10"></script><script src="challenge-engine.js?v=4"></script>
 <script>
 (function(){
  const chapters=[1,2,3,4,5,6,7,8].map(n=>window['mathsChapter0'+n]).filter(Boolean);
@@ -36,7 +36,15 @@
    if(s.think)extras+=`<div class="knowledge think"><b>🤔 सोचो</b>${esc(s.think)}</div>`;
    return `<article class="section-card"><div class="section-no">SECTION ${i+1} / ${sections.length}</div><h3>${esc(s.title)}</h3><p class="body">${esc(s.body)}</p>${extras?`<div class="knowledge-grid">${extras}</div>`:''}</article>`;
  }).join('');
+ const mount=document.getElementById('challengeMount');
  if(window.MathsChallenge)window.MathsChallenge.show(c);
+ else if(mount){
+   mount.innerHTML=`<div class="mc-hero"><div class="mc-badge">🎯 CHALLENGE MODE</div><h3>${esc(c.title)} Challenge</h3><p>10 तक mixed questions • पहले सोचो, फिर answer चुनो • submit के बाद पूरा review</p><div class="mc-stats"><span>🧩 ${Math.min(10,(c.challenge||[]).length)} Questions</span><span>🚫 No negative marking</span></div><button type="button" class="mc-primary" id="mcFallbackStart">Challenge शुरू करें 🚀</button><p id="mcLoadNote" class="mc-hint">Challenge engine load हो रहा है…</p></div>`;
+   const retry=()=>{if(window.MathsChallenge){window.MathsChallenge.show(c)}else setTimeout(retry,100)};
+   const btn=document.getElementById('mcFallbackStart');
+   if(btn)btn.onclick=retry;
+   retry();
+ }
 })();
 </script>
 </body></html>
