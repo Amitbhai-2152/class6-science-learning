@@ -37,11 +37,10 @@
   function getRevision(){try{return Math.max(0,Number(localStorage.getItem(REVISION_KEY))||0)}catch(_){return 0}}
   function setRevision(value){try{localStorage.setItem(REVISION_KEY,String(Math.max(0,Number(value)||0)))}catch(_){}
   }
-  function getDirty(){try{const raw=localStorage.getItem(DIRTY_KEY);if(!raw)return null;const data=JSON.parse(raw);return data&&data.dirty?{dirty:true,userId:String(data.userId||'').trim()}:null}catch(_){return null}}
-  function markDirty(){try{let userId='';try{userId=String(localStorage.getItem(OWNER_KEY)||'').trim()}catch(_){}localStorage.setItem(DIRTY_KEY,JSON.stringify({dirty:true,userId,at:new Date().toISOString()}))}catch(_){}
+  function getDirty(){try{const raw=localStorage.getItem(DIRTY_KEY);if(!raw)return null;const data=JSON.parse(raw);if(!data||!data.dirty)return null;const seq=Math.max(0,Number(data.seq)||0);return{dirty:true,userId:String(data.userId||'').trim(),seq,at:String(data.at||'')}}catch(_){return null}}
+  function markDirty(){try{let userId='';try{userId=String(localStorage.getItem(OWNER_KEY)||'').trim()}catch(_){}const current=getDirty();const seq=(current?.seq||0)+1;localStorage.setItem(DIRTY_KEY,JSON.stringify({dirty:true,userId,seq,at:new Date().toISOString()}))}catch(_){}
   }
-  function clearDirty(){try{localStorage.removeItem(DIRTY_KEY)}catch(_){}
-  }
+  function clearDirty(expectedSeq=null,userId=''){try{const current=getDirty();if(!current)return true;if(expectedSeq!==null&&current.seq!==Number(expectedSeq))return false;if(userId&&current.userId&&current.userId!==String(userId).trim())return false;localStorage.removeItem(DIRTY_KEY);return true}catch(_){return false}}
   function hasPendingLocalChanges(userId){const marker=getDirty();if(!marker?.dirty)return false;return !marker.userId||marker.userId===String(userId||'').trim()}
   async function getUserWithRetries(){for(let i=0;i<USER_RETRY_DELAYS.length;i+=1){const delay=USER_RETRY_DELAYS[i];if(delay)await new Promise(r=>window.setTimeout(r,delay));try{const user=await window.Class6CloudSync.getUser();if(user)return user}catch(error){if(i===USER_RETRY_DELAYS.length-1)throw error}}return null}
   function scheduleRetry(delay=2500){if(retryTimer)return;retryTimer=window.setTimeout(()=>{retryTimer=null;requestSync(0)},delay)}
@@ -62,8 +61,10 @@
         const cloud=migrateState(row?.state||{});
         const cloudRevision=Math.max(0,Number(row?.schema_version)||0);
         const localRevision=getRevision();
+        const dirtyMarker=getDirty();
+        const pendingLocal=Boolean(dirtyMarker?.dirty)&&(!dirtyMarker.userId||dirtyMarker.userId===String(user.id).trim());
+        const dirtySeq=dirtyMarker?.seq||0;
         const localIsCurrent=!scope.changed&&localRevision>0&&localRevision===cloudRevision;
-        const pendingLocal=hasPendingLocalChanges(user.id);
         // Revision drift normally means this browser has stale cached state.
         // A persistent dirty marker proves XP/activity was created locally after
         // the last successful sync, so those changes must be merged before cloud wins.
@@ -73,8 +74,9 @@
         const result=changed?await window.Class6CloudSync.save(merged,STATE_VERSION):{synced:true,userId:user.id,noChange:true,revision:cloudRevision};
         if(result?.synced){
           if(Number.isFinite(Number(result.revision)))setRevision(result.revision);
-          clearDirty();
-          window.dispatchEvent(new CustomEvent('class6:xp-cloud-synced',{detail:{userId:user.id,version:STATE_VERSION,total:merged.total,subjects:Object.assign({},merged.subjects),activeDays:merged.activeDays.length,changed,cloudRevision:Number(result.revision)||cloudRevision,hydratedFromCloud:Boolean(!pendingLocal&&!localIsCurrent&&!scope.changed&&row)}}));
+          const cleared=clearDirty(dirtySeq,user.id);
+          if(!cleared||hasPendingLocalChanges(user.id))rerunAfterSync=true;
+          window.dispatchEvent(new CustomEvent('class6:xp-cloud-synced',{detail:{userId:user.id,version:STATE_VERSION,total:merged.total,subjects:Object.assign({},merged.subjects),activeDays:merged.activeDays.length,changed,cloudRevision:Number(result.revision)||cloudRevision,hydratedFromCloud:Boolean(!pendingLocal&&!localIsCurrent&&!scope.changed&&row),pendingAfterSync:Boolean(!cleared||hasPendingLocalChanges(user.id))}}));
         } else if(result?.reason==='not_signed_in')scheduleRetry(2500);
         return result;
       }catch(error){console.error('Class 6 XP cloud sync failed:',error);scheduleRetry(2500);return{synced:false,reason:'sync_error',error:String(error?.message||error)}}
