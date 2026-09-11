@@ -39,7 +39,7 @@ This file is the project queue. When the user says `next`, continue with the fir
 
 ## Post-Phase-8 maintenance — Chapter completion celebration
 - [x] Add a reusable animated chapter-clear overlay with first-clear persistence and reduced-motion support without changing learning content
-- [x] Wire chapter-clear celebration to Science's existing `Progress.complete` threshold and English's existing Chapter Practice threshold
+- [x] Wire chapter-clear celebration to the Science, English, Maths, Hindi and GK chapter/topic mastery thresholds used by their existing learning flows
 
 ### Phase 8 QA boundary
 The final QA pass is repository/static verification of the committed implementation. A live browser/device session is still the appropriate place for final human visual acceptance testing; this queue does not claim a browser session was executed by the assistant.
@@ -48,7 +48,7 @@ The final QA pass is repository/static verification of the committed implementat
 Revision, platform-integrity, entry/exit navigation, Sunday examination planner, Sunday examination hardening, exact weekly syllabus enforcement, candidate test UX hardening, executable weekly schedule verification, the structural question-quality hardening layer, the difficulty-blueprint hardening, the cognitive-blueprint hardening, question-corpus quality audit/repair, explicit T12/T13 final-syllabus contracts, Progress Engine v2, Science Easy-Language Aid, the GK content-depth upgrade, the GK lesson-question alignment, the Global dark-theme consistency fix, and the chapter completion celebration are verified from committed GitHub source, route wiring, schedule/syllabus contracts, runtime assertions, existing CI execution evidence, and live user acceptance of the repaired Science learning flow. The corrected question-quality CI run #8 passed the structural audit, the difficulty hardening CI run #14 passed the schedule/paper-generation/syllabus/difficulty checks, the cognitive hardening CI run #15 passed the complete weekly examination verification including the cognitive blueprint, the challenge-review quality CI run #35 passed the complete weekly examination verification plus 144 Science challenge review explanations and production resolver wiring, final-syllabus CI run #42 passed the explicit T12/T13 contract and generated-paper scope checks, and Progress Engine runtime CI run #2 passed the progress/XP/streak regression suite.
 
 ## Queue status
-**Chapter completion celebration is complete.** A reusable completion overlay now celebrates first-time chapter clearance, uses the existing mastery thresholds, persists the first-clear state separately, and keeps learning content unchanged.
+**Chapter completion celebration is complete.** A reusable completion overlay now celebrates first-time clearance across the chapter-bearing learning flows, uses each flow's existing mastery threshold, persists first-clear state separately, supports reduced-motion behavior, and keeps learning content unchanged.
 
 ## Rule for `next`
 1. Take the first unchecked task in this queue.
