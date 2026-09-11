@@ -23,7 +23,7 @@ const Progress={
  strongest(){const a=Object.entries(this.data.best).filter(([id])=>Number(id)>0);return a.sort((x,y)=>y[1]-x[1])[0]||null},
  weakest(){const a=Object.entries(this.data.best).filter(([id])=>Number(id)>0);return a.sort((x,y)=>x[1]-y[1])[0]||null},
  reset(){this.data={completed:[],best:{},section:{},history:[],xp:0,badges:[],streak:0,lastActive:null,review:{}};this.save();localStorage.removeItem('scienceCurrentChapter')},
- save(){localStorage.setItem(this.key,JSON.stringify(this.data)}
+ save(){localStorage.setItem(this.key,JSON.stringify(this.data))}
 };
 window.Progress=Progress;
 Progress.init();
