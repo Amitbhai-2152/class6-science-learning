@@ -22,7 +22,7 @@ function ensureButton(){
 function apply(theme){
   ensureStyles();const dark=theme==='dark';document.documentElement.classList.toggle('dark',dark);if(document.body)document.body.classList.toggle('dark',dark);
   const btn=document.getElementById('themeBtn')||document.querySelector('.global-theme-toggle');
-  if(btn){btn.textContent=dark?'☀️':'🌙';btn.setAttribute('aria-label',dark?'Light mode करें':'Dark mode करें');btn.setAttribute('title',dark?'Light mode':'Dark mode');btn.setAttribute('aria-pressed',dark?'true':'false')}
+  if(btn){btn.textContent=dark?'☀️':'🌙';btn.setAttribute('aria-label',dark?'Light mode करें':'Dark mode बदलें');btn.setAttribute('title',dark?'Light mode':'Dark mode');btn.setAttribute('aria-pressed',dark?'true':'false')}
 }
 function save(theme){try{localStorage.setItem(KEY,theme);localStorage.setItem('class6ThemeV1',theme)}catch(_){}
 }
@@ -42,6 +42,9 @@ try{
   }
   if(scriptUrl&&!document.querySelector('script[data-chapter-completion-sync]')){
     const src=new URL('./chapter-completion-sync.js?v=1',scriptUrl).href;const s=document.createElement('script');s.src=src;s.async=false;s.setAttribute('data-chapter-completion-sync','true');(document.head||document.documentElement).appendChild(s);
+  }
+  if(scriptUrl&&!document.querySelector('script[data-xp-badge-fix]')){
+    const src=new URL('./xp-badge-fix.js?v=1',scriptUrl).href;const s=document.createElement('script');s.src=src;s.async=false;s.setAttribute('data-xp-badge-fix','true');(document.head||document.documentElement).appendChild(s);
   }
 }catch(_){}
 })();
