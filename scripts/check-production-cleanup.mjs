@@ -40,14 +40,17 @@ const compatibilityOwners = {
   class6EnglishProgressV1: ['subjects/english/english-progress.js', 'js/cloud-sync.js'],
   class6HindiProgressV2: ['subjects/hindi/hindi-progress.js', 'js/cloud-sync.js'],
   class6GKProgressV1: ['subjects/gk/hi-progress-engine.js', 'js/cloud-sync.js'],
-  socialScienceProgressV3: ['subjects/social-science/social-science-progress.js', 'js/cloud-sync.js'],
-  class6RevisionProgressV1: ['js/revision-engine.js', 'js/cloud-sync.js']
+  socialScienceProgressV3: ['subjects/social-science/social-science-progress.js', 'js/cloud-sync.js']
 };
 for (const [key, allowedFiles] of Object.entries(compatibilityOwners)) {
   const missing = allowedFiles.filter((file) => !fs.existsSync(path.join(root, file)));
   assert(!missing.length, `${key}: expected compatibility owner file is missing: ${missing.join(', ')}`);
   for (const file of allowedFiles) assert(read(file).includes(key), `${key}: expected owner file no longer references its compatibility key: ${file}`);
 }
+
+// Revision progress is retained only as a user-scope cleanup key; its current
+// engine derives recommendations from Science Progress history rather than this key.
+assert(cloud.includes('class6RevisionProgressV1'), 'Revision legacy cleanup key was removed from user-scope cleanup.');
 
 // Central user scoping remains the only supported cleanup boundary.
 assert(cloud.includes("const OWNER_KEY = 'class6CloudOwnerV2'"), 'Central cloud sync owner scope is missing.');
@@ -65,4 +68,4 @@ assert(!xpCloud.includes('class6ChapterCompletionsV1'), 'XP cloud sync must not 
 assert(bridge.includes('x.score(') && bridge.includes('x.award('), 'Unified XP bridge must remain a thin canonical adapter.');
 assert(!bridge.includes("localStorage.setItem('class6XPSystemV1'"), 'XP bridge must not persist canonical XP state directly.');
 
-console.log('PHASE 10 PRODUCTION CLEANUP PASSED: document.write fallback removed, post-bootstrap reconciliation retained, cache-busting verified, legacy compatibility ownership constrained, user-scope cleanup boundaries preserved and canonical XP bridge isolation verified.');
+console.log('PHASE 10 PRODUCTION CLEANUP PASSED: document.write fallback removed, post-bootstrap reconciliation retained, cache-busting verified, compatibility ownership constrained, revision legacy cleanup scoped, user-scope boundaries preserved and canonical XP bridge isolation verified.');
