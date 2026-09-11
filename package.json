@@ -13,6 +13,7 @@
     "check:production-audit": "node scripts/check-production-audit.mjs",
     "check:production-cleanup": "node scripts/check-production-cleanup.mjs",
     "check:browser-compatibility": "node scripts/check-browser-compatibility.mjs",
+    "check:final-release": "node scripts/check-final-release.mjs",
     "check:challenge-review-quality": "node scripts/check-challenge-review-quality.mjs",
     "check:final-syllabus": "node scripts/check-final-syllabus-contract.mjs",
     "check:all-tests-validation": "node scripts/check-all-tests-validation.mjs",
