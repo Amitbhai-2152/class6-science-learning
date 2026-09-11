@@ -1,6 +1,10 @@
 (function(){
 'use strict';
 
+function cloudPending(){
+  return document.documentElement?.dataset?.streakCloudPending==='1';
+}
+
 function getStreak(){
   try{return Math.max(0,Number(window.XPSystem?.currentStreak?.())||0)}catch(_){return 0}
 }
@@ -8,6 +12,7 @@ function getActivityDays(){
   try{return Array.isArray(window.XPSystem?.activityDays?.())?window.XPSystem.activityDays():[]}catch(_){return[]}
 }
 function refresh(){
+  if(cloudPending())return;
   const streak=getStreak();
   const mini=document.getElementById('streakMini');
   if(mini)mini.textContent=String(streak);
@@ -20,6 +25,7 @@ function watchDisplays(){
   if(!targets.length)return;
   document.documentElement.dataset.streakWatchV2='1';
   const observer=new MutationObserver(()=>{
+    if(cloudPending())return;
     const expected=String(getStreak());
     targets.forEach(el=>{if(el.textContent!==expected)el.textContent=expected});
   });
