@@ -65,8 +65,9 @@ window.ThemeToggle={getTheme:read,apply,toggle};
 // automatically get the shared completion module and cross-subject completion hooks.
 (function(){
   try{
-    if(document.querySelector('script[data-universal-chapter-completion-bridge]'))return;
-    const src=new URL('./chapter-completion-bridge.js?v=4',SCRIPT_SRC||location.href).href;
+    if(document.querySelector('script[data-universal-chapter-completion-bridge],script[src*="chapter-completion-bridge.js"]'))return;
+    if(!SCRIPT_SRC)return;
+    const src=new URL('./chapter-completion-bridge.js?v=4',SCRIPT_SRC).href;
     const s=document.createElement('script');
     s.src=src;
     s.async=false;
