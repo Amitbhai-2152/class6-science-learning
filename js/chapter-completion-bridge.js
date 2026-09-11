@@ -1,11 +1,11 @@
 (function(){'use strict';
 const installed=new WeakSet();
 function getScriptPath(){try{return new URL('./chapter-completion.js',document.currentScript?.src||location.href).href}catch(_){return ''}}
-function showScience(){const c=window.CHAPTERS?.find?.(x=>Number(x.id)===Number(window.currentChapter));if(!c||!window.ChapterCompletion)return;window.ChapterCompletion.show({subject:'science',chapterId:c.id,title:c.title,score:arguments[0]??'',total:arguments[1]??'',pct:arguments[2]??100});}
+function showScience(id){const c=window.CHAPTERS?.find?.(x=>Number(x.id)===Number(id));if(!c||!window.ChapterCompletion)return;const pct=Number(window.Progress?.data?.best?.[id]||100),total=Array.isArray(c.challenge)?c.challenge.length:0,score=total?Math.round(pct*total/100):'';window.ChapterCompletion.show({subject:'science',chapterId:id,title:c.title,score,total,pct});}
 function showEnglish(score,total,pct){if(!window.ChapterCompletion||!window.EnglishApp)return;const id=Math.max(1,Number(new URLSearchParams(location.search).get('chapter'))||1),c=window.EnglishApp.getChapter?.(id);window.ChapterCompletion.show({subject:'english',chapterId:id,title:c?.title||`Chapter ${id}`,score,total,pct});}
 function install(){
   if(window.Progress&&!installed.has(window.Progress)&&typeof window.Progress.complete==='function'){
-    const p=window.Progress,original=p.complete.bind(p);p.complete=function(id){const before=original(id);if(before){const c=window.CHAPTERS?.find?.(x=>Number(x.id)===Number(id));if(c)window.ChapterCompletion?.show({subject:'science',chapterId:id,title:c.title});}return before};installed.add(p);
+    const p=window.Progress,original=p.complete.bind(p);p.complete=function(id){const newly=original(id);if(newly)showScience(id);return newly};installed.add(p);
   }
   if(window.EnglishProgress&&!installed.has(window.EnglishProgress)&&typeof window.EnglishProgress.record==='function'){
     const p=window.EnglishProgress,original=p.record.bind(p);p.record=function(kind,score,total,label){const result=original(kind,score,total,label);const pct=total?Math.round(Number(score||0)/Number(total||1)*100):0;if(kind==='Chapter Practice'&&pct>=75)showEnglish(score,total,pct);return result};installed.add(p);
