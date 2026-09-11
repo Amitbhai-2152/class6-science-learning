@@ -6,10 +6,12 @@
   const ACTIVITY_SOURCE = 'xp-system-v2';
   const MAX_ACTIVITY_DAYS = 400;
   const USER_RETRY_DELAYS = [0, 800, 2000, 4000];
+  const POLL_INTERVAL = 5000;
   let syncPromise = null;
   let retryTimer = null;
   let queuedSyncTimer = null;
   let rerunAfterSync = false;
+  let pollTimer = null;
 
   function clone(value) {
     try { return JSON.parse(JSON.stringify(value)); } catch (_) { return value; }
@@ -69,6 +71,17 @@
     if(queuedSyncTimer) return;
     queuedSyncTimer=window.setTimeout(()=>{queuedSyncTimer=null; sync();},Math.max(0,Number(delay)||0));
   }
+  function startPolling(){
+    if(pollTimer||document.visibilityState==='hidden') return;
+    pollTimer=window.setInterval(()=>{
+      if(document.visibilityState==='visible') requestSync(0);
+    },POLL_INTERVAL);
+  }
+  function stopPolling(){
+    if(!pollTimer) return;
+    window.clearInterval(pollTimer);
+    pollTimer=null;
+  }
   async function sync(){
     if(syncPromise) { rerunAfterSync=true; return syncPromise; }
     syncPromise=(async()=>{
@@ -79,13 +92,17 @@
         if(!user){scheduleRetry(2500);return {synced:false,reason:'not_signed_in'};}
         const scope=window.Class6CloudSync.prepareUser?.(user.id)||{changed:false};
         const row=await window.Class6CloudSync.load();
+        const before=clone(window.XPSystem.read());
         const merged=scope.changed
           ? migrateState(row?.state||{})
-          : mergeStates(clone(window.XPSystem.read()),row?.state||{});
+          : mergeStates(before,row?.state||{});
+        const changed=JSON.stringify(normalizeState(before))!==JSON.stringify(normalizeState(merged));
         window.XPSystem.save(merged);
-        const result=await window.Class6CloudSync.save(merged,STATE_VERSION);
+        const result=changed
+          ? await window.Class6CloudSync.save(merged,STATE_VERSION)
+          : {synced:true,userId:user.id,noChange:true};
         if(result?.synced){
-          window.dispatchEvent(new CustomEvent('class6:xp-cloud-synced',{detail:{userId:user.id,version:STATE_VERSION,total:merged.total,subjects:Object.assign({},merged.subjects),activeDays:merged.activeDays.length}}));
+          window.dispatchEvent(new CustomEvent('class6:xp-cloud-synced',{detail:{userId:user.id,version:STATE_VERSION,total:merged.total,subjects:Object.assign({},merged.subjects),activeDays:merged.activeDays.length,changed}}));
         } else if(result?.reason==='not_signed_in') scheduleRetry(2500);
         return result;
       }catch(error){
@@ -104,9 +121,12 @@
 
   window.Class6XPCloudSync=Object.freeze({sync,requestSync,mergeStates,migrateState,normalizeState,XP_KEY,STATE_VERSION,ACTIVITY_SOURCE});
 
-  document.addEventListener('DOMContentLoaded',()=>requestSync(0),{once:true});
-  window.addEventListener('pageshow',()=>requestSync(0));
-  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible') requestSync(100);});
+  document.addEventListener('DOMContentLoaded',()=>{requestSync(0);startPolling();},{once:true});
+  window.addEventListener('pageshow',()=>{requestSync(0);startPolling();});
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible'){requestSync(100);startPolling();}
+    else stopPolling();
+  });
   window.addEventListener('xp:earned',()=>requestSync(150));
   window.addEventListener('xp:activity',()=>requestSync(150));
   window.addEventListener('storage',(event)=>{if(!event||event.key===XP_KEY) requestSync(250);});
