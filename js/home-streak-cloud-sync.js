@@ -2,7 +2,7 @@
   'use strict';
 
   let syncPromise = null;
-  let authFallbackTimer = null;
+  let retryTimer = null;
   const MAX_ACTIVITY_DAYS = 400;
   const USER_RETRY_DELAYS = [0, 800, 2000, 4000];
 
@@ -18,16 +18,6 @@
 
   function clearPending() {
     delete document.documentElement.dataset.streakCloudPending;
-    if (authFallbackTimer) {
-      window.clearTimeout(authFallbackTimer);
-      authFallbackTimer = null;
-    }
-  }
-
-  function revealLocalFallback() {
-    if (!document.documentElement.dataset.streakCloudPending) return;
-    clearPending();
-    window.HomeStreak?.refresh?.();
   }
 
   setPending();
@@ -111,7 +101,9 @@
   }
 
   function scheduleRetry(delay = 2000) {
-    window.setTimeout(() => {
+    if (retryTimer) return;
+    retryTimer = window.setTimeout(() => {
+      retryTimer = null;
       sync();
     }, delay);
   }
@@ -175,11 +167,7 @@
         return { synced: true, streak: merged.streak, activeDays: merged.activeDays };
       } catch (error) {
         console.error('Class 6 streak cloud sync failed:', error);
-        if (!authFallbackTimer) {
-          authFallbackTimer = window.setTimeout(() => {
-            revealLocalFallback();
-          }, 8000);
-        }
+        setPending();
         scheduleRetry(2000);
         return { synced: false, reason: 'sync_error', error: String(error?.message || error) };
       } finally {
