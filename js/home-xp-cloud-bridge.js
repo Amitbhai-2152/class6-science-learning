@@ -25,18 +25,22 @@
 
     const snapshot = window.XPSystem?.snapshot?.();
     const level = Math.max(1, Number(snapshot?.level?.level) || 1);
+    const desiredChip = `🏅 Lv ${level}<span>${value} XP</span>`;
     const chip = document.getElementById('levelMiniBtn');
-    if (chip) chip.innerHTML = `🏅 Lv ${level}<span>${value} XP</span>`;
+    if (chip && chip.innerHTML !== desiredChip) chip.innerHTML = desiredChip;
 
+    const totalText = String(value);
     const totalEl = document.getElementById('homeTotalXP');
-    if (totalEl) totalEl.textContent = String(value);
+    if (totalEl && totalEl.textContent !== totalText) totalEl.textContent = totalText;
 
+    const legacyText = `${value} XP`;
     const legacy = document.getElementById('xpMini');
-    if (legacy) legacy.textContent = `${value} XP`;
+    if (legacy && legacy.textContent !== legacyText) legacy.textContent = legacyText;
 
     document.querySelectorAll('.progress-live-level-box b').forEach((el) => {
       const text = String(el.textContent || '').trim();
-      if (/^⚡\s*\d+\s*XP$/.test(text)) el.textContent = `⚡ ${value} XP`;
+      const desired = `⚡ ${value} XP`;
+      if (/^⚡\s*\d+\s*XP$/.test(text) && text !== desired) el.textContent = desired;
     });
   }
 
@@ -48,7 +52,21 @@
   function observeXPDisplays() {
     if (observer || !window.MutationObserver) return;
     observer = new MutationObserver(() => {
-      if (authoritativeTotal !== null) paintTotal(authoritativeTotal);
+      if (authoritativeTotal !== null) {
+        const chip = document.getElementById('levelMiniBtn');
+        const totalEl = document.getElementById('homeTotalXP');
+        const legacy = document.getElementById('xpMini');
+        const snapshot = window.XPSystem?.snapshot?.();
+        const level = Math.max(1, Number(snapshot?.level?.level) || 1);
+        const chipExpected = `🏅 Lv ${level}<span>${authoritativeTotal} XP</span>`;
+        const totalExpected = String(authoritativeTotal);
+        const legacyExpected = `${authoritativeTotal} XP`;
+        if ((chip && chip.innerHTML !== chipExpected) ||
+            (totalEl && totalEl.textContent !== totalExpected) ||
+            (legacy && legacy.textContent !== legacyExpected)) {
+          paintTotal(authoritativeTotal);
+        }
+      }
     });
 
     const watch = () => {
@@ -93,26 +111,21 @@
   }
 
   window.addEventListener('class6:xp-cloud-synced', adoptSyncedTotal);
-
   window.addEventListener('xp:earned', () => {
     clearAuthoritativeTotal();
     requestCloudSync(150);
   });
-
   window.addEventListener('xp:activity', () => requestCloudSync(150));
-
   window.addEventListener('storage', (event) => {
     if (!event || event.key === 'class6XPSystemV1') {
       clearAuthoritativeTotal();
       requestCloudSync(250);
     }
   });
-
   window.addEventListener('pageshow', () => {
     clearAuthoritativeTotal();
     requestCloudSync(0);
   });
-
   document.addEventListener('DOMContentLoaded', () => {
     render();
     observeXPDisplays();
