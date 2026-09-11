@@ -11,6 +11,7 @@
     "check:progress-state-migration": "node scripts/check-progress-state-migration.mjs",
     "check:subject-progress-wiring": "node scripts/check-subject-progress-wiring.mjs",
     "check:production-audit": "node scripts/check-production-audit.mjs",
+    "check:production-cleanup": "node scripts/check-production-cleanup.mjs",
     "check:browser-compatibility": "node scripts/check-browser-compatibility.mjs",
     "check:challenge-review-quality": "node scripts/check-challenge-review-quality.mjs",
     "check:final-syllabus": "node scripts/check-final-syllabus-contract.mjs",
