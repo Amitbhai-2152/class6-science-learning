@@ -30,6 +30,9 @@ function makeBrowser(name) {
   const removeTimer = (id) => timers.delete(id);
   const setTimeoutMock = (fn, delay) => { const id = ++timerId; timers.set(id, { fn, delay }); return id; };
   const setIntervalMock = (fn, delay) => setTimeoutMock(fn, delay);
+  class BrowserCustomEvent {
+    constructor(type, init = {}) { this.type = type; this.detail = init.detail; this.key = init.key; }
+  }
   const window = {
     addEventListener(type, fn) { addListener('window', type, fn); },
     removeEventListener(type) { listeners.delete(`window:${type}`); },
@@ -40,7 +43,8 @@ function makeBrowser(name) {
     clearInterval: removeTimer,
     window: null,
     localStorage,
-    document: null
+    document: null,
+    CustomEvent: BrowserCustomEvent
   };
   const document = {
     readyState: 'loading',
@@ -56,11 +60,8 @@ function makeBrowser(name) {
       return { classList: { add() {}, remove() {} }, setAttribute() {}, appendChild() {}, querySelector() { return null; } };
     }
   };
-  class CustomEvent {
-    constructor(type, init = {}) { this.type = type; this.detail = init.detail; this.key = init.key; }
-  }
   const sandbox = {
-    window, document, localStorage, CustomEvent,
+    window, document, localStorage, CustomEvent: BrowserCustomEvent,
     MutationObserver: undefined,
     setTimeout: setTimeoutMock,
     setInterval: setIntervalMock,
