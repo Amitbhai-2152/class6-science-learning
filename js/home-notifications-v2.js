@@ -1,12 +1,14 @@
 (() => {
   'use strict';
   const READ_KEY='class6HomeNotificationsReadV2';
-  const UPDATES=[
+  const DATA_URL=new URL('./home-notifications-data.json',document.currentScript?.src||location.href).href;
+  let UPDATES=[
     {id:'2026-09-11-maths-chapter-1',date:'11 Sep 2026',title:'📢 जरूरी सूचना: Maths Chapter 1 पढ़ें',message:'सभी students आज Maths का Chapter 1 जरूर पढ़ें और उसका अभ्यास पूरा करें। समय पर chapter पढ़कर questions solve करें और अपनी practice complete करें।'},
     {id:'2026-09-11-science-chapter-1',date:'11 Sep 2026',title:'📢 जरूरी सूचना: Science Chapter 1 पढ़ें',message:'सभी students आज Science का Chapter 1 जरूर पढ़ें और उसका अभ्यास पूरा करें। इसे pending छोड़ने पर अतिरिक्त study work दिया जा सकता है—इसलिए समय पर पूरा करें।'},
     {id:'2026-09-11-progress',date:'11 Sep 2026',title:'📊 Progress System Improved',message:'Overall Progress अब सभी 6 subjects के chapter completion के आधार पर calculate होता है।'},
     {id:'2026-09-11-badges',date:'11 Sep 2026',title:'🏆 XP Badges Fixed',message:'XP milestones पर badges और उनका unlock animation अब reliably refresh होंगे।'}
   ];
+  let version=3;
   const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[m]);
   function read(){try{const x=JSON.parse(localStorage.getItem(READ_KEY)||'[]');return new Set(Array.isArray(x)?x.map(String):[])}catch(_){return new Set()}}
   function save(s){try{localStorage.setItem(READ_KEY,JSON.stringify([...s]))}catch(_){} }
@@ -16,8 +18,13 @@
   function refresh(){const b=document.getElementById('homeNotificationBtnV2');if(!b)return;const n=unread();const p=b.querySelector('.home-notification-count');b.classList.toggle('has-unread',n>0);b.setAttribute('aria-label',n?`Updates देखें • ${n} unread`:'Updates देखें');if(p){p.textContent=n?String(Math.min(n,99)):'';p.hidden=!n}}
   function modal(){document.getElementById('homeNotificationModalV2')?.remove();const r=read(),m=document.createElement('div');m.id='homeNotificationModalV2';m.className='home-notification-modal-v2';m.innerHTML=`<section class="home-notification-card-v2" role="dialog" aria-modal="true"><div class="home-notification-head-v2"><div><h2>🔔 Updates & Notifications</h2><p>Learning Hub के latest updates</p></div><button class="home-notification-close-v2" type="button">×</button></div><div style="display:flex;justify-content:flex-end"><button class="home-notification-readall-v2" type="button">सबको पढ़ा हुआ करें</button></div><div class="home-notification-list-v2">${UPDATES.map(x=>`<article class="home-notification-item-v2 ${r.has(x.id)?'':'unread'}"><div class="home-notification-meta-v2"><time>${esc(x.date)}</time>${r.has(x.id)?'':'<span class="home-notification-new-v2">NEW</span>'}</div><h3>${esc(x.title)}</h3><p>${esc(x.message)}</p></article>`).join('')}</div></section>`;document.body.appendChild(m);const close=()=>{m.classList.remove('show');setTimeout(()=>m.remove(),180)};m.querySelector('.home-notification-close-v2').onclick=close;m.addEventListener('click',e=>{if(e.target===m)close()});m.querySelector('.home-notification-readall-v2').onclick=()=>{save(new Set(UPDATES.map(x=>x.id)));modal();refresh()};requestAnimationFrame(()=>m.classList.add('show'))}
   function open(){const r=read();UPDATES.forEach(x=>r.add(x.id));save(r);refresh();modal()}
-  function boot(){if(!document.getElementById('homeView'))return;style();button();refresh()}
+  function boot(){if(!document.getElementById('homeView'))return;style();if(button())refresh()}
+  async function syncLive(){try{const res=await fetch(DATA_URL+'?t='+Date.now(),{cache:'no-store'});if(!res.ok)return;const data=await res.json();if(!data||!Array.isArray(data.updates))return;const next=Number(data.version)||0;if(next>version){const before=UPDATES.map(x=>x.id).join('|');UPDATES=data.updates.map(x=>({id:String(x.id),date:String(x.date||''),title:String(x.title||''),message:String(x.message||'')}));version=next;const after=UPDATES.map(x=>x.id).join('|');refresh();if(before!==after&&document.getElementById('homeNotificationModalV2')?.classList.contains('show'))modal();}}
+  catch(_){} }
   window.HomeNotifications=Object.freeze({open,refresh,updates:UPDATES.map(x=>({...x}))});
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
   window.addEventListener('load',boot,{once:true});
+  syncLive();
+  window.setInterval(syncLive,30000);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)syncLive()});
 })();
