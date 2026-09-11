@@ -12,6 +12,7 @@
     'class6RevisionProgressV1'
   ];
   const LOCAL_OWNER_KEYS = ['class6CloudOwnerV1', 'class6CloudOwnerV2'];
+  const COMPLETION_PREFIXES = ['class6ChapterClearedV1:', 'class6ChapterCompletedAtV1:', 'class6ChapterScoreV1:'];
   let client = null;
 
   const $ = (selector) => document.querySelector(selector);
@@ -34,6 +35,14 @@
     [...LOCAL_PROGRESS_KEYS, ...LOCAL_OWNER_KEYS].forEach((key) => {
       try { localStorage.removeItem(key); } catch (_) {}
     });
+    try {
+      const remove = [];
+      for (let i = 0; i < localStorage.length; i += 1) {
+        const key = localStorage.key(i) || '';
+        if (COMPLETION_PREFIXES.some((prefix) => key.startsWith(prefix))) remove.push(key);
+      }
+      remove.forEach((key) => localStorage.removeItem(key));
+    } catch (_) {}
   }
 
   function localAvatar() {
