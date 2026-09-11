@@ -59,19 +59,18 @@ document.addEventListener('click',e=>{
 window.addEventListener('DOMContentLoaded',()=>{apply(read());ensureButton();},{once:true});
 window.addEventListener('load',()=>{apply(read());ensureButton();},{once:true});
 window.ThemeToggle={getTheme:read,apply,toggle};
-})();
 
-// Universal chapter-completion bridge: pages that already load theme-toggle.js
-// automatically get the shared completion module and cross-subject completion hooks.
-(function(){
-  try{
-    if(document.querySelector('script[data-universal-chapter-completion-bridge],script[src*="chapter-completion-bridge.js"]'))return;
-    if(!SCRIPT_SRC)return;
-    const src=new URL('./chapter-completion-bridge.js?v=4',SCRIPT_SRC).href;
+// Universal chapter-completion bridge. Derive its URL from the same theme-toggle
+// script tag, keeping this compatible with root pages and nested subject pages.
+try{
+  const scriptUrl=SCRIPT_SRC||document.querySelector('script[src*="theme-toggle.js"]')?.src||'';
+  if(scriptUrl&&!document.querySelector('script[data-universal-chapter-completion-bridge],script[src*="chapter-completion-bridge.js"]')){
+    const src=new URL('./chapter-completion-bridge.js?v=5',scriptUrl).href;
     const s=document.createElement('script');
     s.src=src;
     s.async=false;
     s.setAttribute('data-universal-chapter-completion-bridge','true');
     (document.head||document.documentElement).appendChild(s);
-  }catch(_){}
+  }
+}catch(_){}
 })();
