@@ -75,7 +75,6 @@ function makeContext(initialStorage = {}, options = {}) {
     const cloudAdapter = options.cloudAdapter || {};
     window.Class6CloudSync = cloudAdapter;
     vm.runInNewContext(cloudSource, sandbox, { filename: cloudPath });
-    window.Class6CloudSync = cloudAdapter;
   }
   return { ...sandbox, store, timeoutCalls, listeners };
 }
@@ -109,17 +108,15 @@ xp.recordLearningDay('runtime-test-duplicate');
 assert(xp.activityDays().filter((d) => d === today).length === 1, 'Recording the same learning day must remain idempotent.');
 assert(xp.currentStreak() === 1, 'Duplicate same-day activity must not inflate streak length.');
 
-xp.save();
-const state = xp.read();
-state.activeDays = [dayBeforeYesterday, yesterday, today];
+xp.read().activeDays = [dayBeforeYesterday, yesterday, today];
 xp.save();
 assert(xp.currentStreak() === 3, 'Consecutive today/yesterday/day-before activity should produce a 3-day streak.');
 
-state.activeDays = [dayBeforeYesterday, today];
+xp.read().activeDays = [dayBeforeYesterday, today];
 xp.save();
 assert(xp.currentStreak() === 1, 'A one-day gap must break the current streak.');
 
-state.activeDays = [yesterday];
+xp.read().activeDays = [yesterday];
 xp.save();
 assert(xp.currentStreak() === 0, 'Yesterday-only activity must not count as a current streak.');
 
@@ -170,16 +167,15 @@ for (let i = 0; i < 30; i += 1) {
 assert(awardXP.read().daily.earned === awardXP.DAILY_CAP, 'Daily XP must stop at the configured 200 XP cap.');
 assert(granted <= awardXP.DAILY_CAP, 'Awards in one day must never grant more than the configured daily cap.');
 
-const staleStreakState = awardXP.read();
-staleStreakState.streakState = { streak: 999, activeDays: [] };
-staleStreakState.activeDays = [today];
+awardXP.read().streakState = { streak: 999, activeDays: [] };
+awardXP.read().activeDays = [today];
 awardXP.save();
 assert(awardXP.currentStreak() === 1, 'Canonical streak must be derived from activity dates, not stale stored streak values.');
 assert(awardCtx.window.HomeStreak.getStreak() === 1, 'Home streak display must use the canonical XPSystem streak.');
 assert(awardCtx.window.HomeStreak.getActivityDays().includes(today), 'Home streak activity view must expose canonical activity dates.');
 
 const invalid = awardXP.award('not-a-subject', 'invalid', 'x', 50);
-assert(invalid.reason === 'invalid-subject' && awardXP.read().total === awardXP.read().total, 'Invalid subjects must be rejected without corrupting XP state.');
+assert(invalid.reason === 'invalid-subject' && awardXP.read().total >= 0, 'Invalid subjects must be rejected without corrupting XP state.');
 
 function makeCloudAdapter(userId, cloudState) {
   let revision = 1;
@@ -218,8 +214,7 @@ const aAward = xpA.award('science', 'practice', 'browser-a', 20, { diminishing: 
 const bAward = xpB.award('maths', 'practice', 'browser-b', 30, { diminishing: false });
 assert(aAward.awarded === 20 && bAward.awarded === 30, 'Independent browser contexts must be able to award XP independently.');
 const cloudSyncA = makeContext({}, { loadCloud: true, userId: 'student-1', cloudAdapter: makeCloudAdapter('student-1', baseCloud) });
-const mergeFn = cloudSyncA.window.Class6XPCloudSync.mergeStates;
-const combined = mergeFn(browserA.window.XPSystem.read(), browserB.window.XPSystem.read());
+const combined = cloudSyncA.window.Class6XPCloudSync.mergeStates(xpA.read(), xpB.read());
 assert(combined.subjects.science >= 30, 'Cross-browser merge must retain Science XP from browser A.');
 assert(combined.subjects.maths >= 40, 'Cross-browser merge must retain Maths XP from browser B.');
 assert(combined.events.some((e) => e.content === 'browser-a'), 'Cross-browser merge must retain browser A event history.');
@@ -248,4 +243,4 @@ storageCtx.window.dispatchEvent(new storageCtx.CustomEvent('storage', { key: 'cl
 storageCtx.window.dispatchEvent(new storageCtx.CustomEvent('storage', { key: 'class6XPCloudDirtyV1' }));
 assert(storageCtx.timeoutCalls.length >= 2, 'Revision/dirty storage events must request a fresh cloud sync across browser contexts.');
 
-console.log('Progress engine runtime test PASSED: canonical activity dates, streak continuity/gaps, legacy event recovery, idempotent XP awards, subject/global XP invariants, daily cap enforcement, stale-streak protection, cross-browser merge preservation, user-scoped revision isolation, concurrent dirty-sequence protection and storage-event sync triggers verified.');
+console.log('Progress engine runtime test PASSED: canonical streaks, legacy recovery, idempotent awards, subject/global XP invariants, daily cap enforcement, stale-streak protection, cross-browser merge preservation, user-scoped revision isolation, concurrent dirty-sequence protection and storage-event sync triggers verified.');
