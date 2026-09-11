@@ -7,7 +7,7 @@ function ensureChapterCompletion(){
 }
 function celebrate(c,score,total,pct){ensureChapterCompletion();const run=()=>window.ChapterCompletion?.show({subject:'maths',chapterId:c?.id,title:c?.title||'Maths Chapter',score,total,pct});if(window.ChapterCompletion)run();else setTimeout(run,60)}
 const escapeHtml = s => String(s ?? '').replace(/[&<>\"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#039;'}[m]));
-const shuffle = arr => { const x=[...arr]; for(let i=x.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [x[i],x[j]]=[x[j],x[i]];} return x; };
+const shuffle = arr => { const x=[...arr]; for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [x[i],x[j]]=[x[j],x[i]];} return x; };
 function ChallengeEngine(){
   let chapter=null, questions=[], index=0, answers=[], locked=false, best=0;
   const mount=()=>document.getElementById('challengeMount');
