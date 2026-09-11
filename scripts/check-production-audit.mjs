@@ -10,7 +10,7 @@ const has = (file, token) => read(file).includes(token);
 const requiredFiles = [
   'index.html','js/xp-system.js','js/xp-cloud-sync.js','js/cloud-sync.js',
   'js/home-streak-v2.js','js/home-streak-cloud-sync.js','js/xp-unify-bridge-v2.js',
-  'js/progress.js','js/subject-progress-cloud-sync.js','js/auth-config.js',
+  'js/progress.js','js/progress-sync-status.js','js/subject-progress-cloud-sync.js','js/auth-config.js',
   'scripts/check-browser-compatibility.mjs','supabase/schema.sql'
 ];
 for (const file of requiredFiles) assert(fs.existsSync(path.join(root, file)), `Required production file is missing: ${file}`);
@@ -34,6 +34,15 @@ assert(has('js/xp-cloud-sync.js',"document.visibilityState==='visible'"), 'Visib
 assert(has('js/xp-cloud-sync.js','function currentOwner()'), 'XP sync must resolve the current user scope.');
 assert(has('js/xp-cloud-sync.js','getRevision(user.id)'), 'XP revision reads must be user-scoped.');
 assert(has('js/xp-cloud-sync.js','setRevision(user.id'), 'XP revision writes must be user-scoped.');
+assert(has('js/xp-cloud-sync.js',"class6:xp-cloud-sync-start"), 'XP sync start status event is missing.');
+assert(has('js/xp-cloud-sync.js',"class6:xp-cloud-sync-error"), 'XP sync error status event is missing.');
+
+const syncStatus = read('js/progress-sync-status.js');
+assert(has('js/progress-sync-status.js','Class6ProgressSyncStatus'), 'Progress sync status API is missing.');
+assert(has('js/progress-sync-status.js','class6:xp-cloud-synced'), 'Sync status UI is not listening for successful cloud sync.');
+assert(has('js/progress-sync-status.js','class6:xp-cloud-sync-error'), 'Sync status UI is not listening for cloud sync errors.');
+assert(has('js/progress-sync-status.js',"window.addEventListener('offline'"), 'Offline progress status handling is missing.');
+assert(has('js/progress-sync-status.js',"window.addEventListener('online'"), 'Online recovery status handling is missing.');
 
 const cloud = read('js/cloud-sync.js');
 assert(has('js/cloud-sync.js',"const OWNER_KEY = 'class6CloudOwnerV2'"), 'Central cloud layer lacks owner scoping.');
@@ -78,7 +87,7 @@ assert(/anonKey\s*:\s*"[^"]+"/.test(auth), 'Public browser auth configuration is
 const index = read('index.html');
 for (const token of [
   'js/xp-system.js?v=','js/xp-unify-bridge-v2.js?v=','js/cloud-sync.js?v=',
-  'js/xp-cloud-sync.js?v=','js/home-streak-v2.js?v=','js/home-streak-cloud-sync.js?v=',
+  'js/xp-cloud-sync.js?v=','js/progress-sync-status.js?v=','js/home-streak-v2.js?v=','js/home-streak-cloud-sync.js?v=',
   'js/subject-progress-cloud-sync.js?v='
 ]) assert(has('index.html',token), `index.html is missing cache-busting for ${token}`);
 assert(/js\/xp-system\.js\?v=\d+/.test(index), 'Canonical XPSystem cache-busting is malformed.');
@@ -104,4 +113,4 @@ const forbiddenSecretPattern = /(service[_-]?role|sb_secret_[A-Za-z0-9_-]+|SUPAB
 const scopedTextFiles = ['index.html','js/auth-config.js','js/cloud-sync.js','js/xp-cloud-sync.js','js/home-streak-cloud-sync.js','.github/workflows/progress-engine-runtime.yml'];
 for (const file of scopedTextFiles) assert(!forbiddenSecretPattern.test(read(file)), `Potential secret material found in browser/workflow file: ${file}`);
 
-console.log('PHASE 9 PRODUCTION AUDIT PASSED: browser-compatibility smoke coverage, canonical XP/streak contracts, cloud-first hydration, user scoping, optimistic locking, concurrent mutation safety, legacy compatibility boundaries, RLS, cache-busting, CI hardening and browser-secret hygiene verified for the Class 6 learning hub.');
+console.log('PHASE 11 PRODUCTION AUDIT PASSED: progress sync status UX, online/offline recovery messaging, canonical XP/streak contracts, cloud-first hydration, user scoping, optimistic locking, concurrent mutation safety, legacy compatibility boundaries, browser compatibility, RLS, cache-busting, CI hardening and browser-secret hygiene verified for the Class 6 learning hub.');
