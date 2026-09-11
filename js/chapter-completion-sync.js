@@ -2,6 +2,7 @@
 'use strict';
 if(window.__chapterCompletionSyncLoaded)return;
 window.__chapterCompletionSyncLoaded=true;
+const SCRIPT_SRC=document.currentScript?.src||'';
 const KEY_PREFIX='class6ChapterClearedV1:';
 const DATE_PREFIX='class6ChapterCompletedAtV1:';
 const SCORE_PREFIX='class6ChapterScoreV1:';
@@ -57,7 +58,8 @@ function ensureConfig(){
   configPromise=new Promise(resolve=>{
     const existing=document.querySelector('script[data-class6-auth-config]');
     if(existing){existing.addEventListener('load',resolve,{once:true});existing.addEventListener('error',resolve,{once:true});setTimeout(resolve,1500);return}
-    const s=document.createElement('script');s.src=new URL('./auth-config.js',location.href).href;s.async=false;s.setAttribute('data-class6-auth-config','true');s.onload=()=>resolve();s.onerror=()=>resolve();(document.head||document.documentElement).appendChild(s)
+    const base=SCRIPT_SRC?new URL('./',SCRIPT_SRC).href:new URL('/js/',location.origin).href;
+    const s=document.createElement('script');s.src=new URL('auth-config.js',base).href;s.async=false;s.setAttribute('data-class6-auth-config','true');s.onload=()=>resolve();s.onerror=()=>resolve();(document.head||document.documentElement).appendChild(s)
   });
   return configPromise;
 }
