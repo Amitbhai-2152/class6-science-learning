@@ -38,7 +38,7 @@ try{
     const src=new URL('./chapter-completion-bridge.js?v=7',scriptUrl).href;const s=document.createElement('script');s.src=src;s.async=false;s.setAttribute('data-universal-chapter-completion-bridge','true');(document.head||document.documentElement).appendChild(s);
   }
   if(scriptUrl&&!document.querySelector('script[data-chapter-status]')){
-    const src=new URL('./chapter-status.js?v=1',scriptUrl).href;const s=document.createElement('script');s.src=src;s.async=false;s.setAttribute('data-chapter-status','true');(document.head||document.documentElement).appendChild(s);
+    const src=new URL('./chapter-status.js?v=2',scriptUrl).href;const s=document.createElement('script');s.src=src;s.async=false;s.setAttribute('data-chapter-status','true');(document.head||document.documentElement).appendChild(s);
   }
 }catch(_){}
 })();
