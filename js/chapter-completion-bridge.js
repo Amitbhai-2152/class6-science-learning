@@ -1,4 +1,6 @@
 (function(){'use strict';
+if(window.__universalChapterCompletionBridgeLoaded)return;
+window.__universalChapterCompletionBridgeLoaded=true;
 const BRIDGE_SRC=document.currentScript?.src||'';
 const installed=new WeakSet();
 function getScriptPath(){try{return BRIDGE_SRC?new URL('./chapter-completion.js',BRIDGE_SRC).href:new URL('js/chapter-completion.js',location.origin+'/').href}catch(_){return ''}}
