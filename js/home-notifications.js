@@ -74,12 +74,13 @@
       @media(max-width:600px){#homeNotificationBtn{order:5;width:42px;height:42px;padding:0}.home-notification-card{padding:15px;border-radius:18px}.home-notification-head h2{font-size:20px}}
       @media(prefers-reduced-motion:reduce){#homeNotificationBtn.has-unread,.home-notification-modal{animation:none!important;transition:none!important}}
     `;
-    document.head.appendChild(style);
+    (document.head || document.documentElement).appendChild(style);
   }
 
   function ensureButton() {
     const actions = document.querySelector('.home-actions');
-    if (!actions || document.getElementById('homeNotificationBtn')) return;
+    if (!actions) return false;
+    if (document.getElementById('homeNotificationBtn')) return true;
     const button = document.createElement('button');
     button.id = 'homeNotificationBtn';
     button.type = 'button';
@@ -90,6 +91,7 @@
     const progress = document.getElementById('levelMiniBtn') || document.getElementById('homeAvatar');
     actions.insertBefore(button, progress || null);
     button.addEventListener('click', open);
+    return true;
   }
 
   function refreshBadge() {
@@ -147,15 +149,14 @@
   function boot() {
     if (!document.getElementById('homeView')) return;
     ensureStyle();
-    ensureButton();
+    if (!ensureButton()) return;
     refreshBadge();
   }
 
   window.HomeNotifications = Object.freeze({ open, refresh: refreshBadge, updates: UPDATES.map((x) => Object.assign({}, x)) });
 
-  // The script is injected dynamically by theme-toggle.js. On a fast mobile
-  // load, DOMContentLoaded/load may already have fired before this file arrives,
-  // so boot immediately when the DOM is already ready.
+  // Dynamically loaded scripts may arrive after DOMContentLoaded on fast mobile loads.
+  // Initialize immediately when the document is already ready.
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', boot, { once: true });
   } else {
