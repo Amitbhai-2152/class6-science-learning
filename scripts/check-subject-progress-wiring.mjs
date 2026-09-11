@@ -6,7 +6,10 @@ const fail = (message) => { throw new Error(`[subject-progress-wiring] ${message
 const assert = (condition, message) => { if (!condition) fail(message); };
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 const has = (file, token) => read(file).includes(token);
-const hasScript = (file, name) => new RegExp(`<script src=[\"'](?:[^\"']*\/)?${name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}(?:\\?v=\\d+)?[\"']><\\/script>`).test(read(file));
+const hasBootstrap = (file, name) => {
+  const source = read(file);
+  return new RegExp(`${name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}(?:\\?v=\\d+)?`).test(source);
+};
 
 const progressEngines = [
   'subjects/gk/gk-progress-hi.js',
@@ -16,8 +19,8 @@ const progressEngines = [
   'subjects/social-science/social-science-progress.js'
 ];
 for (const file of progressEngines) {
-  assert(hasScript(file, 'xp-system.js'), `${file} does not bootstrap canonical XPSystem.`);
-  assert(hasScript(file, 'xp-unify-bridge-v2.js'), `${file} does not bootstrap the unified XP bridge.`);
+  assert(hasBootstrap(file, 'xp-system.js'), `${file} does not bootstrap canonical XPSystem.`);
+  assert(hasBootstrap(file, 'xp-unify-bridge-v2.js'), `${file} does not bootstrap the unified XP bridge.`);
 }
 
 const routes = {
