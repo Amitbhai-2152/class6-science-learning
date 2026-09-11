@@ -11,8 +11,12 @@ function chapters(){
 }
 function getChapter(id){
   const list=chapters();
-  const n=clamp(Number(id)||1,1,Math.max(1,list.length));
-  return list[n-1]||null;
+  if(!list.length) return null;
+  const requested=Number(id);
+  const found=list.find(c=>Number(c.id)===requested);
+  if(found) return found;
+  const n=clamp(Number.isFinite(requested)?requested:1,1,list.length);
+  return list.find(c=>Number(c.id)===n)||list[0]||null;
 }
 function validateChapter(c){
   const errors=[];
@@ -27,12 +31,12 @@ function validateChapter(c){
 }
 function grade(c,answers){
   let score=0,answered=0;
-  (c?.practice||[]).forEach((q,i)=>{const a=answers?.[i];if(a!==null&&a!==undefined&&a!=='') {answered++;if(Number(a)===Number(q[2]))score++;}});
+  (c?.practice||[]).forEach((q,i)=>{const a=answers?.[i];if(a!==null&&a!==undefined&&a!==''){answered++;if(Number(a)===Number(q[2]))score++;}});
   const total=c?.practice?.length||0;
   return {score,total,answered,unanswered:Math.max(0,total-answered),pct:total?Math.round(score/total*100):0};
 }
 function emit(name,detail){window.dispatchEvent(new CustomEvent(name,{detail}));}
 function chapterSummary(c){return `${c?.sections?.length||0} lessons • ${c?.practice?.length||0} practice questions`;}
-window.EnglishApp={chapters,getChapter,validateChapter,grade,emit,chapterSummary,version:'1.0'};
+window.EnglishApp={chapters,getChapter,validateChapter,grade,emit,chapterSummary,version:'1.1'};
 window.EnglishAppValidation=chapters().map(c=>({id:c.id,title:c.title,...validateChapter(c)}));
 })();
