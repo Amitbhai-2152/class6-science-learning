@@ -54,7 +54,8 @@ assert(has('js/xp-unify-bridge-v2.js','const X=()=>window.XPSystem;'), 'Unified 
 
 const progress = read('js/progress.js');
 assert(has('js/progress.js','window.Progress=Progress;'), 'Legacy Progress API must remain available for Science UI compatibility.');
-assert(has('js/progress.js','XPSystem.recordLearningDay'), 'Legacy activity marking must delegate to canonical XPSystem.');
+assert(has('js/progress.js','recordLearningDay(reason'), 'Legacy activity marking must call the canonical activity API.');
+assert(has('js/progress.js','const xp=window.XPSystem;if(xp?.recordLearningDay)'), 'Legacy activity path must use XPSystem when available.');
 assert(has('js/progress.js','canonicalAward(action,content,points,meta={})'), 'Science XP awards must pass through the canonical XP layer.');
 assert(!has('js/progress.js','this.data.xp+='), 'Legacy Science progress must not directly increment its own XP field.');
 assert(!has('js/progress.js','this.data.streak++'), 'Legacy Science progress must not directly increment its own streak.');
