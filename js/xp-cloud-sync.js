@@ -8,6 +8,7 @@
   const USER_RETRY_DELAYS = [0, 800, 2000, 4000];
   let syncPromise = null;
   let retryTimer = null;
+  let queuedSyncTimer = null;
 
   function clone(value) {
     try { return JSON.parse(JSON.stringify(value)); } catch (_) { return value; }
@@ -115,8 +116,16 @@
     if (retryTimer) return;
     retryTimer = window.setTimeout(() => {
       retryTimer = null;
-      sync();
+      requestSync();
     }, delay);
+  }
+
+  function requestSync(delay = 150) {
+    if (queuedSyncTimer) return;
+    queuedSyncTimer = window.setTimeout(() => {
+      queuedSyncTimer = null;
+      sync();
+    }, Math.max(0, Number(delay) || 0));
   }
 
   async function sync() {
@@ -158,20 +167,37 @@
     return syncPromise;
   }
 
-  window.Class6XPCloudSync = Object.freeze({ sync, mergeStates, migrateState, normalizeState, XP_KEY, STATE_VERSION, ACTIVITY_SOURCE });
+  window.Class6XPCloudSync = Object.freeze({
+    sync,
+    requestSync,
+    mergeStates,
+    migrateState,
+    normalizeState,
+    XP_KEY,
+    STATE_VERSION,
+    ACTIVITY_SOURCE
+  });
 
   document.addEventListener('DOMContentLoaded', () => {
-    window.setTimeout(() => { sync(); }, 0);
+    requestSync(0);
   }, { once: true });
 
-  window.addEventListener('pageshow', () => sync());
+  window.addEventListener('pageshow', () => requestSync(0));
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') sync();
+    if (document.visibilityState === 'visible') requestSync(100);
+  });
+
+  window.addEventListener('xp:earned', () => requestSync(150));
+  window.addEventListener('xp:activity', () => requestSync(150));
+  window.addEventListener('storage', (event) => {
+    if (!event || event.key === XP_KEY) requestSync(250);
   });
 
   window.Class6CloudSync?.getClient?.().then((client) => {
     client?.auth?.onAuthStateChange?.((event) => {
-      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'USER_UPDATED' || event === 'INITIAL_SESSION') sync();
+      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'USER_UPDATED' || event === 'INITIAL_SESSION') {
+        requestSync(0);
+      }
     });
   }).catch(() => {});
 })();
