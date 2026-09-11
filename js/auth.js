@@ -11,7 +11,7 @@
     'socialScienceProgressV3',
     'class6RevisionProgressV1'
   ];
-  const LOCAL_OWNER_KEYS = ['class6CloudOwnerV1', 'class6CloudOwnerV2'];
+  const LOCAL_OWNER_KEYS = ['class6CloudOwnerV1', 'class6CloudOwnerV2', 'class6ChapterCompletionOwnerV1'];
   const COMPLETION_PREFIXES = ['class6ChapterClearedV1:', 'class6ChapterCompletedAtV1:', 'class6ChapterScoreV1:'];
   let client = null;
 
