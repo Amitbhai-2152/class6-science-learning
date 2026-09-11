@@ -10,7 +10,8 @@ const has = (file, token) => read(file).includes(token);
 const requiredFiles = [
   'index.html','js/xp-system.js','js/xp-cloud-sync.js','js/cloud-sync.js',
   'js/home-streak-v2.js','js/home-streak-cloud-sync.js','js/xp-unify-bridge-v2.js',
-  'js/progress.js','js/subject-progress-cloud-sync.js','js/auth-config.js','supabase/schema.sql'
+  'js/progress.js','js/subject-progress-cloud-sync.js','js/auth-config.js',
+  'scripts/check-browser-compatibility.mjs','supabase/schema.sql'
 ];
 for (const file of requiredFiles) assert(fs.existsSync(path.join(root, file)), `Required production file is missing: ${file}`);
 
@@ -60,6 +61,11 @@ assert(has('js/progress.js','canonicalAward(action,content,points,meta={})'), 'S
 assert(!has('js/progress.js','this.data.xp+='), 'Legacy Science progress must not directly increment its own XP field.');
 assert(!has('js/progress.js','this.data.streak++'), 'Legacy Science progress must not directly increment its own streak.');
 
+const browserSmoke = read('scripts/check-browser-compatibility.mjs');
+assert(has('scripts/check-browser-compatibility.mjs',"['Chromium', 'Firefox', 'WebKit']"), 'Browser compatibility coverage must include Chromium, Firefox and WebKit-style contexts.');
+assert(has('scripts/check-browser-compatibility.mjs','visibilitychange'), 'Browser compatibility smoke test must exercise visibility changes.');
+assert(has('scripts/check-browser-compatibility.mjs','storage'), 'Browser compatibility smoke test must exercise storage-event synchronization.');
+
 const schema = read('supabase/schema.sql');
 assert(has('supabase/schema.sql','alter table public.student_state enable row level security;'), 'Supabase student_state RLS must remain enabled.');
 assert(has('supabase/schema.sql','auth.uid() = user_id'), 'Supabase policies must remain user-scoped.');
@@ -85,16 +91,17 @@ assert(has('.github/workflows/progress-engine-runtime.yml','permissions:\n  cont
 assert(has('.github/workflows/progress-engine-runtime.yml','timeout-minutes: 10'), 'CI workflow must have a bounded execution time.');
 for (const token of [
   'npm run check:progress-engine-runtime','npm run check:progress-state-migration',
-  'npm run check:subject-progress-wiring','npm run check:production-audit'
+  'npm run check:subject-progress-wiring','npm run check:browser-compatibility','npm run check:production-audit'
 ]) assert(has('.github/workflows/progress-engine-runtime.yml',token), `CI is missing ${token}`);
 
 const packageJson = JSON.parse(read('package.json'));
-for (const key of ['check:progress-engine-runtime','check:progress-state-migration','check:subject-progress-wiring','check:production-audit']) {
-  assert(packageJson.scripts?.[key], `${key} is missing from package.json.`);
-}
+for (const key of [
+  'check:progress-engine-runtime','check:progress-state-migration',
+  'check:subject-progress-wiring','check:browser-compatibility','check:production-audit'
+]) assert(packageJson.scripts?.[key], `${key} is missing from package.json.`);
 
 const forbiddenSecretPattern = /(service[_-]?role|sb_secret_[A-Za-z0-9_-]+|SUPABASE_SERVICE_ROLE|OPENAI_API_KEY\s*[:=]\s*["'][^"']+["'])/i;
 const scopedTextFiles = ['index.html','js/auth-config.js','js/cloud-sync.js','js/xp-cloud-sync.js','js/home-streak-cloud-sync.js','.github/workflows/progress-engine-runtime.yml'];
 for (const file of scopedTextFiles) assert(!forbiddenSecretPattern.test(read(file)), `Potential secret material found in browser/workflow file: ${file}`);
 
-console.log('PHASE 8 FINAL PRODUCTION AUDIT PASSED: canonical XP/streak contracts, cloud-first hydration, user scoping, optimistic locking, concurrent mutation safety, legacy compatibility boundaries, RLS, cache-busting, CI hardening and browser-secret hygiene verified for the Class 6 learning hub.');
+console.log('PHASE 9 PRODUCTION AUDIT PASSED: browser-compatibility smoke coverage, canonical XP/streak contracts, cloud-first hydration, user scoping, optimistic locking, concurrent mutation safety, legacy compatibility boundaries, RLS, cache-busting, CI hardening and browser-secret hygiene verified for the Class 6 learning hub.');
