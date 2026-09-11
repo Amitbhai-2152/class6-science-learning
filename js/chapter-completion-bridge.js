@@ -36,8 +36,8 @@ function install(){
 }
 function ensureLoader(){
   const src=getScriptPath();if(!src)return;
-  if(!document.querySelector('link[data-universal-chapter-completion-style]')){const l=document.createElement('link');l.rel='stylesheet';l.href=new URL('../css/chapter-completion.css?v=2',src).href;l.setAttribute('data-universal-chapter-completion-style','true');document.head?.appendChild(l)}
-  if(!document.querySelector('script[data-chapter-completion]')){const s=document.createElement('script');s.src=src;s.async=false;s.setAttribute('data-chapter-completion','true');(document.head||document.documentElement).appendChild(s)}
+  if(!document.querySelector('link[href*="chapter-completion.css"]')){const l=document.createElement('link');l.rel='stylesheet';l.href=new URL('../css/chapter-completion.css?v=2',src).href;l.setAttribute('data-universal-chapter-completion-style','true');document.head?.appendChild(l)}
+  if(!document.querySelector('script[src*="chapter-completion.js"]')){const s=document.createElement('script');s.src=src;s.async=false;s.setAttribute('data-chapter-completion','true');(document.head||document.documentElement).appendChild(s)}
 }
 ensureLoader();
 let tries=0;function tick(){install();if(tries++>160)return;setTimeout(tick,125)}tick();
