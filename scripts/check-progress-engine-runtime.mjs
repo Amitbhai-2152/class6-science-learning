@@ -55,7 +55,7 @@ function makeContext(initialStorage = {}, options = {}) {
     }
   };
   class CustomEvent {
-    constructor(type, init = {}) { this.type = type; this.detail = init.detail; }
+    constructor(type, init = {}) { this.type = type; this.detail = init.detail; this.key = init.key; }
   }
   const sandbox = {
     window, document, localStorage, CustomEvent,
@@ -72,7 +72,6 @@ function makeContext(initialStorage = {}, options = {}) {
   vm.runInNewContext(xpSource, sandbox, { filename: xpPath });
   vm.runInNewContext(streakSource, sandbox, { filename: streakPath });
   if (options.loadCloud) {
-    const userId = String(options.userId || 'user-a');
     const cloudAdapter = options.cloudAdapter || {};
     window.Class6CloudSync = cloudAdapter;
     vm.runInNewContext(cloudSource, sandbox, { filename: cloudPath });
@@ -193,7 +192,8 @@ function makeCloudAdapter(userId, cloudState) {
       cloudState = JSON.parse(JSON.stringify(state));
       revision += 1;
       return { synced: true, userId, revision };
-    }
+    },
+    getClient: async () => ({ auth: { onAuthStateChange() {} } })
   };
 }
 
@@ -217,7 +217,6 @@ const xpB = browserB.window.XPSystem;
 const aAward = xpA.award('science', 'practice', 'browser-a', 20, { diminishing: false });
 const bAward = xpB.award('maths', 'practice', 'browser-b', 30, { diminishing: false });
 assert(aAward.awarded === 20 && bAward.awarded === 30, 'Independent browser contexts must be able to award XP independently.');
-const mergedAB = JSON.parse(JSON.stringify(browserA.window.XPSystem.read()));
 const cloudSyncA = makeContext({}, { loadCloud: true, userId: 'student-1', cloudAdapter: makeCloudAdapter('student-1', baseCloud) });
 const mergeFn = cloudSyncA.window.Class6XPCloudSync.mergeStates;
 const combined = mergeFn(browserA.window.XPSystem.read(), browserB.window.XPSystem.read());
@@ -245,10 +244,8 @@ assert(cloudAPI.getDirty()?.seq === newSeq, 'Newer pending mutation must survive
 assert(cloudAPI.clearDirty(newSeq, 'student-a') === true && !cloudAPI.getDirty(), 'The latest successful sync may clear the current pending marker.');
 
 const storageCtx = makeContext({}, { loadCloud: true, userId: 'student-1', cloudAdapter: makeCloudAdapter('student-1', baseCloud) });
-storageCtx.window.dispatchEvent(new storageCtx.CustomEvent('storage', { detail: {}, key: 'class6XPCloudRevisionV1' }));
-storageCtx.window.dispatchEvent(new storageCtx.CustomEvent('storage', { detail: {}, key: 'class6XPCloudDirtyV1' }));
+storageCtx.window.dispatchEvent(new storageCtx.CustomEvent('storage', { key: 'class6XPCloudRevisionV1' }));
+storageCtx.window.dispatchEvent(new storageCtx.CustomEvent('storage', { key: 'class6XPCloudDirtyV1' }));
 assert(storageCtx.timeoutCalls.length >= 2, 'Revision/dirty storage events must request a fresh cloud sync across browser contexts.');
-
-assert(mergedAB.total !== cloudSyncA.window.XPSystem.read().total || mergedAB.total >= 0, 'Independent context setup remained valid.');
 
 console.log('Progress engine runtime test PASSED: canonical activity dates, streak continuity/gaps, legacy event recovery, idempotent XP awards, subject/global XP invariants, daily cap enforcement, stale-streak protection, cross-browser merge preservation, user-scoped revision isolation, concurrent dirty-sequence protection and storage-event sync triggers verified.');
