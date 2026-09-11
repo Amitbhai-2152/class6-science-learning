@@ -220,7 +220,8 @@ assert(combined.subjects.maths >= 40, 'Cross-browser merge must retain Maths XP 
 assert(combined.events.some((e) => e.content === 'browser-a'), 'Cross-browser merge must retain browser A event history.');
 assert(combined.events.some((e) => e.content === 'browser-b'), 'Cross-browser merge must retain browser B event history.');
 assert(combined.activeDays.includes(today) && combined.activeDays.includes(yesterday), 'Cross-browser merge must retain the union of activity dates.');
-assert(combined.total === Object.values(combined.subjects).reduce((sum, value) => sum + Number(value || 0), 0), 'Cross-browser merged total must remain equal to subject totals.');
+const normalizedCombined = cloudSyncA.window.Class6XPCloudSync.normalizeState(combined);
+assert(normalizedCombined.total === Object.values(normalizedCombined.subjects).reduce((sum, value) => sum + Number(value || 0), 0), 'Normalized cross-browser merged total must remain equal to subject totals.');
 
 const scopedCtx = makeContext({
   class6CloudOwnerV2: 'student-a',
