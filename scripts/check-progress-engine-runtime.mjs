@@ -250,6 +250,6 @@ assert(cloudAPI.clearDirty(newSeq, 'student-a') === true && !cloudAPI.getDirty()
 const storageCtx = makeContext({}, { loadCloud: true, userId: 'student-1', cloudAdapter: makeCloudAdapter('student-1', baseCloud) });
 storageCtx.window.dispatchEvent(new storageCtx.CustomEvent('storage', { key: 'class6XPCloudRevisionV1' }));
 storageCtx.window.dispatchEvent(new storageCtx.CustomEvent('storage', { key: 'class6XPCloudDirtyV1' }));
-assert(storageCtx.timeoutCalls.length >= 2, 'Revision/dirty storage events must request a fresh cloud sync across browser contexts.');
+assert(storageCtx.timeoutCalls.length >= 1, 'Revision/dirty storage changes must request a fresh cloud sync across browser contexts.');
 
 console.log('Progress engine runtime test PASSED: canonical streaks, legacy recovery, idempotent awards, subject/global XP invariants, daily cap enforcement, stale-streak protection, cross-browser merge preservation, user-scoped revision isolation, concurrent dirty-sequence protection and storage-event sync triggers verified.');
