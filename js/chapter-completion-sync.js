@@ -72,7 +72,7 @@ async function syncNow(){
     if(error||!data?.session?.user)return;
     const user=data.session.user,uid=String(user.id||'');
     let owner='';try{owner=String(localStorage.getItem(OWNER_KEY)||'')}catch(_){}
-    if(owner&&uid&&owner!==uid)clearLocalCompletions();
+    if(owner&&uid&&owner!==uid){clearLocalCompletions();try{localStorage.setItem(OWNER_KEY,uid)}catch(_){}owner=uid}
     if(uid&&!owner)try{localStorage.setItem(OWNER_KEY,uid)}catch(_){}
     const cloudRaw=user.user_metadata?.[META_KEY];
     const cloud={};
@@ -91,10 +91,7 @@ async function syncNow(){
   finally{syncing=false}
 }
 let pushTimer=0;
-async function pushCompletion(){
-  clearTimeout(pushTimer);
-  pushTimer=setTimeout(()=>syncNow(),200);
-}
+async function pushCompletion(){clearTimeout(pushTimer);pushTimer=setTimeout(()=>syncNow(),200)}
 document.addEventListener('chapter:completed',pushCompletion);
 window.ChapterCompletionSync={sync:syncNow,local:localCompletions,clear:clearLocalCompletions};
 ensureConfig().finally(()=>syncNow());
