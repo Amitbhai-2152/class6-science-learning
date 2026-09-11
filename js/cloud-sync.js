@@ -16,16 +16,11 @@
   let saveQueue = Promise.resolve();
   let sessionUserId = null;
 
-  function configured() {
-    return Boolean(String(cfg.url || '').trim() && String(cfg.anonKey || '').trim());
-  }
+  function configured() { return Boolean(String(cfg.url || '').trim() && String(cfg.anonKey || '').trim()); }
 
   async function getClient() {
     if (!configured()) return null;
-    if (!clientPromise) {
-      clientPromise = import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm')
-        .then(({ createClient }) => createClient(String(cfg.url).trim(), String(cfg.anonKey).trim()));
-    }
+    if (!clientPromise) clientPromise = import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm').then(({ createClient }) => createClient(String(cfg.url).trim(), String(cfg.anonKey).trim()));
     return clientPromise;
   }
 
@@ -37,30 +32,17 @@
     return data?.user || null;
   }
 
-  function clearLocalProgress() {
-    LOCAL_PROGRESS_KEYS.forEach((key) => {
-      try { localStorage.removeItem(key); } catch (_) {}
-    });
-  }
+  function clearLocalProgress() { LOCAL_PROGRESS_KEYS.forEach((key) => { try { localStorage.removeItem(key); } catch (_) {} }); }
 
   function prepareUser(userId) {
     const nextUserId = String(userId || '').trim();
     if (!nextUserId) return { changed: false, previousUserId: null, userId: null };
-
-    if (sessionUserId === nextUserId) {
-      return { changed: false, previousUserId: nextUserId, userId: nextUserId };
-    }
-
+    if (sessionUserId === nextUserId) return { changed: false, previousUserId: nextUserId, userId: nextUserId };
     let previousUserId = null;
     try { previousUserId = String(localStorage.getItem(OWNER_KEY) || '').trim() || null; } catch (_) {}
     const changed = previousUserId !== nextUserId;
     sessionUserId = nextUserId;
-
-    if (changed) {
-      clearLocalProgress();
-      try { localStorage.setItem(OWNER_KEY, nextUserId); } catch (_) {}
-    }
-
+    if (changed) { clearLocalProgress(); try { localStorage.setItem(OWNER_KEY, nextUserId); } catch (_) {} }
     return { changed, previousUserId, userId: nextUserId };
   }
 
@@ -69,120 +51,57 @@
     if (!supabase) return null;
     const user = await getUser();
     if (!user) return null;
-
-    const { data, error } = await supabase
-      .from('student_state')
-      .select('state,schema_version,updated_at')
-      .eq('user_id', user.id)
-      .maybeSingle();
-
+    const { data, error } = await supabase.from('student_state').select('state,schema_version,updated_at').eq('user_id', user.id).maybeSingle();
     if (error) throw error;
     return data || null;
   }
 
-  function clone(value) {
-    try { return JSON.parse(JSON.stringify(value)); } catch (_) { return value; }
-  }
-
-  function dayKey(value) {
-    const d = value instanceof Date ? value : new Date(value);
-    if (Number.isNaN(d.getTime())) return null;
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-  }
-
-  function mergeArrays(a, b) {
-    return [...new Set([...(Array.isArray(a) ? a : []), ...(Array.isArray(b) ? b : [])])];
-  }
-
-  function mergeActiveDays(a, b) {
-    return mergeArrays(a, b).map(dayKey).filter(Boolean).sort().slice(-400);
-  }
-
+  function clone(value) { try { return JSON.parse(JSON.stringify(value)); } catch (_) { return value; } }
+  function dayKey(value) { const d = value instanceof Date ? value : new Date(value); if (Number.isNaN(d.getTime())) return null; return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
+  function mergeArrays(a, b) { return [...new Set([...(Array.isArray(a) ? a : []), ...(Array.isArray(b) ? b : [])])]; }
+  function mergeActiveDays(a, b) { return mergeArrays(a, b).map(dayKey).filter(Boolean).sort().slice(-400); }
   function mergeEvents(a, b) {
-    const seen = new Set();
-    const combined = [];
+    const seen = new Set(), combined = [];
     [...(Array.isArray(a) ? a : []), ...(Array.isArray(b) ? b : [])].forEach((event) => {
       if (!event || typeof event !== 'object') return;
       const key = String(event.key || `${event.subject || ''}|${event.action || ''}|${event.content || ''}|${event.at || ''}`);
-      if (seen.has(key)) return;
-      seen.add(key);
-      combined.push(event);
+      if (seen.has(key)) return; seen.add(key); combined.push(event);
     });
     combined.sort((x, y) => String(y?.at || '').localeCompare(String(x?.at || '')));
     return combined.slice(0, 500);
   }
-
   function mergeXPState(cloud, incoming) {
-    const c = cloud && typeof cloud === 'object' ? cloud : {};
-    const l = incoming && typeof incoming === 'object' ? incoming : {};
-    const merged = Object.assign({}, c, l);
-    const cs = c.subjects && typeof c.subjects === 'object' ? c.subjects : {};
-    const ls = l.subjects && typeof l.subjects === 'object' ? l.subjects : {};
-    const subjects = Object.assign({}, cs, ls);
-    new Set([...Object.keys(cs), ...Object.keys(ls)]).forEach((key) => {
-      subjects[key] = Math.max(Number(cs[key]) || 0, Number(ls[key]) || 0);
-    });
-    merged.subjects = subjects;
-    merged.total = Object.values(subjects).reduce((sum, value) => sum + (Number(value) || 0), 0);
-    merged.events = mergeEvents(c.events, l.events);
-    merged.activeDays = mergeActiveDays(c.activeDays, l.activeDays);
-    const cd = c.daily && typeof c.daily === 'object' ? c.daily : {};
-    const ld = l.daily && typeof l.daily === 'object' ? l.daily : {};
-    merged.daily = String(ld.date || '') === String(cd.date || '')
-      ? { date: String(ld.date || cd.date || ''), earned: Math.max(Number(cd.earned) || 0, Number(ld.earned) || 0) }
-      : (String(ld.date || '') > String(cd.date || '') ? clone(ld) : clone(cd));
+    const c = cloud && typeof cloud === 'object' ? cloud : {}, l = incoming && typeof incoming === 'object' ? incoming : {}, merged = Object.assign({}, c, l);
+    const cs = c.subjects && typeof c.subjects === 'object' ? c.subjects : {}, ls = l.subjects && typeof l.subjects === 'object' ? l.subjects : {}, subjects = Object.assign({}, cs, ls);
+    new Set([...Object.keys(cs), ...Object.keys(ls)]).forEach((key) => { subjects[key] = Math.max(Number(cs[key]) || 0, Number(ls[key]) || 0); });
+    merged.subjects = subjects; merged.total = Object.values(subjects).reduce((sum, value) => sum + (Number(value) || 0), 0); merged.events = mergeEvents(c.events, l.events); merged.activeDays = mergeActiveDays(c.activeDays, l.activeDays);
+    const cd = c.daily && typeof c.daily === 'object' ? c.daily : {}, ld = l.daily && typeof l.daily === 'object' ? l.daily : {};
+    merged.daily = String(ld.date || '') === String(cd.date || '') ? { date: String(ld.date || cd.date || ''), earned: Math.max(Number(cd.earned) || 0, Number(ld.earned) || 0) } : (String(ld.date || '') > String(cd.date || '') ? clone(ld) : clone(cd));
     return merged;
   }
-
   function mergeStreakState(cloud, incoming) {
-    const c = cloud && typeof cloud === 'object' ? cloud : {};
-    const l = incoming && typeof incoming === 'object' ? incoming : {};
-    return Object.assign({}, c, l, {
-      activeDays: mergeActiveDays(c.activeDays, l.activeDays),
-      streak: Math.max(Number(c.streak) || 0, Number(l.streak) || 0),
-      lastActive: [c.lastActive, l.lastActive].filter(Boolean).sort().at(-1) || null
-    });
+    const c = cloud && typeof cloud === 'object' ? cloud : {}, l = incoming && typeof incoming === 'object' ? incoming : {};
+    return Object.assign({}, c, l, { activeDays: mergeActiveDays(c.activeDays, l.activeDays), streak: Math.max(Number(c.streak) || 0, Number(l.streak) || 0), lastActive: [c.lastActive, l.lastActive].filter(Boolean).sort().at(-1) || null });
   }
-
   function mergeBadgeState(cloud, incoming) {
-    const c = cloud && typeof cloud === 'object' ? cloud : {};
-    const l = incoming && typeof incoming === 'object' ? incoming : {};
-    return Object.assign({}, c, l, {
-      ids: mergeArrays(c.ids, l.ids),
-      total: Math.max(Number(c.total) || 0, Number(l.total) || 0)
-    });
+    const c = cloud && typeof cloud === 'object' ? cloud : {}, l = incoming && typeof incoming === 'object' ? incoming : {};
+    return Object.assign({}, c, l, { ids: mergeArrays(c.ids, l.ids), total: Math.max(Number(c.total) || 0, Number(l.total) || 0) });
   }
-
   function mergeSubjectProgress(cloud, incoming) {
-    const c = cloud && typeof cloud === 'object' ? cloud : {};
-    const l = incoming && typeof incoming === 'object' ? incoming : {};
-    const result = Object.assign({}, c, l);
+    const c = cloud && typeof cloud === 'object' ? cloud : {}, l = incoming && typeof incoming === 'object' ? incoming : {}, result = Object.assign({}, c, l);
     new Set([...Object.keys(c), ...Object.keys(l)]).forEach((subject) => {
       const cv = c[subject], lv = l[subject];
       if (!cv || !lv || typeof cv !== 'object' || typeof lv !== 'object') return;
       const item = Object.assign({}, cv, lv);
-      if ('completed' in cv || 'completed' in lv) {
-        item.completed = mergeArrays(cv.completed, lv.completed).map(Number).filter(Number.isFinite).sort((a, b) => a - b);
-      }
-      ['xp', 'streak'].forEach((key) => {
-        if (key in cv || key in lv) item[key] = Math.max(Number(cv[key]) || 0, Number(lv[key]) || 0);
-      });
+      if ('completed' in cv || 'completed' in lv) item.completed = mergeArrays(cv.completed, lv.completed).map(Number).filter(Number.isFinite).sort((a, b) => a - b);
+      ['xp', 'streak'].forEach((key) => { if (key in cv || key in lv) item[key] = Math.max(Number(cv[key]) || 0, Number(lv[key]) || 0); });
       result[subject] = item;
     });
     return result;
   }
-
-  // Revision locking prevents two writers from updating the same row revision.
-  // Semantic merging below also prevents a stale browser snapshot from
-  // replacing newer nested XP/streak/badge/progress data after a retry.
   function mergeTopLevel(cloudState, incoming) {
-    const cloud = cloudState && typeof cloudState === 'object' ? cloudState : {};
-    const local = incoming && typeof incoming === 'object' ? incoming : {};
-    const merged = Object.assign({}, cloud, local);
-
-    if (cloud.subjects || local.subjects || cloud.events || local.events || cloud.activeDays || local.activeDays) {
-      Object.assign(merged, mergeXPState(cloud, local));
-    }
+    const cloud = cloudState && typeof cloudState === 'object' ? cloudState : {}, local = incoming && typeof incoming === 'object' ? incoming : {}, merged = Object.assign({}, cloud, local);
+    if (cloud.subjects || local.subjects || cloud.events || local.events || cloud.activeDays || local.activeDays) Object.assign(merged, mergeXPState(cloud, local));
     if (cloud.streakState || local.streakState) merged.streakState = mergeStreakState(cloud.streakState, local.streakState);
     if (cloud.badgeState || local.badgeState) merged.badgeState = mergeBadgeState(cloud.badgeState, local.badgeState);
     if (cloud.subjectProgress || local.subjectProgress) merged.subjectProgress = mergeSubjectProgress(cloud.subjectProgress, local.subjectProgress);
@@ -191,61 +110,32 @@
 
   async function save(state, schemaVersion = 1) {
     const write = saveQueue.then(async () => {
-      const supabase = await getClient();
-      if (!supabase) return { synced: false, reason: 'not_configured' };
-      const user = await getUser();
-      if (!user) return { synced: false, reason: 'not_signed_in' };
-
-      const incoming = state && typeof state === 'object' ? state : {};
-      const requestedVersion = Math.max(1, Number(schemaVersion) || 1);
-
+      const supabase = await getClient(); if (!supabase) return { synced: false, reason: 'not_configured' };
+      const user = await getUser(); if (!user) return { synced: false, reason: 'not_signed_in' };
+      const incoming = state && typeof state === 'object' ? state : {}, requestedVersion = Math.max(1, Number(schemaVersion) || 1);
       for (let attempt = 1; attempt <= SAVE_RETRIES; attempt += 1) {
         const existing = await load();
         const cloudState = existing?.state && typeof existing.state === 'object' ? existing.state : {};
         const mergedState = mergeTopLevel(cloudState, incoming);
-
         if (!existing) {
-          const { data, error } = await supabase
-            .from('student_state')
-            .insert({ user_id: user.id, state: mergedState, schema_version: requestedVersion })
-            .select('user_id,schema_version')
-            .maybeSingle();
-
-          if (!error && data?.user_id === user.id) {
-            return { synced: true, userId: user.id, created: true, revision: Number(data.schema_version) || requestedVersion };
-          }
-          if (String(error?.code || '') === '23505' && attempt < SAVE_RETRIES) {
-            await new Promise((resolve) => window.setTimeout(resolve, Math.min(1200, 100 * attempt)));
-            continue;
-          }
+          const { data, error } = await supabase.from('student_state').insert({ user_id: user.id, state: mergedState, schema_version: requestedVersion }).select('user_id,schema_version').maybeSingle();
+          if (!error && data?.user_id === user.id) return { synced: true, userId: user.id, created: true, revision: Number(data.schema_version) || requestedVersion };
+          if (String(error?.code || '') === '23505' && attempt < SAVE_RETRIES) { await new Promise((resolve) => window.setTimeout(resolve, Math.min(1200, 100 * attempt))); continue; }
           if (error) throw error;
           if (attempt < SAVE_RETRIES) continue;
           return { synced: false, reason: 'conflict' };
         }
-
         const expectedRevision = Math.max(1, Number(existing.schema_version) || requestedVersion);
+        if (JSON.stringify(existing.state || {}) === JSON.stringify(mergedState)) return { synced: true, userId: user.id, noChange: true, revision: expectedRevision };
         const nextRevision = expectedRevision + 1;
-        const { data, error } = await supabase
-          .from('student_state')
-          .update({ state: mergedState, schema_version: nextRevision })
-          .eq('user_id', user.id)
-          .eq('schema_version', expectedRevision)
-          .select('user_id,schema_version')
-          .maybeSingle();
-
+        const { data, error } = await supabase.from('student_state').update({ state: mergedState, schema_version: nextRevision }).eq('user_id', user.id).eq('schema_version', expectedRevision).select('user_id,schema_version').maybeSingle();
         if (error) throw error;
-        if (data?.user_id === user.id) {
-          return { synced: true, userId: user.id, conflictRetried: attempt > 1, revision: Number(data.schema_version) || nextRevision };
-        }
-        if (attempt < SAVE_RETRIES) {
-          await new Promise((resolve) => window.setTimeout(resolve, Math.min(1200, 100 * attempt)));
-          continue;
-        }
+        if (data?.user_id === user.id) return { synced: true, userId: user.id, conflictRetried: attempt > 1, revision: Number(data.schema_version) || nextRevision };
+        if (attempt < SAVE_RETRIES) { await new Promise((resolve) => window.setTimeout(resolve, Math.min(1200, 100 * attempt))); continue; }
         return { synced: false, reason: 'conflict' };
       }
       return { synced: false, reason: 'conflict' };
     });
-
     saveQueue = write.catch(() => undefined);
     return write;
   }
