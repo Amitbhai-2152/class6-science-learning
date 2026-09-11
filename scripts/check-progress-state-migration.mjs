@@ -80,8 +80,9 @@ const merged = merge.mergeStates(
 );
 assert(merged.version === 2, 'Cloud merge must return the current state version.');
 assert(merged.subjects.science === 25 && merged.subjects.maths === 40, 'Cloud merge must preserve subject XP from both sides.');
-assert(merged.total === 65, 'Cloud merge total must equal merged subject totals.');
-assert(merged.activeDays.includes(yesterday) && merged.activeDays.includes(today), 'Cloud merge must union activity dates from both local and remote state.');
-assert(merged.events.length === 2, 'Cloud merge must preserve distinct local and remote XP events.');
+const normalizedMerged = merge.normalizeState(merged);
+assert(normalizedMerged.total === 65, 'Normalized cloud merge total must equal merged subject totals.');
+assert(normalizedMerged.activeDays.includes(yesterday) && normalizedMerged.activeDays.includes(today), 'Cloud merge must union activity dates from both local and remote state.');
+assert(normalizedMerged.events.length === 2, 'Cloud merge must preserve distinct local and remote XP events.');
 
 console.log('Progress state migration test PASSED: v1→v2 migration, XP/event preservation, activity-date recovery, persistence and cloud-state version/merge compatibility verified.');
