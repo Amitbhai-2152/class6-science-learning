@@ -23,10 +23,11 @@ const Progress={
  strongest(){const a=Object.entries(this.data.best).filter(([id])=>Number(id)>0);return a.sort((x,y)=>y[1]-x[1])[0]||null},
  weakest(){const a=Object.entries(this.data.best).filter(([id])=>Number(id)>0);return a.sort((x,y)=>x[1]-y[1])[0]||null},
  reset(){this.data={completed:[],best:{},section:{},history:[],xp:0,badges:[],streak:0,lastActive:null,review:{}};this.save();localStorage.removeItem('scienceCurrentChapter')},
- save(){localStorage.setItem(this.key,JSON.stringify(this.data))}
+ save(){localStorage.setItem(this.key,JSON.stringify(this.data)}
 };
 window.Progress=Progress;
 Progress.init();
 window.addEventListener('xp:earned',()=>{try{Progress.syncCanonicalView()}catch(_){} });
 window.addEventListener('xp:activity',e=>{try{const d=e.detail||{};Progress.data.streak=Number(d.streak)||0;Progress.data.lastActive=d.date||Progress.data.lastActive;Progress.syncCanonicalView()}catch(_){} });
+document.addEventListener('DOMContentLoaded',()=>{try{Progress.syncCanonicalView()}catch(_){}},{once:true});
 })();
