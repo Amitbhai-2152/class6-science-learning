@@ -152,6 +152,14 @@
   }
 
   window.HomeNotifications = Object.freeze({ open, refresh: refreshBadge, updates: UPDATES.map((x) => Object.assign({}, x)) });
-  document.addEventListener('DOMContentLoaded', boot, { once: true });
+
+  // The script is injected dynamically by theme-toggle.js. On a fast mobile
+  // load, DOMContentLoaded/load may already have fired before this file arrives,
+  // so boot immediately when the DOM is already ready.
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot, { once: true });
+  } else {
+    boot();
+  }
   window.addEventListener('load', boot, { once: true });
 })();
