@@ -5,7 +5,9 @@
   const STATE_VERSION = 2;
   const ACTIVITY_SOURCE = 'xp-system-v2';
   const MAX_ACTIVITY_DAYS = 400;
-  let started = false;
+  const USER_RETRY_DELAYS = [0, 800, 2000, 4000];
+  let syncPromise = null;
+  let retryTimer = null;
 
   function clone(value) {
     try { return JSON.parse(JSON.stringify(value)); } catch (_) { return value; }
@@ -95,34 +97,65 @@
     return merged;
   }
 
-  async function sync() {
-    if (started) return { synced: false, reason: 'already_started' };
-    started = true;
-
-    try {
-      if (!window.Class6CloudSync?.configured?.()) return { synced: false, reason: 'not_configured' };
-      if (!window.XPSystem?.read || !window.XPSystem?.save) return { synced: false, reason: 'xp_system_unavailable' };
-
-      const user = await window.Class6CloudSync.getUser();
-      if (!user) return { synced: false, reason: 'not_signed_in' };
-
-      const scope = window.Class6CloudSync.prepareUser?.(user.id) || { changed: false };
-      const localState = scope.changed ? null : clone(window.XPSystem.read());
-      const row = await window.Class6CloudSync.load();
-      const merged = scope.changed ? migrateState(row?.state || {}) : mergeStates(localState, row?.state || {});
-      window.XPSystem.save(merged);
-
-      const result = await window.Class6CloudSync.save(merged, STATE_VERSION);
-      if (result?.synced) {
-        window.dispatchEvent(new CustomEvent('class6:xp-cloud-synced', {
-          detail: { userId: user.id, version: STATE_VERSION, total: merged.total, subjects: Object.assign({}, merged.subjects), activeDays: merged.activeDays.length }
-        }));
+  async function getUserWithRetries() {
+    for (let index = 0; index < USER_RETRY_DELAYS.length; index += 1) {
+      const delay = USER_RETRY_DELAYS[index];
+      if (delay) await new Promise((resolve) => window.setTimeout(resolve, delay));
+      try {
+        const user = await window.Class6CloudSync.getUser();
+        if (user) return user;
+      } catch (error) {
+        if (index === USER_RETRY_DELAYS.length - 1) throw error;
       }
-      return result;
-    } catch (error) {
-      console.error('Class 6 XP cloud sync failed:', error);
-      return { synced: false, reason: 'sync_error', error: String(error?.message || error) };
     }
+    return null;
+  }
+
+  function scheduleRetry(delay = 2500) {
+    if (retryTimer) return;
+    retryTimer = window.setTimeout(() => {
+      retryTimer = null;
+      sync();
+    }, delay);
+  }
+
+  async function sync() {
+    if (syncPromise) return syncPromise;
+    syncPromise = (async () => {
+      try {
+        if (!window.Class6CloudSync?.configured?.()) return { synced: false, reason: 'not_configured' };
+        if (!window.XPSystem?.read || !window.XPSystem?.save) return { synced: false, reason: 'xp_system_unavailable' };
+
+        const user = await getUserWithRetries();
+        if (!user) {
+          scheduleRetry(2500);
+          return { synced: false, reason: 'not_signed_in' };
+        }
+
+        const scope = window.Class6CloudSync.prepareUser?.(user.id) || { changed: false };
+        const localState = scope.changed ? null : clone(window.XPSystem.read());
+        const row = await window.Class6CloudSync.load();
+        const merged = scope.changed ? migrateState(row?.state || {}) : mergeStates(localState, row?.state || {});
+        window.XPSystem.save(merged);
+
+        const result = await window.Class6CloudSync.save(merged, STATE_VERSION);
+        if (result?.synced) {
+          window.dispatchEvent(new CustomEvent('class6:xp-cloud-synced', {
+            detail: { userId: user.id, version: STATE_VERSION, total: merged.total, subjects: Object.assign({}, merged.subjects), activeDays: merged.activeDays.length }
+          }));
+        } else if (result?.reason === 'not_signed_in') {
+          scheduleRetry(2500);
+        }
+        return result;
+      } catch (error) {
+        console.error('Class 6 XP cloud sync failed:', error);
+        scheduleRetry(2500);
+        return { synced: false, reason: 'sync_error', error: String(error?.message || error) };
+      } finally {
+        syncPromise = null;
+      }
+    })();
+    return syncPromise;
   }
 
   window.Class6XPCloudSync = Object.freeze({ sync, mergeStates, migrateState, normalizeState, XP_KEY, STATE_VERSION, ACTIVITY_SOURCE });
@@ -130,4 +163,15 @@
   document.addEventListener('DOMContentLoaded', () => {
     window.setTimeout(() => { sync(); }, 0);
   }, { once: true });
+
+  window.addEventListener('pageshow', () => sync());
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') sync();
+  });
+
+  window.Class6CloudSync?.getClient?.().then((client) => {
+    client?.auth?.onAuthStateChange?.((event) => {
+      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'USER_UPDATED' || event === 'INITIAL_SESSION') sync();
+    });
+  }).catch(() => {});
 })();
