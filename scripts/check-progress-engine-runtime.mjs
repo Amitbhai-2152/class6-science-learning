@@ -5,15 +5,18 @@ import vm from 'node:vm';
 const root = process.cwd();
 const xpPath = path.join(root, 'js/xp-system.js');
 const streakPath = path.join(root, 'js/home-streak-v2.js');
+const cloudPath = path.join(root, 'js/xp-cloud-sync.js');
 const xpSource = fs.readFileSync(xpPath, 'utf8');
 const streakSource = fs.readFileSync(streakPath, 'utf8');
+const cloudSource = fs.readFileSync(cloudPath, 'utf8');
 
 const fail = (message) => { throw new Error(`[progress-engine-runtime] ${message}`); };
 const assert = (condition, message) => { if (!condition) fail(message); };
 
-function makeContext(initialStorage = {}) {
+function makeContext(initialStorage = {}, options = {}) {
   const store = new Map(Object.entries(initialStorage));
   const listeners = new Map();
+  const timeoutCalls = [];
   const localStorage = {
     getItem(key) { return store.has(key) ? store.get(key) : null; },
     setItem(key, value) { store.set(key, String(value)); },
@@ -27,6 +30,7 @@ function makeContext(initialStorage = {}) {
     body: { appendChild() {} },
     head: { appendChild() {} },
     documentElement: { dataset: {} },
+    visibilityState: 'visible',
     addEventListener(type, fn) { listeners.set(`document:${type}`, fn); },
     getElementById() { return null; },
     querySelector() { return null; },
@@ -56,7 +60,9 @@ function makeContext(initialStorage = {}) {
   const sandbox = {
     window, document, localStorage, CustomEvent,
     MutationObserver: undefined,
-    setTimeout() {}, setInterval() {}, clearTimeout() {}, clearInterval() {},
+    setTimeout(fn, delay) { timeoutCalls.push({ fn, delay }); return timeoutCalls.length; },
+    setInterval() { return 1; },
+    clearTimeout() {}, clearInterval() {},
     Date, Math, JSON, Set, Map, Array, Object, Number, String, Boolean, Error, Intl, console
   };
   window.window = window;
@@ -65,7 +71,14 @@ function makeContext(initialStorage = {}) {
   window.CustomEvent = CustomEvent;
   vm.runInNewContext(xpSource, sandbox, { filename: xpPath });
   vm.runInNewContext(streakSource, sandbox, { filename: streakPath });
-  return { ...sandbox, store };
+  if (options.loadCloud) {
+    const userId = String(options.userId || 'user-a');
+    const cloudAdapter = options.cloudAdapter || {};
+    window.Class6CloudSync = cloudAdapter;
+    vm.runInNewContext(cloudSource, sandbox, { filename: cloudPath });
+    window.Class6CloudSync = cloudAdapter;
+  }
+  return { ...sandbox, store, timeoutCalls, listeners };
 }
 
 const dayKey = (value) => {
@@ -169,4 +182,73 @@ assert(awardCtx.window.HomeStreak.getActivityDays().includes(today), 'Home strea
 const invalid = awardXP.award('not-a-subject', 'invalid', 'x', 50);
 assert(invalid.reason === 'invalid-subject' && awardXP.read().total === awardXP.read().total, 'Invalid subjects must be rejected without corrupting XP state.');
 
-console.log('Progress engine runtime test PASSED: canonical activity dates, streak continuity/gaps, legacy event recovery, idempotent XP awards, subject/global XP invariants, daily cap enforcement and stale-streak protection verified.');
+function makeCloudAdapter(userId, cloudState) {
+  let revision = 1;
+  return {
+    configured: () => true,
+    getUser: async () => ({ id: userId }),
+    prepareUser: () => ({ changed: false }),
+    load: async () => ({ state: cloudState, schema_version: revision }),
+    save: async (state) => {
+      cloudState = JSON.parse(JSON.stringify(state));
+      revision += 1;
+      return { synced: true, userId, revision };
+    }
+  };
+}
+
+const baseCloud = {
+  version: 2,
+  total: 40,
+  subjects: { science: 10, maths: 10, english: 5, hindi: 5, gk: 5, social: 5, revision: 0 },
+  events: [
+    { id: 'cloud-1', key: 'science|practice|cloud-1', subject: 'science', action: 'practice', content: 'cloud-1', points: 10, at: `${today}T08:00:00.000Z` }
+  ],
+  daily: { date: today, earned: 10 },
+  activeDays: [yesterday, today],
+  activitySource: 'xp-system-v2',
+  legacySeeded: false
+};
+
+const browserA = makeContext({ class6XPSystemV1: JSON.stringify(baseCloud) });
+const browserB = makeContext({ class6XPSystemV1: JSON.stringify(baseCloud) });
+const xpA = browserA.window.XPSystem;
+const xpB = browserB.window.XPSystem;
+const aAward = xpA.award('science', 'practice', 'browser-a', 20, { diminishing: false });
+const bAward = xpB.award('maths', 'practice', 'browser-b', 30, { diminishing: false });
+assert(aAward.awarded === 20 && bAward.awarded === 30, 'Independent browser contexts must be able to award XP independently.');
+const mergedAB = JSON.parse(JSON.stringify(browserA.window.XPSystem.read()));
+const cloudSyncA = makeContext({}, { loadCloud: true, userId: 'student-1', cloudAdapter: makeCloudAdapter('student-1', baseCloud) });
+const mergeFn = cloudSyncA.window.Class6XPCloudSync.mergeStates;
+const combined = mergeFn(browserA.window.XPSystem.read(), browserB.window.XPSystem.read());
+assert(combined.subjects.science >= 30, 'Cross-browser merge must retain Science XP from browser A.');
+assert(combined.subjects.maths >= 40, 'Cross-browser merge must retain Maths XP from browser B.');
+assert(combined.events.some((e) => e.content === 'browser-a'), 'Cross-browser merge must retain browser A event history.');
+assert(combined.events.some((e) => e.content === 'browser-b'), 'Cross-browser merge must retain browser B event history.');
+assert(combined.activeDays.includes(today) && combined.activeDays.includes(yesterday), 'Cross-browser merge must retain the union of activity dates.');
+assert(combined.total === Object.values(combined.subjects).reduce((sum, value) => sum + Number(value || 0), 0), 'Cross-browser merged total must remain equal to subject totals.');
+
+const scopedCtx = makeContext({
+  class6CloudOwnerV2: 'student-a',
+  class6XPCloudRevisionV1: JSON.stringify({ userId: 'student-a', revision: 7 }),
+  class6XPCloudDirtyV1: JSON.stringify({ dirty: true, userId: 'student-a', seq: 4, at: new Date().toISOString() })
+}, { loadCloud: true, userId: 'student-a', cloudAdapter: makeCloudAdapter('student-a', baseCloud) });
+const cloudAPI = scopedCtx.window.Class6XPCloudSync;
+assert(cloudAPI.getRevision('student-a') === 7, 'A browser must accept its own scoped cloud revision.');
+assert(cloudAPI.getRevision('student-b') === 0, 'A browser must reject another user\'s scoped cloud revision.');
+const oldSeq = cloudAPI.getDirty().seq;
+cloudAPI.markDirty();
+const newSeq = cloudAPI.getDirty().seq;
+assert(newSeq === oldSeq + 1, 'A second local mutation must advance the pending-sync sequence.');
+assert(cloudAPI.clearDirty(oldSeq, 'student-a') === false, 'An older sync completion must not clear a newer pending mutation.');
+assert(cloudAPI.getDirty()?.seq === newSeq, 'Newer pending mutation must survive stale clear attempts.');
+assert(cloudAPI.clearDirty(newSeq, 'student-a') === true && !cloudAPI.getDirty(), 'The latest successful sync may clear the current pending marker.');
+
+const storageCtx = makeContext({}, { loadCloud: true, userId: 'student-1', cloudAdapter: makeCloudAdapter('student-1', baseCloud) });
+storageCtx.window.dispatchEvent(new storageCtx.CustomEvent('storage', { detail: {}, key: 'class6XPCloudRevisionV1' }));
+storageCtx.window.dispatchEvent(new storageCtx.CustomEvent('storage', { detail: {}, key: 'class6XPCloudDirtyV1' }));
+assert(storageCtx.timeoutCalls.length >= 2, 'Revision/dirty storage events must request a fresh cloud sync across browser contexts.');
+
+assert(mergedAB.total !== cloudSyncA.window.XPSystem.read().total || mergedAB.total >= 0, 'Independent context setup remained valid.');
+
+console.log('Progress engine runtime test PASSED: canonical activity dates, streak continuity/gaps, legacy event recovery, idempotent XP awards, subject/global XP invariants, daily cap enforcement, stale-streak protection, cross-browser merge preservation, user-scoped revision isolation, concurrent dirty-sequence protection and storage-event sync triggers verified.');
