@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Keep public learning content crawlable. Authentication/account pages are not useful search destinations.
+Disallow: /auth.html
+Disallow: /auth/
+
+# Sitemap URL is intentionally omitted here because the production host/domain is deployment-specific.
+# Submit /sitemap.xml directly in Google Search Console after confirming the live site URL.
