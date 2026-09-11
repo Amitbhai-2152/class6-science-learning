@@ -2,7 +2,35 @@
   'use strict';
 
   let syncPromise = null;
+  let authFallbackTimer = null;
   const MAX_ACTIVITY_DAYS = 400;
+  const USER_RETRY_DELAYS = [0, 800, 2000, 4000];
+
+  function setPending() {
+    if (!window.Class6CloudSync?.configured?.()) return false;
+    document.documentElement.dataset.streakCloudPending = '1';
+    ['streakMini', 'homeStreak'].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = '…';
+    });
+    return true;
+  }
+
+  function clearPending() {
+    delete document.documentElement.dataset.streakCloudPending;
+    if (authFallbackTimer) {
+      window.clearTimeout(authFallbackTimer);
+      authFallbackTimer = null;
+    }
+  }
+
+  function revealLocalFallback() {
+    if (!document.documentElement.dataset.streakCloudPending) return;
+    clearPending();
+    window.HomeStreak?.refresh?.();
+  }
+
+  setPending();
 
   const dayKey = (value) => {
     const d = value instanceof Date ? new Date(value.getTime()) : new Date(value);
@@ -68,7 +96,21 @@
     return { streak, lastActive };
   }
 
-  function scheduleRetry(delay = 1000) {
+  async function getUserWithRetries() {
+    for (let index = 0; index < USER_RETRY_DELAYS.length; index += 1) {
+      const delay = USER_RETRY_DELAYS[index];
+      if (delay) await new Promise((resolve) => window.setTimeout(resolve, delay));
+      try {
+        const user = await window.Class6CloudSync.getUser();
+        if (user) return user;
+      } catch (error) {
+        if (index === USER_RETRY_DELAYS.length - 1) throw error;
+      }
+    }
+    return null;
+  }
+
+  function scheduleRetry(delay = 2000) {
     window.setTimeout(() => {
       sync();
     }, delay);
@@ -78,12 +120,17 @@
     if (syncPromise) return syncPromise;
     syncPromise = (async () => {
       try {
-        if (!window.Class6CloudSync?.configured?.()) return { synced: false, reason: 'not_configured' };
-        const user = await window.Class6CloudSync.getUser();
+        if (!window.Class6CloudSync?.configured?.()) {
+          clearPending();
+          window.HomeStreak?.refresh?.();
+          return { synced: false, reason: 'not_configured' };
+        }
+
+        setPending();
+        const user = await getUserWithRetries();
         if (!user) {
-          scheduleRetry(800);
-          scheduleRetry(2000);
-          scheduleRetry(4000);
+          clearPending();
+          window.HomeStreak?.refresh?.();
           return { synced: false, reason: 'not_signed_in' };
         }
 
@@ -123,10 +170,16 @@
           }, 1);
         }
 
+        clearPending();
         window.HomeStreak?.refresh?.();
         return { synced: true, streak: merged.streak, activeDays: merged.activeDays };
       } catch (error) {
         console.error('Class 6 streak cloud sync failed:', error);
+        if (!authFallbackTimer) {
+          authFallbackTimer = window.setTimeout(() => {
+            revealLocalFallback();
+          }, 8000);
+        }
         scheduleRetry(2000);
         return { synced: false, reason: 'sync_error', error: String(error?.message || error) };
       } finally {
@@ -151,4 +204,8 @@
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') sync();
   });
+
+  window.Class6CloudSync?.getClient?.().then((client) => {
+    client?.auth?.onAuthStateChange?.(() => sync());
+  }).catch(() => {});
 })();
