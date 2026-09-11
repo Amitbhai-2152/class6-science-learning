@@ -3,6 +3,8 @@
 
   const XP_KEY = 'class6XPSystemV1';
   const REVISION_KEY = 'class6XPCloudRevisionV1';
+  const DIRTY_KEY = 'class6XPCloudDirtyV1';
+  const OWNER_KEY = 'class6CloudOwnerV2';
   const STATE_VERSION = 2;
   const ACTIVITY_SOURCE = 'xp-system-v2';
   const MAX_ACTIVITY_DAYS = 400;
@@ -35,6 +37,12 @@
   function getRevision(){try{return Math.max(0,Number(localStorage.getItem(REVISION_KEY))||0)}catch(_){return 0}}
   function setRevision(value){try{localStorage.setItem(REVISION_KEY,String(Math.max(0,Number(value)||0)))}catch(_){}
   }
+  function getDirty(){try{const raw=localStorage.getItem(DIRTY_KEY);if(!raw)return null;const data=JSON.parse(raw);return data&&data.dirty?{dirty:true,userId:String(data.userId||'').trim()}:null}catch(_){return null}}
+  function markDirty(){try{let userId='';try{userId=String(localStorage.getItem(OWNER_KEY)||'').trim()}catch(_){}localStorage.setItem(DIRTY_KEY,JSON.stringify({dirty:true,userId,at:new Date().toISOString()}))}catch(_){}
+  }
+  function clearDirty(){try{localStorage.removeItem(DIRTY_KEY)}catch(_){}
+  }
+  function hasPendingLocalChanges(userId){const marker=getDirty();if(!marker?.dirty)return false;return !marker.userId||marker.userId===String(userId||'').trim()}
   async function getUserWithRetries(){for(let i=0;i<USER_RETRY_DELAYS.length;i+=1){const delay=USER_RETRY_DELAYS[i];if(delay)await new Promise(r=>window.setTimeout(r,delay));try{const user=await window.Class6CloudSync.getUser();if(user)return user}catch(error){if(i===USER_RETRY_DELAYS.length-1)throw error}}return null}
   function scheduleRetry(delay=2500){if(retryTimer)return;retryTimer=window.setTimeout(()=>{retryTimer=null;requestSync(0)},delay)}
   function requestSync(delay=150){if(syncPromise){rerunAfterSync=true;return syncPromise}if(queuedSyncTimer)return;queuedSyncTimer=window.setTimeout(()=>{queuedSyncTimer=null;sync()},Math.max(0,Number(delay)||0))}
@@ -55,15 +63,18 @@
         const cloudRevision=Math.max(0,Number(row?.schema_version)||0);
         const localRevision=getRevision();
         const localIsCurrent=!scope.changed&&localRevision>0&&localRevision===cloudRevision;
-        // A browser with an older revision has a stale local cache. Cloud wins.
-        // Local changes are merged only when they are based on the current revision.
-        const merged=scope.changed?cloud:(!row||!cloudRevision||localIsCurrent?mergeStates(before,cloud):cloud);
+        const pendingLocal=hasPendingLocalChanges(user.id);
+        // Revision drift normally means this browser has stale cached state.
+        // A persistent dirty marker proves XP/activity was created locally after
+        // the last successful sync, so those changes must be merged before cloud wins.
+        const merged=scope.changed?cloud:(pendingLocal?mergeStates(before,cloud):(!row||!cloudRevision||localIsCurrent?mergeStates(before,cloud):cloud));
         const changed=JSON.stringify(normalizeState(before))!==JSON.stringify(normalizeState(merged));
         window.XPSystem.save(merged);
         const result=changed?await window.Class6CloudSync.save(merged,STATE_VERSION):{synced:true,userId:user.id,noChange:true,revision:cloudRevision};
         if(result?.synced){
           if(Number.isFinite(Number(result.revision)))setRevision(result.revision);
-          window.dispatchEvent(new CustomEvent('class6:xp-cloud-synced',{detail:{userId:user.id,version:STATE_VERSION,total:merged.total,subjects:Object.assign({},merged.subjects),activeDays:merged.activeDays.length,changed,cloudRevision:Number(result.revision)||cloudRevision,hydratedFromCloud:Boolean(!localIsCurrent&&!scope.changed&&row)}}));
+          clearDirty();
+          window.dispatchEvent(new CustomEvent('class6:xp-cloud-synced',{detail:{userId:user.id,version:STATE_VERSION,total:merged.total,subjects:Object.assign({},merged.subjects),activeDays:merged.activeDays.length,changed,cloudRevision:Number(result.revision)||cloudRevision,hydratedFromCloud:Boolean(!pendingLocal&&!localIsCurrent&&!scope.changed&&row)}}));
         } else if(result?.reason==='not_signed_in')scheduleRetry(2500);
         return result;
       }catch(error){console.error('Class 6 XP cloud sync failed:',error);scheduleRetry(2500);return{synced:false,reason:'sync_error',error:String(error?.message||error)}}
@@ -72,12 +83,12 @@
     return syncPromise;
   }
 
-  window.Class6XPCloudSync=Object.freeze({sync,requestSync,mergeStates,migrateState,normalizeState,XP_KEY,STATE_VERSION,ACTIVITY_SOURCE,REVISION_KEY,getRevision});
+  window.Class6XPCloudSync=Object.freeze({sync,requestSync,mergeStates,migrateState,normalizeState,XP_KEY,STATE_VERSION,ACTIVITY_SOURCE,REVISION_KEY,getRevision,DIRTY_KEY,getDirty,hasPendingLocalChanges,markDirty,clearDirty});
   document.addEventListener('DOMContentLoaded',()=>{requestSync(0);startPolling()},{once:true});
   window.addEventListener('pageshow',()=>{requestSync(0);startPolling()});
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){requestSync(100);startPolling()}else stopPolling()});
-  window.addEventListener('xp:earned',()=>requestSync(150));
-  window.addEventListener('xp:activity',()=>requestSync(150));
-  window.addEventListener('storage',(event)=>{if(!event||event.key===XP_KEY)requestSync(250)});
+  window.addEventListener('xp:earned',()=>{markDirty();requestSync(150)});
+  window.addEventListener('xp:activity',()=>{markDirty();requestSync(150)});
+  window.addEventListener('storage',(event)=>{if(!event||event.key===XP_KEY||event.key===DIRTY_KEY)requestSync(250)});
   window.Class6CloudSync?.getClient?.().then(client=>{client?.auth?.onAuthStateChange?.(event=>{if(event==='SIGNED_IN'||event==='SIGNED_OUT'||event==='USER_UPDATED'||event==='INITIAL_SESSION')requestSync(0)})}).catch(()=>{});
 })();
