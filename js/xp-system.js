@@ -10,7 +10,7 @@ const BADGES=[
 {id:'xp-100',xp:100,icon:'🌱',title:'First Steps',text:'You reached 100 unified XP across the learning hub.'},
 {id:'xp-300',xp:300,icon:'🚀',title:'Learning Explorer',text:'You reached 300 unified XP. Keep exploring every subject.'},
 {id:'xp-600',xp:600,icon:'🎓',title:'Dedicated Learner',text:'You reached 600 unified XP through consistent study.'},
-{id:'xp-1000',xp:1000,icon:'🏆',title:'Knowledge Achiever',text:'You reached 1,000 unified XP across your subjects.'},
+{id:'xp-1000',xp:1000,icon:'🏆',title:'Knowledge Achiever',text:'You reached 1,000 XP across your subjects.'},
 {id:'xp-1500',xp:1500,icon:'👑',title:'Learning Master',text:'You reached 1,500 XP. Excellent progress.'}
 ];
 const clamp=(n,min=0,max=100)=>Math.max(min,Math.min(max,Number(n)||0));
@@ -44,7 +44,17 @@ function activityDays(){return [...new Set([...state.activeDays,...eventActivity
 function currentStreak(){const days=new Set(activityDays());let cursor=new Date(),streak=0;while(days.has(dayKey(cursor))){streak++;cursor.setDate(cursor.getDate()-1)}return streak}
 function legacyValue(key){try{const x=JSON.parse(localStorage.getItem(key)||'null');if(!x)return 0;if(Array.isArray(x)){return x.reduce((s,v)=>s+10+(Number(v.score)||0)*2,0)}return Math.max(0,Number(x.xp)||0)}catch(_){return 0}}
 function legacySnapshot(){return{science:legacyValue('class6ScienceProgressV9'),maths:legacyValue('mathsExamHistory'),english:legacyValue('class6EnglishProgressV1'),hindi:legacyValue('class6HindiProgressV2'),gk:legacyValue('class6GKProgressV1'),social:legacyValue('socialScienceProgressV3'),revision:legacyValue('class6RevisionProgressV1')}}
-function seedLegacy(){if(state.legacySeeded)return;const legacy=legacySnapshot();state.total=0;Object.keys(state.subjects).forEach(s=>{const v=Math.max(0,Math.round(legacy[s]||0));state.subjects[s]=v;state.total+=v});state.legacySeeded=true;state.daily={date:today(),earned:0};save()}
+function seedLegacy(){
+  if(state.legacySeeded)return;
+  const hasCanonical=Number(state.total)>0||Object.values(state.subjects||{}).some(v=>Number(v)>0)||(Array.isArray(state.events)&&state.events.length>0)||(Array.isArray(state.activeDays)&&state.activeDays.length>0);
+  if(hasCanonical){state.legacySeeded=true;save();return}
+  const legacy=legacySnapshot();
+  const hasLegacy=Object.values(legacy).some(v=>Number(v)>0);
+  if(!hasLegacy){state.legacySeeded=true;save();return}
+  state.total=0;
+  Object.keys(state.subjects).forEach(s=>{const v=Math.max(0,Math.round(legacy[s]||0));state.subjects[s]=v;state.total+=v});
+  state.legacySeeded=true;state.daily={date:today(),earned:0};save()
+}
 function reconcileLegacy(){const legacy=legacySnapshot();let changed=false;Object.keys(state.subjects).forEach(s=>{const v=Math.max(0,Math.round(legacy[s]||0));if(v>Number(state.subjects[s]||0)){state.subjects[s]=v;changed=true}});if(changed){state.total=Object.values(state.subjects).reduce((sum,v)=>sum+Math.max(0,Number(v)||0),0);save()}return changed}
 seedLegacy();
 reconcileLegacy();
