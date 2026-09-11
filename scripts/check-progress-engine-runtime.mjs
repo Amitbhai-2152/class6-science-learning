@@ -17,6 +17,9 @@ function makeContext(initialStorage = {}, options = {}) {
   const store = new Map(Object.entries(initialStorage));
   const listeners = new Map();
   const timeoutCalls = [];
+  const setTimeoutMock = (fn, delay) => { timeoutCalls.push({ fn, delay }); return timeoutCalls.length; };
+  const setIntervalMock = () => 1;
+  const clearTimerMock = () => {};
   const localStorage = {
     getItem(key) { return store.has(key) ? store.get(key) : null; },
     setItem(key, value) { store.set(key, String(value)); },
@@ -52,7 +55,11 @@ function makeContext(initialStorage = {}, options = {}) {
       const fn = listeners.get(`window:${event?.type}`);
       if (fn) fn(event);
       return true;
-    }
+    },
+    setTimeout: setTimeoutMock,
+    setInterval: setIntervalMock,
+    clearTimeout: clearTimerMock,
+    clearInterval: clearTimerMock
   };
   class CustomEvent {
     constructor(type, init = {}) { this.type = type; this.detail = init.detail; this.key = init.key; }
@@ -60,9 +67,10 @@ function makeContext(initialStorage = {}, options = {}) {
   const sandbox = {
     window, document, localStorage, CustomEvent,
     MutationObserver: undefined,
-    setTimeout(fn, delay) { timeoutCalls.push({ fn, delay }); return timeoutCalls.length; },
-    setInterval() { return 1; },
-    clearTimeout() {}, clearInterval() {},
+    setTimeout: setTimeoutMock,
+    setInterval: setIntervalMock,
+    clearTimeout: clearTimerMock,
+    clearInterval: clearTimerMock,
     Date, Math, JSON, Set, Map, Array, Object, Number, String, Boolean, Error, Intl, console
   };
   window.window = window;
