@@ -11,7 +11,7 @@
     'socialScienceProgressV3',
     'class6RevisionProgressV1'
   ];
-  const SAVE_RETRIES = 6;
+  const SAVE_RETRIES = 8;
   let clientPromise = null;
   let saveQueue = Promise.resolve();
   let sessionUserId = null;
@@ -96,19 +96,18 @@
       if (!user) return { synced: false, reason: 'not_signed_in' };
 
       const incoming = state && typeof state === 'object' ? state : {};
+      const requestedVersion = Math.max(1, Number(schemaVersion) || 1);
 
-      // This is deliberately NOT a plain upsert. Two browsers can read the
-      // same cloud snapshot at nearly the same time. A normal upsert would
-      // then let the last writer silently replace the newer state from the
-      // other browser. Instead, update only when updated_at is still the
-      // version that we actually read. A conflicting writer changes that
-      // timestamp, making our update affect zero rows; we then reload the
-      // latest cloud state, merge again, and retry.
+      // schema_version is used as an explicit row revision counter. It is
+      // more reliable than updated_at because it does not depend on a
+      // database trigger being installed. Every successful update increments
+      // the revision, so two browsers cannot both successfully update the
+      // same revision. A loser detects the zero-row conditional update,
+      // reloads the newest state, merges again, and retries.
       for (let attempt = 1; attempt <= SAVE_RETRIES; attempt += 1) {
         const existing = await load();
         const cloudState = existing?.state && typeof existing.state === 'object' ? existing.state : {};
         const mergedState = mergeTopLevel(cloudState, incoming);
-        const version = Number(schemaVersion) || Number(existing?.schema_version) || 1;
 
         if (!existing) {
           const { data, error } = await supabase
@@ -116,18 +115,17 @@
             .insert({
               user_id: user.id,
               state: mergedState,
-              schema_version: version
+              schema_version: requestedVersion
             })
-            .select('user_id,updated_at')
+            .select('user_id,schema_version')
             .maybeSingle();
 
           if (!error && data?.user_id === user.id) {
-            return { synced: true, userId: user.id, created: true };
+            return { synced: true, userId: user.id, created: true, revision: Number(data.schema_version) || requestedVersion };
           }
 
-          // Another browser may have created the row between our read and
-          // insert. Postgres reports a unique-key conflict in that case.
           if (String(error?.code || '') === '23505' && attempt < SAVE_RETRIES) {
+            await new Promise((resolve) => window.setTimeout(resolve, Math.min(1200, 100 * attempt)));
             continue;
           }
           if (error) throw error;
@@ -135,27 +133,32 @@
           return { synced: false, reason: 'conflict' };
         }
 
-        const expectedUpdatedAt = existing.updated_at;
-        if (!expectedUpdatedAt) throw new Error('student_state.updated_at is missing');
+        const expectedRevision = Math.max(1, Number(existing.schema_version) || requestedVersion);
+        const nextRevision = expectedRevision + 1;
 
         const { data, error } = await supabase
           .from('student_state')
           .update({
             state: mergedState,
-            schema_version: version
+            schema_version: nextRevision
           })
           .eq('user_id', user.id)
-          .eq('updated_at', expectedUpdatedAt)
-          .select('user_id,updated_at')
+          .eq('schema_version', expectedRevision)
+          .select('user_id,schema_version')
           .maybeSingle();
 
         if (error) throw error;
         if (data?.user_id === user.id) {
-          return { synced: true, userId: user.id, conflictRetried: attempt > 1 };
+          return {
+            synced: true,
+            userId: user.id,
+            conflictRetried: attempt > 1,
+            revision: Number(data.schema_version) || nextRevision
+          };
         }
 
         if (attempt < SAVE_RETRIES) {
-          await new Promise((resolve) => window.setTimeout(resolve, Math.min(1200, 120 * attempt)));
+          await new Promise((resolve) => window.setTimeout(resolve, Math.min(1200, 100 * attempt)));
           continue;
         }
         return { synced: false, reason: 'conflict' };
