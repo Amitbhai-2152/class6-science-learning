@@ -1,5 +1,6 @@
 (function(){
 'use strict';
+/* Canonical delegation contract: XPSystem.score / XPSystem.award are the authoritative XP paths. */
 const X=()=>window.XPSystem;
 function wrap(obj,name,handler){if(!obj||typeof obj[name]!=='function'||obj[name].__xpUnifiedV3)return;const original=obj[name];const wrapped=function(){return handler.call(this,original,arguments)};wrapped.__xpUnifiedV3=true;obj[name]=wrapped}
 function pct(score,total){return Math.round(Number(score||0)/Math.max(1,Number(total||0))*100)}
