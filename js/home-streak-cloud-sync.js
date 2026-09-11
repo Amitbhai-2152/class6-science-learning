@@ -3,11 +3,13 @@
 
   let syncPromise = null;
   let retryTimer = null;
+  let cloudResolved = false;
   const MAX_ACTIVITY_DAYS = 400;
   const USER_RETRY_DELAYS = [0, 800, 2000, 4000];
 
-  function setPending() {
+  function setPending(force = false) {
     if (!window.Class6CloudSync?.configured?.()) return false;
+    if (cloudResolved && !force) return false;
     document.documentElement.dataset.streakCloudPending = '1';
     ['streakMini', 'homeStreak'].forEach((id) => {
       const el = document.getElementById(id);
@@ -18,6 +20,18 @@
 
   function clearPending() {
     delete document.documentElement.dataset.streakCloudPending;
+  }
+
+  function markCloudResolved() {
+    cloudResolved = true;
+    document.documentElement.dataset.streakCloudResolved = '1';
+    clearPending();
+  }
+
+  function markAwaitingCloud() {
+    cloudResolved = false;
+    delete document.documentElement.dataset.streakCloudResolved;
+    setPending(true);
   }
 
   setPending();
@@ -113,7 +127,7 @@
     syncPromise = (async () => {
       try {
         if (!window.Class6CloudSync?.configured?.()) {
-          clearPending();
+          markCloudResolved();
           window.HomeStreak?.refresh?.();
           return { synced: false, reason: 'not_configured' };
         }
@@ -121,7 +135,7 @@
         setPending();
         const user = await getUserWithRetries();
         if (!user) {
-          clearPending();
+          markCloudResolved();
           window.HomeStreak?.refresh?.();
           return { synced: false, reason: 'not_signed_in' };
         }
@@ -162,12 +176,12 @@
           }, 1);
         }
 
-        clearPending();
+        markCloudResolved();
         window.HomeStreak?.refresh?.();
         return { synced: true, streak: merged.streak, activeDays: merged.activeDays };
       } catch (error) {
         console.error('Class 6 streak cloud sync failed:', error);
-        setPending();
+        if (!cloudResolved) setPending(true);
         scheduleRetry(2000);
         return { synced: false, reason: 'sync_error', error: String(error?.message || error) };
       } finally {
@@ -194,6 +208,9 @@
   });
 
   window.Class6CloudSync?.getClient?.().then((client) => {
-    client?.auth?.onAuthStateChange?.(() => sync());
+    client?.auth?.onAuthStateChange?.(() => {
+      markAwaitingCloud();
+      sync();
+    });
   }).catch(() => {});
 })();
