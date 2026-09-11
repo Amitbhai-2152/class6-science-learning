@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  let started = false;
+  let syncPromise = null;
   const MAX_ACTIVITY_DAYS = 400;
 
   const dayKey = (value) => {
@@ -68,56 +68,72 @@
     return { streak, lastActive };
   }
 
+  function scheduleRetry(delay = 1000) {
+    window.setTimeout(() => {
+      sync();
+    }, delay);
+  }
+
   async function sync() {
-    if (started) return { synced: false, reason: 'already_started' };
-    started = true;
-    try {
-      if (!window.Class6CloudSync?.configured?.()) return { synced: false, reason: 'not_configured' };
-      const user = await window.Class6CloudSync.getUser();
-      if (!user) return { synced: false, reason: 'not_signed_in' };
+    if (syncPromise) return syncPromise;
+    syncPromise = (async () => {
+      try {
+        if (!window.Class6CloudSync?.configured?.()) return { synced: false, reason: 'not_configured' };
+        const user = await window.Class6CloudSync.getUser();
+        if (!user) {
+          scheduleRetry(800);
+          scheduleRetry(2000);
+          scheduleRetry(4000);
+          return { synced: false, reason: 'not_signed_in' };
+        }
 
-      const scope = window.Class6CloudSync.prepareUser?.(user.id) || { changed: false };
-      const local = scope.changed ? { activeDays: [] } : activityFromLocal();
-      const row = await window.Class6CloudSync.load();
-      const sourceCloud = row?.state && typeof row.state === 'object' ? row.state : {};
-      const cloud = activityFromCloud(sourceCloud);
-      const mergedDays = merge(local, cloud);
-      const derived = calculateStreak(mergedDays.activeDays);
-      const merged = {
-        activeDays: mergedDays.activeDays,
-        streak: derived.streak,
-        lastActive: derived.lastActive
-      };
+        const scope = window.Class6CloudSync.prepareUser?.(user.id) || { changed: false };
+        const local = scope.changed ? { activeDays: [] } : activityFromLocal();
+        const row = await window.Class6CloudSync.load();
+        const sourceCloud = row?.state && typeof row.state === 'object' ? row.state : {};
+        const cloud = activityFromCloud(sourceCloud);
+        const mergedDays = merge(local, cloud);
+        const derived = calculateStreak(mergedDays.activeDays);
+        const merged = {
+          activeDays: mergedDays.activeDays,
+          streak: derived.streak,
+          lastActive: derived.lastActive
+        };
 
-      const current = window.XPSystem?.read?.();
-      if (current && window.XPSystem?.save) {
-        window.XPSystem.save(Object.assign({}, current, {
-          activeDays: merged.activeDays,
-          streakState: merged
-        }));
-        const result = await window.Class6CloudSync.save(window.XPSystem.read(), 1);
-        window.dispatchEvent(new CustomEvent('class6:streak-cloud-synced', {
-          detail: {
-            userId: user.id,
-            streak: merged.streak,
-            lastActive: merged.lastActive,
+        const current = window.XPSystem?.read?.();
+        if (current && window.XPSystem?.save) {
+          window.XPSystem.save(Object.assign({}, current, {
             activeDays: merged.activeDays,
-            synced: result?.synced === true
-          }
-        }));
-      } else {
-        await window.Class6CloudSync.save({
-          activeDays: merged.activeDays,
-          streakState: merged
-        }, 1);
-      }
+            streakState: merged
+          }));
+          const result = await window.Class6CloudSync.save(window.XPSystem.read(), 1);
+          window.dispatchEvent(new CustomEvent('class6:streak-cloud-synced', {
+            detail: {
+              userId: user.id,
+              streak: merged.streak,
+              lastActive: merged.lastActive,
+              activeDays: merged.activeDays,
+              synced: result?.synced === true
+            }
+          }));
+        } else {
+          await window.Class6CloudSync.save({
+            activeDays: merged.activeDays,
+            streakState: merged
+          }, 1);
+        }
 
-      window.HomeStreak?.refresh?.();
-      return { synced: true, streak: merged.streak, activeDays: merged.activeDays };
-    } catch (error) {
-      console.error('Class 6 streak cloud sync failed:', error);
-      return { synced: false, reason: 'sync_error', error: String(error?.message || error) };
-    }
+        window.HomeStreak?.refresh?.();
+        return { synced: true, streak: merged.streak, activeDays: merged.activeDays };
+      } catch (error) {
+        console.error('Class 6 streak cloud sync failed:', error);
+        scheduleRetry(2000);
+        return { synced: false, reason: 'sync_error', error: String(error?.message || error) };
+      } finally {
+        syncPromise = null;
+      }
+    })();
+    return syncPromise;
   }
 
   window.Class6StreakCloudSync = Object.freeze({
@@ -131,4 +147,8 @@
   document.addEventListener('DOMContentLoaded', () => {
     window.setTimeout(() => sync(), 0);
   }, { once: true });
+  window.addEventListener('pageshow', () => sync());
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') sync();
+  });
 })();
