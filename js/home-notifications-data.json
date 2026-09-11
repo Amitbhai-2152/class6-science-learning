@@ -1,0 +1,30 @@
+{
+  "version": 4,
+  "updatedAt": "2026-09-11T06:05:00+05:30",
+  "updates": [
+    {
+      "id": "2026-09-11-maths-chapter-1",
+      "date": "11 Sep 2026",
+      "title": "📢 जरूरी सूचना: Maths Chapter 1 पढ़ें",
+      "message": "सभी students आज Maths का Chapter 1 जरूर पढ़ें और उसका अभ्यास पूरा करें। समय पर chapter पढ़कर questions solve करें और अपनी practice complete करें।"
+    },
+    {
+      "id": "2026-09-11-science-chapter-1",
+      "date": "11 Sep 2026",
+      "title": "📢 जरूरी सूचना: Science Chapter 1 पढ़ें",
+      "message": "सभी students आज Science का Chapter 1 जरूर पढ़ें और उसका अभ्यास पूरा करें। इसे pending छोड़ने पर अतिरिक्त study work दिया जा सकता है—इसलिए समय पर पूरा करें।"
+    },
+    {
+      "id": "2026-09-11-progress",
+      "date": "11 Sep 2026",
+      "title": "📊 Progress System Improved",
+      "message": "Overall Progress अब सभी 6 subjects के chapter completion के आधार पर calculate होता है।"
+    },
+    {
+      "id": "2026-09-11-badges",
+      "date": "11 Sep 2026",
+      "title": "🏆 XP Badges Fixed",
+      "message": "XP milestones पर badges और उनका unlock animation अब reliably refresh होंगे।"
+    }
+  ]
+}
