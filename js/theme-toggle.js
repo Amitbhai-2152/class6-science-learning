@@ -40,9 +40,10 @@ document.addEventListener('click',e=>{const btn=e.target?.closest?.('#themeBtn,.
 window.addEventListener('DOMContentLoaded',()=>{apply(read());ensureButton()},{once:true});
 window.addEventListener('load',()=>{apply(read());ensureButton()},{once:true});
 window.ThemeToggle={getTheme:read,apply,toggle};
+loadGlobalScript('seo-meta.js','data-seo-meta',1);
 loadGlobalScript('chapter-completion-bridge.js','data-universal-chapter-completion-bridge',7);
 loadGlobalScript('chapter-status.js','data-chapter-status',2);
 loadGlobalScript('chapter-completion-sync.js','data-chapter-completion-sync',1);
 loadGlobalScript('xp-badge-fix.js','data-xp-badge-fix',1);
-loadGlobalScript('home-notifications-v2.js','data-home-notifications-v2',2);
+loadGlobalScript('home-notifications-v2.js','data-home-notifications-v2',3);
 })();
