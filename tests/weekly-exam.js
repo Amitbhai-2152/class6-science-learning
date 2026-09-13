@@ -129,6 +129,42 @@
     }, true);
   }
 
+  function installExamTimerDisplay() {
+    if (window.__examTimerHoursDisplay) return;
+    const format = (text) => {
+      const parts = String(text ?? '').trim().split(':').map(Number);
+      if (parts.length === 3 && parts.every(Number.isFinite)) return `${String(Math.max(0, Math.floor(parts[0]))).padStart(1, '0')}:${String(Math.max(0, Math.floor(parts[1]))).padStart(2, '0')}:${String(Math.max(0, Math.floor(parts[2]))).padStart(2, '0')}`;
+      if (parts.length !== 2 || parts.some(v => !Number.isFinite(v))) return null;
+      const totalMinutes = Math.max(0, Math.floor(parts[0]));
+      const seconds = Math.max(0, Math.floor(parts[1]));
+      const hours = Math.floor(totalMinutes / 60);
+      const minutes = totalMinutes % 60;
+      return `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    };
+    const apply = () => {
+      const el = $('timer');
+      if (!el) return;
+      const next = format(el.textContent);
+      if (next && el.textContent !== next) el.textContent = next;
+      el.setAttribute('aria-label', el.textContent ? `Time remaining ${el.textContent}` : 'Time remaining');
+    };
+    const attach = () => {
+      const el = $('timer');
+      if (!el) return false;
+      if (el.dataset.hoursDisplayAttached === 'true') return true;
+      el.dataset.hoursDisplayAttached = 'true';
+      const observer = new MutationObserver(apply);
+      observer.observe(el, { childList: true, characterData: true, subtree: true });
+      apply();
+      return true;
+    };
+    attach();
+    const timer = setInterval(() => {
+      if (attach()) clearInterval(timer);
+    }, 250);
+    window.__examTimerHoursDisplay = true;
+  }
+
   function normalizeStem(value) {
     return String(value ?? '')
       .replace(/[“”"'’‘`.,!?;:()[\]{}]/g, ' ')
@@ -232,6 +268,7 @@
       renderBanner();
       guardForm();
       hardenExamBuilder();
+      installExamTimerDisplay();
       setInterval(() => { try { renderBanner(); } catch (_) {} }, 60000);
     } catch (error) {
       const main = document.querySelector('main.main');
@@ -258,36 +295,4 @@
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });
   else boot();
-})();
-
-/* Timer display patch: keep the real 90-minute countdown in seconds, but show
-   elapsed time as H:MM (90 minutes starts at 1:30 rather than 90:00). */
-(function () {
-  const formatExamTime = (totalSeconds) => {
-    const s = Math.max(0, Number(totalSeconds) || 0);
-    const hours = Math.floor(s / 3600);
-    const minutes = Math.floor((s % 3600) / 60);
-    return `${hours}:${String(minutes).padStart(2, '0')}`;
-  };
-
-  const originalTick = window.tick;
-  if (typeof originalTick === 'function' && !window.__hourMinuteExamTimer) {
-    window.tick = function () {
-      originalTick();
-      const el = document.getElementById('timer');
-      if (el && typeof seconds === 'number') el.textContent = formatExamTime(seconds);
-    };
-
-    const form = document.getElementById('candidateForm');
-    form?.addEventListener('submit', () => {
-      setTimeout(() => {
-        const el = document.getElementById('timer');
-        if (el && typeof seconds === 'number') el.textContent = formatExamTime(seconds);
-      }, 0);
-    });
-
-    const el = document.getElementById('timer');
-    if (el && typeof seconds === 'number') el.textContent = formatExamTime(seconds);
-    window.__hourMinuteExamTimer = true;
-  }
 })();
