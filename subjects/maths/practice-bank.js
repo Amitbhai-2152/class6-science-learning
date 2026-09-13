@@ -61,26 +61,6 @@ q(8,'HARD','3/4 और 2/3 में कौन बड़ा है?',['3/4','2/3
 q(8,'HOTS','एक cake के 12 बराबर हिस्सों में 8 हिस्से लिए गए। simplest fraction क्या है?',['2/3','3/2','8/12','4/6'],0,'8/12 को 4 से divide करने पर 2/3 मिलता है।','पहले fraction बनाओ: 8/12, फिर simplest form में लाओ।')
 ];
 
-bank.forEach((item,i)=>{ item.id=`practice-${item.chapterId}-${i}`; item.chapterTitle=`Maths • Chapter ${item.chapterId}`; });
-
-function install(){
- const original=window.MathsExam?.startPractice;
- if(!original)return false;
- const byChapter={};
- bank.forEach(item=>(byChapter[item.chapterId] ||= []).push(item));
- window.MathsExam.startPractice=function(){
-   const originals=[];
-   for(let i=1;i<=8;i++){
-     const target=window[`mathsChapter0${i}`];
-     if(!target)continue;
-     originals.push([target,target.challenge]);
-     target.challenge=byChapter[i]||[];
-   }
-   try{return original();}
-   finally{originals.forEach(([target,old])=>{target.challenge=old;});}
- };
- window.MathsPracticeBank=bank;
- return true;
-}
-if(!install()) window.addEventListener('load',install,{once:true});
+window.mathsPracticeBank=bank;
+window.MathsPracticeBank=bank;
 })();
