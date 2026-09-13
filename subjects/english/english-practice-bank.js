@@ -1,4 +1,4 @@
-const ENGLISH_PRACTICE_BANK=[
+window.ENGLISH_PRACTICE_BANK=[
 {question:'Choose the noun in: “The puppy chased the ball.”',options:['chased','the','puppy','quickly'],answer:2,explanation:'“Puppy” names an animal, so it is a noun.'},
 {question:'Choose the correct verb: “Mina ___ her homework every evening.”',options:['do','does','did','doing'],answer:1,explanation:'“Mina” is singular, so the simple-present form is “does”.'},
 {question:'Which pronoun correctly replaces “Ravi and I”?',options:['he','we','they','it'],answer:1,explanation:'“Ravi and I” includes the speaker and another person, so “we” is correct.'},
