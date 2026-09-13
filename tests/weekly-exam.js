@@ -259,3 +259,35 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });
   else boot();
 })();
+
+/* Timer display patch: keep the real 90-minute countdown in seconds, but show
+   elapsed time as H:MM (90 minutes starts at 1:30 rather than 90:00). */
+(function () {
+  const formatExamTime = (totalSeconds) => {
+    const s = Math.max(0, Number(totalSeconds) || 0);
+    const hours = Math.floor(s / 3600);
+    const minutes = Math.floor((s % 3600) / 60);
+    return `${hours}:${String(minutes).padStart(2, '0')}`;
+  };
+
+  const originalTick = window.tick;
+  if (typeof originalTick === 'function' && !window.__hourMinuteExamTimer) {
+    window.tick = function () {
+      originalTick();
+      const el = document.getElementById('timer');
+      if (el && typeof seconds === 'number') el.textContent = formatExamTime(seconds);
+    };
+
+    const form = document.getElementById('candidateForm');
+    form?.addEventListener('submit', () => {
+      setTimeout(() => {
+        const el = document.getElementById('timer');
+        if (el && typeof seconds === 'number') el.textContent = formatExamTime(seconds);
+      }, 0);
+    });
+
+    const el = document.getElementById('timer');
+    if (el && typeof seconds === 'number') el.textContent = formatExamTime(seconds);
+    window.__hourMinuteExamTimer = true;
+  }
+})();
