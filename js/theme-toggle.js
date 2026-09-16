@@ -46,4 +46,5 @@ loadGlobalScript('chapter-status.js','data-chapter-status',2);
 loadGlobalScript('chapter-completion-sync.js','data-chapter-completion-sync',1);
 loadGlobalScript('xp-badge-fix.js','data-xp-badge-fix',1);
 loadGlobalScript('home-notifications-v2.js','data-home-notifications-v2',3);
+loadGlobalScript('pwa-install.js','data-pwa-install',1);
 })();
