@@ -1,4 +1,4 @@
-const CACHE = 'class6-learning-v1';
+const CACHE = 'class6-learning-v2';
 const APP_SHELL = [
   './',
   './index.html',
