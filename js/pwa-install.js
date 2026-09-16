@@ -1,8 +1,10 @@
 (function () {
   'use strict';
 
-  const SW_PATH = './service-worker.js';
-  const MANIFEST_PATH = './manifest.webmanifest';
+  const SCRIPT_SRC = document.currentScript?.src || '';
+  const ROOT_URL = SCRIPT_SRC ? new URL('../', SCRIPT_SRC).href : new URL('./', location.href).href;
+  const SW_PATH = new URL('service-worker.js', ROOT_URL).href;
+  const MANIFEST_PATH = new URL('manifest.webmanifest', ROOT_URL).href;
   let deferredPrompt = null;
 
   function ensureManifest() {
@@ -50,7 +52,7 @@
   function registerServiceWorker() {
     if (!('serviceWorker' in navigator)) return;
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register(SW_PATH, { scope: './' }).catch(() => {});
+      navigator.serviceWorker.register(SW_PATH, { scope: ROOT_URL }).catch(() => {});
     }, { once: true });
   }
 
