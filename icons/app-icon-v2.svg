@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Class 6 Learning Hub">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#071a3d"/>
+    <stop offset="0.55" stop-color="#124fa3"/>
+    <stop offset="1" stop-color="#06152f"/>
+  </linearGradient>
+  <linearGradient id="gold" x1="0" y1="0" x2="0.9" y2="1">
+    <stop offset="0" stop-color="#fff7a1"/>
+    <stop offset="0.5" stop-color="#ffd338"/>
+    <stop offset="1" stop-color="#ff9b08"/>
+  </linearGradient>
+  <linearGradient id="page" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#ffffff"/>
+    <stop offset="1" stop-color="#d8f0ff"/>
+  </linearGradient>
+  <filter id="shadow" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="10" stdDeviation="10" flood-opacity=".38"/></filter>
+  <filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<rect x="10" y="10" width="492" height="492" rx="118" fill="url(#bg)"/>
+<rect x="15" y="15" width="482" height="482" rx="113" fill="none" stroke="#38a7ff" stroke-width="6" opacity=".9"/>
+<circle cx="256" cy="250" r="188" fill="#35a9ff" opacity=".08"/>
+
+<!-- learning spark -->
+<g fill="#ffe56a" filter="url(#glow)">
+  <path d="M256 62l7 20 20 7-20 7-7 20-7-20-20-7 20-7z"/>
+  <path d="M111 145l5 14 14 5-14 5-5 14-5-14-14-5 14-5z"/>
+  <path d="M402 145l5 14 14 5-14 5-5 14-5-14-14-5 14-5z"/>
+</g>
+
+<!-- atom -->
+<g transform="translate(118 112)" fill="none" stroke="#73e7ff" stroke-width="8" opacity=".9" filter="url(#glow)">
+  <ellipse cx="0" cy="0" rx="47" ry="18" transform="rotate(28)"/>
+  <ellipse cx="0" cy="0" rx="47" ry="18" transform="rotate(-28)"/>
+  <ellipse cx="0" cy="0" rx="47" ry="18"/>
+  <circle cx="0" cy="0" r="9" fill="#6cf3ff" stroke="none"/>
+</g>
+
+<!-- lightbulb -->
+<g transform="translate(394 112)" filter="url(#glow)">
+  <path d="M-20 4c0-28 19-46 42-46s42 18 42 46c0 15-7 27-17 38-5 6-7 11-7 18H4c0-7-2-12-7-18C-13 31-20 19-20 4z" fill="url(#gold)" stroke="#fff5a4" stroke-width="5"/>
+  <path d="M8 64h28M10 76h24" stroke="#6fe6ff" stroke-width="8" stroke-linecap="round"/>
+</g>
+
+<!-- open book -->
+<g transform="translate(256 354)" filter="url(#shadow)">
+  <path d="M-184 18Q-92-14 0 23v116Q-94 100-184 130z" fill="url(#page)" stroke="#70d7ff" stroke-width="5"/>
+  <path d="M184 18Q92-14 0 23v116q94-39 184-9z" fill="url(#page)" stroke="#70d7ff" stroke-width="5"/>
+  <path d="M-184 130Q-92 98 0 143q92-45 184-13" fill="none" stroke="#249bff" stroke-width="11" stroke-linecap="round"/>
+  <path d="M-164 31q73-25 145-1M-160 57q70-24 139-1M164 31q-73-25-145-1M160 57q-70-24-139-1" fill="none" stroke="#9edfff" stroke-width="6" stroke-linecap="round"/>
+</g>
+
+<!-- big 6 -->
+<g filter="url(#glow)">
+  <path d="M304 168c-22-25-53-37-91-35-56 3-90 37-90 87 0 53 38 89 94 89 33 0 61-10 81-32 18-20 27-49 27-80 0-13-2-24-7-36l-44 21c2 6 3 11 3 17 0 24-16 42-45 42-27 0-44-16-44-41 0-25 18-41 46-41 20 0 37 7 54 21z" fill="url(#gold)" stroke="#fff7b3" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="259" cy="276" r="21" fill="#0a397e"/>
+</g>
+
+<!-- small growth leaf -->
+<g transform="translate(107 315) rotate(-16)" filter="url(#shadow)">
+  <path d="M0 42C-28 10-20-33 21-49 39-26 31 16 0 42z" fill="#63e56b" stroke="#b1ffa7" stroke-width="5"/>
+  <path d="M2 35L19-34" stroke="#218c46" stroke-width="5" stroke-linecap="round"/>
+</g>
+</svg>
