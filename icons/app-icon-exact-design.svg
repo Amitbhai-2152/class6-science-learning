@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Class 6 Learning Hub">
+<defs>
+ <linearGradient id="border" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1689ff"/><stop offset=".5" stop-color="#18d9d6"/><stop offset="1" stop-color="#4939ff"/></linearGradient>
+ <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#168eff"/><stop offset="1" stop-color="#0755d6"/></linearGradient>
+ <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff7a0"/><stop offset=".55" stop-color="#ffd23c"/><stop offset="1" stop-color="#ff9b12"/></linearGradient>
+ <linearGradient id="page" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#dff3ff"/></linearGradient>
+ <filter id="shadow" x="-40%" y="-40%" width="180%" height="200%"><feDropShadow dx="0" dy="7" stdDeviation="6" flood-opacity=".28"/></filter>
+</defs>
+<rect x="4" y="4" width="504" height="504" rx="124" fill="url(#border)"/>
+<rect x="18" y="18" width="476" height="476" rx="110" fill="#fff"/>
+<path d="M112 173h288v176H112z" fill="url(#blue)" opacity=".98"/>
+<circle cx="256" cy="260" r="127" fill="#0d72ed" opacity=".92"/>
+
+<!-- atom -->
+<g transform="translate(118 111)" fill="none" stroke="#123c7b" stroke-width="7">
+ <ellipse rx="45" ry="18" transform="rotate(25)"/><ellipse rx="45" ry="18" transform="rotate(-25)"/><ellipse rx="45" ry="18"/>
+ <circle r="8" fill="#ffb51d" stroke="none"/>
+</g>
+
+<!-- light bulb -->
+<g transform="translate(254 83)" filter="url(#shadow)">
+ <path d="M-18 6c0-26 17-42 38-42s38 16 38 42c0 13-6 23-14 33-6 7-8 12-8 18H-7c0-6-2-11-8-18C-12 29-18 19-18 6z" fill="url(#gold)"/>
+ <path d="M-6 65h25M-3 76h19" stroke="#1887ff" stroke-width="7" stroke-linecap="round"/>
+ <path d="M0 6l13 13L27 3" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+</g>
+
+<!-- calculator -->
+<g transform="translate(392 115) rotate(12)" filter="url(#shadow)">
+ <rect x="-30" y="-40" width="60" height="80" rx="12" fill="#ffab18" stroke="#ffd978" stroke-width="4"/>
+ <rect x="-17" y="-29" width="34" height="16" rx="3" fill="#fff"/>
+ <g fill="#fff"><rect x="-18" y="-6" width="10" height="9" rx="2"/><rect x="-2" y="-6" width="10" height="9" rx="2"/><rect x="14" y="-6" width="10" height="9" rx="2"/><rect x="-18" y="9" width="10" height="9" rx="2"/><rect x="-2" y="9" width="10" height="9" rx="2"/><rect x="14" y="9" width="10" height="9" rx="2"/></g>
+</g>
+
+<!-- large 6 -->
+<text x="256" y="299" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="170" font-weight="900" fill="#fff" filter="url(#shadow)">6</text>
+
+<!-- open book -->
+<g transform="translate(256 339)" filter="url(#shadow)">
+ <path d="M-183 20Q-88-9 0 24v104Q-93 93-183 124z" fill="url(#page)" stroke="#70cfff" stroke-width="4"/>
+ <path d="M183 20Q88-9 0 24v104q93-35 183-4z" fill="url(#page)" stroke="#70cfff" stroke-width="4"/>
+ <path d="M-183 124Q-91 94 0 137q91-43 183-13" fill="none" stroke="#0b75e5" stroke-width="9" stroke-linecap="round"/>
+ <path d="M-163 34q71-22 141-1M-161 57q69-21 139-1M163 34q-71-22-141-1M161 57q-69-21-139-1" fill="none" stroke="#9edfff" stroke-width="5" stroke-linecap="round"/>
+</g>
+
+<!-- growth leaf -->
+<g transform="translate(97 308) rotate(-15)" filter="url(#shadow)">
+ <path d="M0 35C-25 6-19-29 17-43 34-22 29 11 0 35z" fill="#5bd85e" stroke="#a8ffa0" stroke-width="4"/>
+ <path d="M2 29L16-29" stroke="#198c3e" stroke-width="4" stroke-linecap="round"/>
+</g>
+
+<!-- small book -->
+<g transform="translate(418 300) rotate(-9)" filter="url(#shadow)">
+ <path d="M-26-21Q-9-29 0-20v40Q-12 13-26 19z" fill="#ff5f79" stroke="#ffb7c3" stroke-width="3"/>
+ <path d="M26-21Q9-29 0-20v40Q12 13 26 19z" fill="#ff748b" stroke="#ffb7c3" stroke-width="3"/>
+</g>
+
+<!-- sparkles -->
+<g fill="#f5ad22"><path d="M61 212l5 13 13 5-13 5-5 13-5-13-13-5 13-5z"/><path d="M445 207l4 10 10 4-10 4-4 10-4-10-10-4 10-4z"/></g>
+
+<!-- exact title area matching reference design -->
+<text x="256" y="438" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="42" font-weight="900" letter-spacing="-1" fill="#12326d">Class <tspan fill="#1487ff">6</tspan></text>
+<line x1="122" y1="457" x2="184" y2="457" stroke="#1591ff" stroke-width="4" stroke-linecap="round"/><line x1="328" y1="457" x2="390" y2="457" stroke="#1591ff" stroke-width="4" stroke-linecap="round"/>
+<text x="256" y="461" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="13" font-weight="800" letter-spacing="4" fill="#12326d">LEARNING HUB</text>
+<text x="256" y="481" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="10" font-weight="700" letter-spacing="3" fill="#26384f">LEARN • PRACTICE • GROW</text>
+</svg>
