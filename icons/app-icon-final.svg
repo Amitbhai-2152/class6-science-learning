@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Class 6 Learning Hub">
+<defs>
+ <linearGradient id="border" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#168cff"/><stop offset=".5" stop-color="#13cde0"/><stop offset="1" stop-color="#493dff"/></linearGradient>
+ <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0797ff"/><stop offset="1" stop-color="#2736d8"/></linearGradient>
+ <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff6a0"/><stop offset=".5" stop-color="#ffd137"/><stop offset="1" stop-color="#ff9c0b"/></linearGradient>
+ <linearGradient id="page" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#d7efff"/></linearGradient>
+ <filter id="shadow" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="7" stdDeviation="7" flood-opacity=".25"/></filter>
+</defs>
+<rect x="10" y="10" width="492" height="492" rx="118" fill="#fff"/>
+<rect x="10" y="10" width="492" height="492" rx="118" fill="none" stroke="url(#border)" stroke-width="8"/>
+<circle cx="256" cy="252" r="150" fill="url(#blue)" opacity=".98"/>
+<g fill="#ffb824">
+ <path d="M256 44l7 18 18 7-18 7-7 18-7-18-18-7 18-7z"/>
+ <path d="M96 150l5 14 14 5-14 5-5 14-5-14-14-5 14-5z"/>
+ <path d="M410 174l4 11 11 4-11 4-4 11-4-11-11-4 11-4z"/>
+</g>
+<g transform="translate(124 112)" fill="none" stroke="#173b7b" stroke-width="7">
+ <ellipse cx="0" cy="0" rx="42" ry="18" transform="rotate(28)"/><ellipse cx="0" cy="0" rx="42" ry="18" transform="rotate(-28)"/><ellipse cx="0" cy="0" rx="42" ry="18"/>
+ <circle cx="0" cy="0" r="8" fill="#ffae18" stroke="none"/>
+</g>
+<g transform="translate(397 112) rotate(12)" filter="url(#shadow)">
+ <rect x="-30" y="-43" width="60" height="85" rx="12" fill="#ffae22" stroke="#fff" stroke-width="5"/>
+ <rect x="-17" y="-29" width="34" height="16" rx="3" fill="#0b3a78"/>
+ <g fill="#fff"><rect x="-18" y="-3" width="11" height="9" rx="2"/><rect x="-2" y="-3" width="11" height="9" rx="2"/><rect x="14" y="-3" width="11" height="9" rx="2"/><rect x="-18" y="12" width="11" height="9" rx="2"/><rect x="-2" y="12" width="11" height="9" rx="2"/><rect x="14" y="12" width="11" height="9" rx="2"/></g>
+</g>
+<g transform="translate(256 352)" filter="url(#shadow)">
+ <path d="M-176 16Q-88-16 0 20v110Q-90 100-176 126z" fill="url(#page)" stroke="#37a9ff" stroke-width="5"/>
+ <path d="M176 16Q88-16 0 20v110q90-30 176-4z" fill="url(#page)" stroke="#37a9ff" stroke-width="5"/>
+ <path d="M-176 126Q-88 98 0 140q88-42 176-18" fill="none" stroke="#126bea" stroke-width="10" stroke-linecap="round"/>
+ <path d="M-155 34q70-25 138-2M-152 57q68-23 136-2M155 34q-70-25-138-2M152 57q-68-23-136-2" fill="none" stroke="#9bdcff" stroke-width="5" stroke-linecap="round"/>
+</g>
+<g filter="url(#shadow)">
+ <path d="M302 168c-21-24-51-36-88-34-53 3-86 35-86 84 0 51 36 86 91 86 31 0 58-9 77-30 18-19 27-47 27-77 0-11-2-22-6-33l-43 20c2 5 3 10 3 16 0 23-16 40-43 40-26 0-43-15-43-39s18-40 45-40c19 0 35 7 52 20z" fill="url(#gold)" stroke="#fff7ad" stroke-width="6" stroke-linejoin="round"/>
+ <circle cx="258" cy="270" r="19" fill="#103e82"/>
+</g>
+<g transform="translate(105 310) rotate(-14)" filter="url(#shadow)">
+ <path d="M0 38C-26 8-18-30 18-46 35-24 28 13 0 38z" fill="#54d95a" stroke="#b1ffa5" stroke-width="4"/><path d="M2 32L17-32" stroke="#1f8b46" stroke-width="4" stroke-linecap="round"/>
+</g>
+<g transform="translate(409 294) rotate(-7)" filter="url(#shadow)">
+ <path d="M-27-20Q-10-28 0-20v42Q-12 15-27 20z" fill="#ff5f70" stroke="#ffc2c8" stroke-width="3"/>
+ <path d="M27-20Q10-28 0-20v42q12-27 27-22z" fill="#ff7787" stroke="#ffc2c8" stroke-width="3"/>
+</g>
+<text x="256" y="454" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="40" font-weight="900" fill="#12397a">CLASS 6</text>
+<text x="256" y="482" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="17" font-weight="700" letter-spacing="4" fill="#1598e9">LEARNING HUB</text>
+</svg>
