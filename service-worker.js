@@ -1,9 +1,9 @@
-const CACHE = 'class6-learning-v3';
+const CACHE = 'class6-learning-v4';
 const APP_SHELL = [
   './',
   './index.html',
   './manifest.webmanifest',
-  './icons/app-icon-v2.svg'
+  './icons/app-icon-v3.svg'
 ];
 
 self.addEventListener('install', (event) => {
